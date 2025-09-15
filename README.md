@@ -47,7 +47,7 @@ habit-tracker/
 
 2. Crea una rama con tu mejora (git checkout -b feature/nueva-funcionalidad).
 
-3. Haz commit de tus cambios (git commit -m 'tipo: descripción corta').
+3. Haz commit de tus cambios (git commit -m 'tipo: verbo infinitivo + descripcion corta').
 
 4. Haz push a tu rama (git push origin feature/nueva-funcionalidad).
 
@@ -64,5 +64,17 @@ habit-tracker/
    cd habit-tracker
 
 ## 👨‍💻 Autores
+- [Helbert Alexeiv Correa Uribe](https://github.com/Alvoid101) – Product Owner and development team
+ 
+- [Juan Fernando Ballesteros Macias](https://github.com/JuanFernandoBallesterosMaciasUIS) – Scrum master and Development Team
+
+- Camilo Ivan Palacio Perez – Development Team
+
+- [Julian Javier Lizcano Villarreal]() – Scrum máster y development team
+
+- Carlos Eduardo Ayala Moreno – Product owner y development team
+
+- Harold Esteban Duran Osma – Development Team
+
 ## Diseño de base de datos relacional
 ![Modelo entidad relación](docs/arquitectura/Modelo-Entidad-Relacion/MER_Extendido.jpg)
