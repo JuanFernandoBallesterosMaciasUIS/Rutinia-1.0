@@ -29,7 +29,7 @@ Aplicación web para la gestión de hábitos, diseñada para ayudar a los usuari
 
 ```
 habit-tracker/
-│── backend/        # Lógica de la aplicación (Django)
+│── backend/        # Lógica de la aplicación (Spring boot) o (Django)
 │── frontend/       # Archivos de la interfaz (HTML, CSS, JS)
 │── docs/           # Documentación y diagramas
 │── tests/          # Pruebas unitarias
