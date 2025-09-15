@@ -60,8 +60,8 @@ habit-tracker/
 
 1. Clonar el repositorio:
    ```bash
-   git clone https://github.com/tuusuario/habit-tracker.git
-   cd habit-tracker
+   https://github.com/JuanFernandoBallesterosMaciasUIS/Rutinia-1.0.git
+   cd Rutinia-1.0
 
 ## 👨‍💻 Autores
 - [Helbert Alexeiv Correa Uribe](https://github.com/Alvoid101) – Product Owner and development team
