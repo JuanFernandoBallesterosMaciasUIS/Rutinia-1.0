@@ -29,12 +29,17 @@ Aplicación web para la gestión de hábitos, diseñada para ayudar a los usuari
 
 ```
 habit-tracker/
-│── backend/        # Lógica de la aplicación (Spring boot) o (Django)
-│── frontend/       # Archivos de la interfaz (HTML, CSS, JS)
-│── docs/           # Documentación y diagramas
-│── tests/          # Pruebas unitarias
-│── .env.example    # Variables de entorno de ejemplo
-│── requirements.txt
+├── src/              # Todo el código fuente aquí
+│   ├── backend/      # API, lógica, base de datos
+│   └── frontend/     # Interfaz de usuario
+│── docs/             # Documentación y diagramas
+├── docs/             
+│   ├── arquitectura/ # Diagramas de arquitectura, modelos UML, etc.
+│   ├── diseno-ui/    # Mockups, wireframes, bocetos
+│── tests/            # Pruebas unitarias
+├── sprints/
+│   ├── sprint-01/
+│   └── sprint-02/
 │── README.md
 ```
 ---
@@ -70,7 +75,7 @@ habit-tracker/
 
 - Camilo Ivan Palacio Perez – Development Team
 
-- [Julian Javier Lizcano Villarreal]() – Scrum máster y development team
+- [Julian Javier Lizcano Villarreal](https://github.com/jjlizcano) – Scrum máster y development team
 
 - Carlos Eduardo Ayala Moreno – Product owner y development team
 
