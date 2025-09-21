@@ -2,6 +2,8 @@
 
 Aplicación web para la gestión de hábitos, diseñada para ayudar a los usuarios a crear, organizar y visualizar sus rutinas de forma intuitiva mediante calendarios, reportes y recordatorios.
 
+👉 La documentación completa del proyecto está disponible en la [Wiki](https://github.com/JuanFernandoBallesterosMaciasUIS/Rutinia-1.0/wiki). 
+
 ---
 
 ## ✨ Características
