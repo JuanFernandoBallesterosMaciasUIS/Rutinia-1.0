@@ -26,7 +26,7 @@ public class UsuarioControlador {
 	UsuarioService usuarioService;
 	
 	//Listar usuarios
-	@GetMapping("/usuarios")//Le dice al servidor que este método debe manejar 
+	@GetMapping("/api/usuarios/list")//Le dice al servidor que este método debe manejar 
 	//las solicitudes HTTP de tipo GET
 	public List<Usuario> cargarUsuario(){
 		return usuarioService.getUsuarios();
@@ -34,14 +34,14 @@ public class UsuarioControlador {
 	
 	//Buscar por ID
 	
-	@GetMapping("/usuarios/{id}")
+	@GetMapping("/api/usuarios/list/{id}")
 	public Usuario buscarPorId (@PathVariable int id) {
 		
 		return usuarioService.buscarUsuario(id);
 	}
 	
 	//agregar un usuario
-	@PostMapping("/nuevousuario")
+	@PostMapping("/api/usuarios/")
 	
 	public ResponseEntity<Usuario> agregar(@RequestBody Usuario usuario){
 		Usuario obj =usuarioService.nuevoUsuario(usuario);
@@ -52,7 +52,7 @@ public class UsuarioControlador {
 	
 	//editar usuario
 	
-	@PutMapping("/actualizarusu")
+	@PutMapping("/api/usuarios/")
 	//Es el tipo de dato que el método devolverá //con el formato JSON  de entrada se crea el objeto
 	public ResponseEntity<Usuario> editar(@RequestBody Usuario usuario){
 		Usuario obj =usuarioService.buscarUsuario(usuario.getIdUsuario());
@@ -79,7 +79,7 @@ public class UsuarioControlador {
 	
 	//eliminar usuario
 	
-	@DeleteMapping("/borrarusu/{id}")
+	@DeleteMapping("/api/usuarios/{id}")
 	public ResponseEntity<Usuario> eliminar(@PathVariable int id){
 		Usuario obj =usuarioService.buscarUsuario(id);
 		
