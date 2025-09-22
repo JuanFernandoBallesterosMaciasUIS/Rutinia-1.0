@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("rutinia-app")
+@RequestMapping("/api/recordatorios")
 @CrossOrigin(value = "http://localhost:3000")
 public class RecordatorioControlador {
     
@@ -22,20 +22,20 @@ public class RecordatorioControlador {
     @Autowired
     private IRecordatorioService recordatorioService;
     
-    @GetMapping("/recordatorios")
+    @GetMapping("/list")
     public List<Recordatorio> obtenerRecordatorios() {
         var recordatorios = recordatorioService.listarRecordatorios();
         recordatorios.forEach((recordatorio -> logger.info(recordatorio.toString())));
         return recordatorios;
     }
     
-    @PostMapping("/recordatorios")
+    @PostMapping("/")
     public Recordatorio agregarRecordatorio(@RequestBody Recordatorio recordatorio) {
         logger.info("Recordatorio a agregar: " + recordatorio);
         return recordatorioService.guardarRecordatorio(recordatorio);
     }
     
-    @GetMapping("/recordatorios/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Recordatorio> obtenerRecordatorioPorId(@PathVariable Integer id) {
         Recordatorio recordatorio = recordatorioService.buscarRecordatorioPorId(id);
         if (recordatorio == null) {
@@ -44,12 +44,12 @@ public class RecordatorioControlador {
         return ResponseEntity.ok(recordatorio);
     }
     
-    @GetMapping("/recordatorios/habito/{habitoId}")
+    @GetMapping("/habito/{habitoId}")
     public List<Recordatorio> obtenerRecordatoriosPorHabito(@PathVariable Integer habitoId) {
         return recordatorioService.buscarRecordatoriosPorHabito(habitoId);
     }
     
-    @PutMapping("/recordatorios/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Recordatorio> actualizarRecordatorio(@PathVariable Integer id, @RequestBody Recordatorio recordatorioRecibido) {
         Recordatorio recordatorio = recordatorioService.buscarRecordatorioPorId(id);
         if (recordatorio == null) {
@@ -67,7 +67,7 @@ public class RecordatorioControlador {
         return ResponseEntity.ok(recordatorio);
     }
     
-    @DeleteMapping("/recordatorios/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, Boolean>> eliminarRecordatorio(@PathVariable Integer id) {
         Recordatorio recordatorio = recordatorioService.buscarRecordatorioPorId(id);
         if (recordatorio == null) {

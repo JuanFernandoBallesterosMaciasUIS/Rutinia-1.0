@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("rutinia-app")
+@RequestMapping("/api/frecuencias")
 @CrossOrigin(value = "http://localhost:3000")
 public class FrecuenciaHabitoControlador {
     
@@ -22,20 +22,20 @@ public class FrecuenciaHabitoControlador {
     @Autowired
     private IFrecuenciaHabitoService frecuenciaHabitoService;
     
-    @GetMapping("/frecuencias")
+    @GetMapping("/list")
     public List<FrecuenciaHabito> obtenerFrecuencias() {
         var frecuencias = frecuenciaHabitoService.listarFrecuencias();
         frecuencias.forEach((frecuencia -> logger.info(frecuencia.toString())));
         return frecuencias;
     }
     
-    @PostMapping("/frecuencias")
+    @PostMapping("/")
     public FrecuenciaHabito agregarFrecuencia(@RequestBody FrecuenciaHabito frecuencia) {
         logger.info("Frecuencia a agregar: " + frecuencia);
         return frecuenciaHabitoService.guardarFrecuencia(frecuencia);
     }
     
-    @GetMapping("/frecuencias/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<FrecuenciaHabito> obtenerFrecuenciaPorId(@PathVariable Integer id) {
         FrecuenciaHabito frecuencia = frecuenciaHabitoService.buscarFrecuenciaPorId(id);
         if (frecuencia == null) {
@@ -44,7 +44,7 @@ public class FrecuenciaHabitoControlador {
         return ResponseEntity.ok(frecuencia);
     }
     
-    @PutMapping("/frecuencias/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<FrecuenciaHabito> actualizarFrecuencia(@PathVariable Integer id, @RequestBody FrecuenciaHabito frecuenciaRecibida) {
         FrecuenciaHabito frecuencia = frecuenciaHabitoService.buscarFrecuenciaPorId(id);
         if (frecuencia == null) {
@@ -58,7 +58,7 @@ public class FrecuenciaHabitoControlador {
         return ResponseEntity.ok(frecuencia);
     }
     
-    @DeleteMapping("/frecuencias/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, Boolean>> eliminarFrecuencia(@PathVariable Integer id) {
         FrecuenciaHabito frecuencia = frecuenciaHabitoService.buscarFrecuenciaPorId(id);
         if (frecuencia == null) {

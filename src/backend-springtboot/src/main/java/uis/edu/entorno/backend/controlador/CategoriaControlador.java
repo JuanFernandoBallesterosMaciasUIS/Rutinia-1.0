@@ -24,21 +24,21 @@ public class CategoriaControlador {
 	CategoriaService categoriaService;
 	
 	//Listar categorias
-	@GetMapping("/categorias")
+	@GetMapping("/api/categorias/list")
 	public List<Categoria> cargarcategorias(){
 		return categoriaService.getCategorias();
 	}
 	
 	//Buscar por ID
 	
-	@GetMapping("categorias/{id}")
+	@GetMapping("/api/categorias/{id}")
 	public Categoria buscarporId(@PathVariable int id) {
 		
 		return categoriaService.buscarCategoria(id);
 	}
 	
 	//nueva categoria
-	@PostMapping("/nuevacategoria")
+	@PostMapping("/api/categorias/")
 	public ResponseEntity<Categoria> nuevaCateg(@RequestBody Categoria categoria) {
 		
 		Categoria cat=categoriaService.nuevaCategoria(categoria);
@@ -47,7 +47,7 @@ public class CategoriaControlador {
 	}
 	
 	//editar categoria
-	@PutMapping("/actualizarcateg")
+	@PutMapping("/api/categorias/")
 	//Es el tipo de dato que el método devolverá //con el formato JSON  de entrada se crea el objeto
 	public ResponseEntity<Categoria> editar(@RequestBody Categoria categoria){
 		Categoria obj =categoriaService.buscarCategoria(categoria.getIdCategoria());

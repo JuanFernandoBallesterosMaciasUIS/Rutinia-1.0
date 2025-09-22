@@ -25,21 +25,21 @@ public class RolControlador {
 	
 	//Listar los roles
 	
-	@GetMapping("/roles")
+	@GetMapping("/roles/list")
 	public List<Rol> cargarRol(){
 		return rolService.getRoles();
 	}
 	
 	//Buscar al rol por ID
 	
-	@GetMapping("/roles/{id}")
+	@GetMapping("/api/roles/list/{id}")
 	public Rol buscarId (@PathVariable int id) {
 		
 		return rolService.buscarRol(id);
 	}
 	
 	//nuevo rol
-	@PostMapping("/nuevorol")
+	@PostMapping("/api/roles/")
 	
 	public ResponseEntity<Rol> crearrol(@RequestBody Rol rol) {
 		
@@ -49,7 +49,7 @@ public class RolControlador {
 	}
 	
 	//editar rol
-	@PutMapping("/actualizarrol")
+	@PutMapping("/api/roles/")
 	//Es el tipo de dato que el método devolverá //con el formato JSON  de entrada se crea el objeto
 	public ResponseEntity<Rol> editar(@RequestBody Rol rol){
 		Rol obj =rolService.buscarRol(rol.getIdRol());

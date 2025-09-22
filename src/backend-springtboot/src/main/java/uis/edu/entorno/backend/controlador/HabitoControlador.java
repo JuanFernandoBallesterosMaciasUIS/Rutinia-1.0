@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("rutinia-app")
+@RequestMapping("/api/habitos")
 @CrossOrigin(value = "http://localhost:3000")
 public class HabitoControlador {
     
@@ -22,20 +22,20 @@ public class HabitoControlador {
     @Autowired
     private IHabitoService habitoService;
     
-    @GetMapping("/habitos")
+    @GetMapping("/list")
     public List<Habito> obtenerHabitos() {
         var habitos = habitoService.listarHabitos();
         habitos.forEach((habito -> logger.info(habito.toString())));
         return habitos;
     }
     
-    @PostMapping("/habitos")
+    @PostMapping("/")
     public Habito agregarHabito(@RequestBody Habito habito) {
         logger.info("Hábito a agregar: " + habito);
         return habitoService.guardarHabito(habito);
     }
     
-    @GetMapping("/habitos/{id}")
+    @GetMapping("/list/{id}")
     public ResponseEntity<Habito> obtenerHabitoPorId(@PathVariable Integer id) {
         Habito habito = habitoService.buscarHabitoPorId(id);
         if (habito == null) {
@@ -44,22 +44,22 @@ public class HabitoControlador {
         return ResponseEntity.ok(habito);
     }
     
-    @GetMapping("/habitos/usuario/{usuarioId}")
+    @GetMapping("/usuarios/{usuarioId}")
     public List<Habito> obtenerHabitosPorUsuario(@PathVariable Integer usuarioId) {
         return habitoService.buscarHabitosPorUsuario(usuarioId);
     }
     
-    @GetMapping("/habitos/categoria/{categoriaId}")
+    @GetMapping("/categorias/{categoriaId}")
     public List<Habito> obtenerHabitosPorCategoria(@PathVariable Integer categoriaId) {
         return habitoService.buscarHabitosPorCategoria(categoriaId);
     }
     
-    @GetMapping("/habitos/publicos")
+    @GetMapping("/publicos")
     public List<Habito> obtenerHabitosPublicos() {
         return habitoService.listarHabitosPublicos();
     }
     
-    @PutMapping("/habitos/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Habito> actualizarHabito(@PathVariable Integer id, @RequestBody Habito habitoRecibido) {
         Habito habito = habitoService.buscarHabitoPorId(id);
         if (habito == null) {
@@ -81,7 +81,7 @@ public class HabitoControlador {
         return ResponseEntity.ok(habito);
     }
     
-    @DeleteMapping("/habitos/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, Boolean>> eliminarHabito(@PathVariable Integer id) {
         Habito habito = habitoService.buscarHabitoPorId(id);
         if (habito == null) {
