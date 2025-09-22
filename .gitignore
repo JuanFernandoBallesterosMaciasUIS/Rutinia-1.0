@@ -1,0 +1,76 @@
+# --- Java / Maven (equipo) ---
+target/
+build/
+bin/
+*.class
+*.log
+hs_err_pid*
+
+# --- Maven metadata ---
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+
+# --- Maven Wrapper: ¡sí se versiona! ---
+.mvn/wrapper/
+!.mvn/wrapper/maven-wrapper.jar
+!mvnw
+!mvnw.cmd
+
+# --- Paquetes binarios generados (normalmente no se suben) ---
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+# Si usan libs locales, agrega excepciones:
+# !lib/**
+# !libs/**
+
+# --- SO / varios (ruido local) ---
+.DS_Store
+Thumbs.db
+$RECYCLE.BIN/
+[Dd]esktop.ini
+*.stackdump
+*.swp
+*.sw?
+*~
+.#*
+/scratch
+.gradle
+
+# Eclipse / STS
+.project
+.classpath
+.settings/
+.sts4-cache/
+.apt_generated/
+.recommenders/
+.metadata
+.externalToolBuilders/
+*.launch
+
+# IntelliJ
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# VS Code
+.vscode/
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+!**/src/main/**/build/
+!**/src/test/**/build/
