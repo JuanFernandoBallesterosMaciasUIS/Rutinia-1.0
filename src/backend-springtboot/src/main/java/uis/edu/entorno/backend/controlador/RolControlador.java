@@ -25,7 +25,7 @@ public class RolControlador {
 	
 	//Listar los roles
 	
-	@GetMapping("/roles/list")
+	@GetMapping("/api/roles/list")
 	public List<Rol> cargarRol(){
 		return rolService.getRoles();
 	}
