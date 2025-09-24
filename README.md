@@ -85,6 +85,7 @@ habit-tracker/
    ```bash
    http://localhost:8080/swagger-ui/index.html
    ```
+   > Se recomienda leer la siguiente sección de la wiki [Documeantación APIs](https://github.com/JuanFernandoBallesterosMaciasUIS/Rutinia-1.0/wiki/Documentaci%C3%B3n-API-en-spring-boot)
    
 
 ## 👨‍💻 Autores
