@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 import uis.edu.entorno.backend.servicio.UsuarioService;
+import uis.edu.entorno.backend.modelo.LoginDto;
 import uis.edu.entorno.backend.modelo.Usuario;
 
 @RestController //especifica que esta clase esta diseñada para manejar solicitudes web y devolver datos
@@ -89,5 +90,21 @@ public class UsuarioControlador {
 			return new ResponseEntity<>(obj, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		return null;
+	}
+
+	@PostMapping("/loginclient")
+	public int login(@RequestBody LoginDto usuario) {
+		return usuarioService.login(usuario);
+	}
+
+	@PostMapping("/login")
+	public ResponseEntity<?> loginCliente(@RequestBody LoginDto usuario) {
+		return usuarioService.ingresar(usuario);
+	}
+
+	@PostMapping("/registro")
+	public ResponseEntity<Usuario> registrarUsuario(@RequestBody Usuario usuario){
+		Usuario obj = usuarioService.nuevoUsuario(usuario);
+		return new ResponseEntity<>(obj, HttpStatus.OK);
 	}
 }
