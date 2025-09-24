@@ -34,8 +34,7 @@ habit-tracker/
 ├── src/              # Todo el código fuente aquí
 │   ├── backend/      # API, lógica, base de datos
 │   └── frontend/     # Interfaz de usuario
-│── docs/             # Documentación y diagramas
-├── docs/             
+│── docs/             # Documentación y diagramas             
 │   ├── arquitectura/ # Diagramas de arquitectura, modelos UML, etc.
 │   ├── diseno-ui/    # Mockups, wireframes, bocetos
 │── tests/            # Pruebas unitarias
@@ -66,9 +65,27 @@ habit-tracker/
 ## ⚙️ Instalación y configuración
 
 1. Clonar el repositorio:
+   
    ```bash
-   https://github.com/JuanFernandoBallesterosMaciasUIS/Rutinia-1.0.git
+   git clone https://github.com/JuanFernandoBallesterosMaciasUIS/Rutinia-1.0.git
    cd Rutinia-1.0
+   ```
+   
+3. Ejecutar proyecto
+   
+   Si se hace uso de IDEs como visual estudio code ejecutar el siguiente comando
+   ```bash
+   ./mvnw spring-boot:run
+   ```
+   > Se recomienda el uso de eclipse para la ejecución de este proyecto
+   
+5. Acceder a APIs RESTful
+   
+   Una vez con el proyecto en ejecución se puede acceder a la siguiente url
+   ```bash
+   http://localhost:8080/swagger-ui/index.html
+   ```
+   
 
 ## 👨‍💻 Autores
 - [Helbert Alexeiv Correa Uribe](https://github.com/Alvoid101) – Product Owner and development team
