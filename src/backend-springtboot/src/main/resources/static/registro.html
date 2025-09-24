@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rutinia - Registro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo h1 {
+            color: #667eea;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .logo p {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .divider {
+            text-align: center;
+            margin: 1.5rem 0;
+            color: #666;
+            position: relative;
+        }
+
+        .divider:before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #e1e5e9;
+        }
+
+        .divider span {
+            background: white;
+            padding: 0 1rem;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .login-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        .alert {
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #667eea;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <h1>🏃‍♂️ Rutinia</h1>
+            <p>Crea tu cuenta y comienza tu rutina</p>
+        </div>
+
+        <div id="alert" class="alert"></div>
+        <div id="loading" class="loading">Creando cuenta...</div>
+
+        <form id="registerForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="nombre">Nombre</label>
+                    <input type="text" id="nombre" name="nombre" required>
+                </div>
+                <div class="form-group">
+                    <label for="apellido">Apellido</label>
+                    <input type="text" id="apellido" name="apellido" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="correo">Correo Electrónico</label>
+                <input type="email" id="correo" name="correo" required>
+            </div>
+
+            <div class="form-group">
+                <label for="clave">Contraseña</label>
+                <input type="password" id="clave" name="clave" required minlength="6">
+            </div>
+
+            <div class="form-group">
+                <label for="confirmarClave">Confirmar Contraseña</label>
+                <input type="password" id="confirmarClave" name="confirmarClave" required minlength="6">
+            </div>
+
+            <div class="form-group">
+                <label for="tema">Tema Preferido</label>
+                <select id="tema" name="tema" required>
+                    <option value="">Selecciona un tema</option>
+                    <option value="claro">Claro</option>
+                    <option value="oscuro">Oscuro</option>
+                    <option value="automatico">Automático</option>
+                </select>
+            </div>
+
+            <div class="form-group checkbox-group">
+                <input type="checkbox" id="notificaciones" name="notificaciones" checked>
+                <label for="notificaciones">Recibir notificaciones de recordatorios</label>
+            </div>
+
+            <button type="submit" class="btn">Crear Cuenta</button>
+        </form>
+
+        <div class="divider">
+            <span>¿Ya tienes cuenta?</span>
+        </div>
+
+        <div class="login-link">
+            <a href="login.html">Iniciar sesión aquí</a>
+        </div>
+    </div>
+
+    <script>
+        // Cargar roles al inicio
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Por ahora usaremos un rol por defecto (ID 1)
+            // Si necesitas cargar roles dinámicamente, puedes hacer una petición a /api/roles/list
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const alertDiv = document.getElementById('alert');
+            const loadingDiv = document.getElementById('loading');
+            
+            // Validar que las contraseñas coincidan
+            const clave = formData.get('clave');
+            const confirmarClave = formData.get('confirmarClave');
+            
+            if (clave !== confirmarClave) {
+                alertDiv.className = 'alert alert-error';
+                alertDiv.textContent = 'Las contraseñas no coinciden';
+                alertDiv.style.display = 'block';
+                return;
+            }
+            
+            // Mostrar loading
+            loadingDiv.style.display = 'block';
+            alertDiv.style.display = 'none';
+            
+            const userData = {
+                nombre: formData.get('nombre'),
+                apellido: formData.get('apellido'),
+                correo: formData.get('correo'),
+                clave: clave,
+                tema: formData.get('tema'),
+                notificaciones: formData.has('notificaciones'),
+                rol: {
+                    idRol: 1 // Rol por defecto, ajusta según tus necesidades
+                }
+            };
+            
+            try {
+                const response = await fetch('/registro', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(userData)
+                });
+                
+                loadingDiv.style.display = 'none';
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    alertDiv.className = 'alert alert-success';
+                    alertDiv.textContent = 'Cuenta creada exitosamente! Redirigiendo al login...';
+                    alertDiv.style.display = 'block';
+                    
+                    // Redirigir al login después de 2 segundos
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2000);
+                } else {
+                    const errorData = await response.json();
+                    alertDiv.className = 'alert alert-error';
+                    alertDiv.textContent = errorData.message || 'Error al crear la cuenta';
+                    alertDiv.style.display = 'block';
+                }
+            } catch (error) {
+                loadingDiv.style.display = 'none';
+                alertDiv.className = 'alert alert-error';
+                alertDiv.textContent = 'Error de conexión. Verifica que el servidor esté funcionando.';
+                alertDiv.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
