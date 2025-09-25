@@ -2,6 +2,8 @@
 
 Aplicación web para la gestión de hábitos, diseñada para ayudar a los usuarios a crear, organizar y visualizar sus rutinas de forma intuitiva mediante calendarios, reportes y recordatorios.
 
+👉 La documentación completa del proyecto está disponible en la [Wiki](https://github.com/JuanFernandoBallesterosMaciasUIS/Rutinia-1.0/wiki). 
+
 ---
 
 ## ✨ Características
@@ -29,12 +31,16 @@ Aplicación web para la gestión de hábitos, diseñada para ayudar a los usuari
 
 ```
 habit-tracker/
-│── backend/        # Lógica de la aplicación (Spring boot) o (Django)
-│── frontend/       # Archivos de la interfaz (HTML, CSS, JS)
-│── docs/           # Documentación y diagramas
-│── tests/          # Pruebas unitarias
-│── .env.example    # Variables de entorno de ejemplo
-│── requirements.txt
+├── src/              # Todo el código fuente aquí
+│   ├── backend/      # API, lógica, base de datos
+│   └── frontend/     # Interfaz de usuario
+│── docs/             # Documentación y diagramas             
+│   ├── arquitectura/ # Diagramas de arquitectura, modelos UML, etc.
+│   ├── diseno-ui/    # Mockups, wireframes, bocetos
+│── tests/            # Pruebas unitarias
+├── sprints/
+│   ├── sprint-01/
+│   └── sprint-02/
 │── README.md
 ```
 ---
@@ -59,9 +65,28 @@ habit-tracker/
 ## ⚙️ Instalación y configuración
 
 1. Clonar el repositorio:
+   
    ```bash
-   https://github.com/JuanFernandoBallesterosMaciasUIS/Rutinia-1.0.git
+   git clone https://github.com/JuanFernandoBallesterosMaciasUIS/Rutinia-1.0.git
    cd Rutinia-1.0
+   ```
+   
+3. Ejecutar proyecto
+   
+   Si se hace uso de IDEs como visual estudio code ejecutar el siguiente comando
+   ```bash
+   ./mvnw spring-boot:run
+   ```
+   > Se recomienda el uso de eclipse para la ejecución de este proyecto
+   
+5. Acceder a APIs RESTful
+   
+   Una vez con el proyecto en ejecución se puede acceder a la siguiente url
+   ```bash
+   http://localhost:8080/swagger-ui/index.html
+   ```
+   > Se recomienda leer la siguiente sección de la wiki [Documeantación APIs](https://github.com/JuanFernandoBallesterosMaciasUIS/Rutinia-1.0/wiki/Documentaci%C3%B3n-API-en-spring-boot)
+   
 
 ## 👨‍💻 Autores
 - [Helbert Alexeiv Correa Uribe](https://github.com/Alvoid101) – Product Owner and development team
@@ -70,7 +95,7 @@ habit-tracker/
 
 - Camilo Ivan Palacio Perez – Development Team
 
-- [Julian Javier Lizcano Villarreal]() – Scrum máster y development team
+- [Julian Javier Lizcano Villarreal](https://github.com/jjlizcano) – Scrum máster y development team
 
 - Carlos Eduardo Ayala Moreno – Product owner y development team
 
