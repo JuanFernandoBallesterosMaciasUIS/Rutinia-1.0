@@ -3,9 +3,21 @@ from django.shortcuts import render
 # Create your views here.
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from .models import Usuario
-from .serializers import UsuarioSerializer
+from .models import Usuario, Rol, Tool
+from .serializers import UsuarioSerializer, RolSerializer, ToolSerializer
 
+
+class RolViewSet(viewsets.ModelViewSet):
+    queryset = Rol.objects.all()
+    serializer_class = RolSerializer
+
+
+class UsuarioViewSet(viewsets.ModelViewSet):
+    queryset = Usuario.objects.all()
+    serializer_class = UsuarioSerializer
+
+
+"""
 class UsuarioViewSet(viewsets.ViewSet):
     
     def list(self, request):
@@ -25,3 +37,17 @@ class UsuarioViewSet(viewsets.ViewSet):
             usuario.save()
             return Response(UsuarioSerializer(usuario).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+"""
+
+class ToolViewSet(viewsets.ModelViewSet):
+    '''
+    Contains information about inputs/outputs of a single program
+    that may be used in Universe workflows.
+    '''
+    lookup_field = 'id'
+    serializer_class = ToolSerializer
+
+    def get_queryset(self):
+        return Tool.objects.all()
