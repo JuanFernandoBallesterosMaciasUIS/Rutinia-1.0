@@ -59,7 +59,7 @@ class UsuarioSerializer(serializers.Serializer):
 class NotificacionSerializer(mon.EmbeddedDocumentSerializer):
     class Meta:
         model = Notificacion
-        fields = '__all__'
+        fields = ['hora']
 
 class CategoriaSerializer(mon.DocumentSerializer):
     class Meta:
@@ -78,8 +78,7 @@ class HabitoSerializer(serializers.Serializer):
     usuario = UsuarioSerializer()
     categoria = CategoriaSerializer()
 
-class RegistroHabitoSerializer(serializers.Serializer):
-    id = serializers.CharField(read_only=True)
-    fecha = serializers.DateField()
-    estado = serializers.BooleanField()
-    habito = HabitoSerializer()
+class RegistroHabitoSerializer(mon.DocumentSerializer):
+    class Meta:
+        model = RegistroHabito
+        fields = '__all__'
