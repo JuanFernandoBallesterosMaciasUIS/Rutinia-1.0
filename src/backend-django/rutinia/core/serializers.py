@@ -15,9 +15,20 @@ class RolSerializer(mon.DocumentSerializer):
 
 
 class UsuarioSerializer(mon.DocumentSerializer):
+    rol = serializers.CharField()  # Solo se usa para crear con id
+
     class Meta:
         model = Usuario
         fields = '__all__'
+
+    def to_representation(self, instance):
+        """Muestra el rol completo al hacer GET"""
+        data = super().to_representation(instance)
+        if instance.rol:
+            data['rol'] = RolSerializer(instance.rol).data
+        return data
+    
+    
 
 """
 class RolSerializer(serializers.Serializer):
@@ -44,9 +55,10 @@ class UsuarioSerializer(serializers.Serializer):
         return rep
 
 """
-class CategoriaSerializer(serializers.Serializer):
-    id = serializers.CharField(read_only=True)
-    nombre = serializers.CharField()
+class CategoriaSerializer(mon.DocumentSerializer):
+    class Meta:
+        model = Categoria
+        fields = '__all__'
 
 class HabitoSerializer(serializers.Serializer):
     id = serializers.CharField(read_only=True)

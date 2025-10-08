@@ -10,6 +10,8 @@ from mongoengine import (
 class Rol(Document):
     nombre = fields.StringField(max_length=20, unique=True)
 
+    def __str__(self):
+        return self.nombre
 
 # --- Usuario ---
 class Usuario(Document):
@@ -19,6 +21,9 @@ class Usuario(Document):
     clave = fields.StringField(max_length=100)
     tema = fields.StringField(max_length=20)
     rol = fields.ReferenceField(Rol)
+
+    def __str__(self):
+        return f"{self.nombre} {self.apellido}"
 
 # --- Categoría ---
 class Categoria(Document):
