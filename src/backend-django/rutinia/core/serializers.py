@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework_mongoengine import serializers as mon
 
-from .models import Usuario, Habito, RegistroHabito, Rol, Categoria, Tool
+from .models import Usuario, Habito, RegistroHabito, Rol, Categoria, Notificacion, Tool
 
 class ToolSerializer(mon.DocumentSerializer):
     class Meta:
@@ -22,7 +22,7 @@ class UsuarioSerializer(mon.DocumentSerializer):
         fields = '__all__'
 
     def to_representation(self, instance):
-        """Muestra el rol completo al hacer GET"""
+        #Muestra el rol completo al hacer GET
         data = super().to_representation(instance)
         if instance.rol:
             data['rol'] = RolSerializer(instance.rol).data
@@ -55,6 +55,12 @@ class UsuarioSerializer(serializers.Serializer):
         return rep
 
 """
+
+class NotificacionSerializer(mon.EmbeddedDocumentSerializer):
+    class Meta:
+        model = Notificacion
+        fields = '__all__'
+
 class CategoriaSerializer(mon.DocumentSerializer):
     class Meta:
         model = Categoria

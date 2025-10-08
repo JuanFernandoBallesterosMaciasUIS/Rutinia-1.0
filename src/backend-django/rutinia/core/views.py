@@ -3,8 +3,8 @@ from django.shortcuts import render
 # Create your views here.
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from .models import Usuario, Habito, RegistroHabito, Rol, Categoria, Tool
-from .serializers import UsuarioSerializer, RolSerializer, HabitoSerializer, CategoriaSerializer, RegistroHabitoSerializer, ToolSerializer
+from .models import Usuario, Habito, RegistroHabito, Rol, Categoria, Notificacion, Tool
+from .serializers import UsuarioSerializer, RolSerializer, HabitoSerializer, CategoriaSerializer, RegistroHabitoSerializer, ToolSerializer, NotificacionSerializer
 
 
 class RolViewSet(viewsets.ModelViewSet):
@@ -19,6 +19,7 @@ class UsuarioViewSet(viewsets.ModelViewSet):
 class CategoriaViewSet(viewsets.ModelViewSet):
     queryset = Categoria.objects.all()
     serializer_class = CategoriaSerializer
+
 """
 class UsuarioViewSet(viewsets.ViewSet):
     
