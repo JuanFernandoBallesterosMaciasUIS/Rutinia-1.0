@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+    <link href="css/styles.css" rel="stylesheet"/>
     <script>
         tailwind.config = {
             darkMode: "class",
@@ -34,60 +35,6 @@
             },
         };
     </script>
-    <style>
-        .material-icons {
-            font-family: 'Material Icons';
-            font-weight: normal;
-            font-style: normal;
-            font-size: 24px;
-            line-height: 1;
-            letter-spacing: normal;
-            text-transform: none;
-            display: inline-block;
-            white-space: nowrap;
-            word-wrap: normal;
-            direction: ltr;
-            -webkit-font-feature-settings: 'liga';
-            -webkit-font-smoothing: antialiased;
-        }
-        
-        body {
-            min-height: 100vh;
-        }
-
-        /* Estilos para grid responsivo */
-        .habits-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1rem;
-        }
-
-        @media (min-width: 640px) {
-            .habits-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (min-width: 1024px) {
-            .habits-grid {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 1.5rem;
-            }
-        }
-
-        @media (min-width: 1280px) {
-            .habits-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
-
-        /* Sidebar responsivo */
-        @media (min-width: 1024px) {
-            #sidebar.lg-visible {
-                transform: translateX(0) !important;
-            }
-        }
-    </style>
 </head>
 <body class="bg-background-light dark:bg-background-dark font-display">
     <div class="relative w-full min-h-screen bg-background-light dark:bg-background-dark" id="app-container">
@@ -127,6 +74,391 @@
         <!-- Overlay para móvil -->
         <div class="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden hidden" id="sidebar-overlay"></div>
 
+        <!-- Modal para crear nuevo hábito -->
+        <div class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden flex items-center justify-center p-4" id="new-habit-modal">
+            <div class="bg-card-light dark:bg-card-dark rounded-large p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl transform transition-all" id="modal-content">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-text-light dark:text-text-dark">Nuevo Hábito</h2>
+                    <button class="text-subtext-light dark:text-subtext-dark hover:text-text-light dark:hover:text-text-dark" id="close-modal">
+                        <span class="material-icons">close</span>
+                    </button>
+                </div>
+
+                <form id="habit-form" class="space-y-5">
+                    <!-- Nombre del hábito -->
+                    <div>
+                        <label class="block text-sm font-semibold text-text-light dark:text-text-dark mb-2" for="habit-name">
+                            Nombre del hábito *
+                        </label>
+                        <input 
+                            type="text" 
+                            id="habit-name" 
+                            name="habit-name"
+                            required
+                            placeholder="Ej: Hacer ejercicio"
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+                        />
+                    </div>
+
+                    <!-- Categoría -->
+                    <div>
+                        <label class="block text-sm font-semibold text-text-light dark:text-text-dark mb-2" for="habit-category">
+                            Categoría *
+                        </label>
+                        <select 
+                            id="habit-category" 
+                            name="habit-category"
+                            required
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+                        >
+                            <option value="">Selecciona una categoría</option>
+                            <option value="salud">Salud</option>
+                            <option value="desarrollo-personal">Desarrollo Personal</option>
+                            <option value="bienestar">Bienestar</option>
+                            <option value="productividad">Productividad</option>
+                            <option value="social">Social</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                    </div>
+
+                    <!-- Icono -->
+                    <div>
+                        <label class="block text-sm font-semibold text-text-light dark:text-text-dark mb-2">
+                            Icono *
+                        </label>
+                        <div class="grid grid-cols-6 gap-2" id="icon-grid">
+                            <button type="button" class="icon-option p-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-primary transition-all" data-icon="fitness_center">
+                                <span class="material-icons text-indigo-500">fitness_center</span>
+                            </button>
+                            <button type="button" class="icon-option p-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-primary transition-all" data-icon="book">
+                                <span class="material-icons text-green-500">book</span>
+                            </button>
+                            <button type="button" class="icon-option p-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-primary transition-all" data-icon="local_drink">
+                                <span class="material-icons text-blue-500">local_drink</span>
+                            </button>
+                            <button type="button" class="icon-option p-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-primary transition-all" data-icon="self_improvement">
+                                <span class="material-icons text-purple-500">self_improvement</span>
+                            </button>
+                            <button type="button" class="icon-option p-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-primary transition-all" data-icon="restaurant">
+                                <span class="material-icons text-red-500">restaurant</span>
+                            </button>
+                            <button type="button" class="icon-option p-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-primary transition-all" data-icon="bedtime">
+                                <span class="material-icons text-indigo-400">bedtime</span>
+                            </button>
+                            <button type="button" class="icon-option p-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-primary transition-all" data-icon="directions_run">
+                                <span class="material-icons text-orange-500">directions_run</span>
+                            </button>
+                            <button type="button" class="icon-option p-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-primary transition-all" data-icon="laptop">
+                                <span class="material-icons text-gray-600">laptop</span>
+                            </button>
+                            <button type="button" class="icon-option p-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-primary transition-all" data-icon="music_note">
+                                <span class="material-icons text-pink-500">music_note</span>
+                            </button>
+                            <button type="button" class="icon-option p-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-primary transition-all" data-icon="brush">
+                                <span class="material-icons text-yellow-500">brush</span>
+                            </button>
+                            <button type="button" class="icon-option p-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-primary transition-all" data-icon="pets">
+                                <span class="material-icons text-brown-500">pets</span>
+                            </button>
+                            <button type="button" class="icon-option p-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-primary transition-all" data-icon="favorite">
+                                <span class="material-icons text-red-400">favorite</span>
+                            </button>
+                        </div>
+                        <input type="hidden" id="selected-icon" name="icon" required />
+                    </div>
+
+                    <!-- Color -->
+                    <div>
+                        <label class="block text-sm font-semibold text-text-light dark:text-text-dark mb-2">
+                            Color *
+                        </label>
+                        <div class="grid grid-cols-8 gap-2" id="color-grid">
+                            <button type="button" class="color-option w-10 h-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:scale-110 transition-transform bg-indigo-100 dark:bg-indigo-900" data-color="indigo"></button>
+                            <button type="button" class="color-option w-10 h-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:scale-110 transition-transform bg-green-100 dark:bg-green-900" data-color="green"></button>
+                            <button type="button" class="color-option w-10 h-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:scale-110 transition-transform bg-blue-100 dark:bg-blue-900" data-color="blue"></button>
+                            <button type="button" class="color-option w-10 h-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:scale-110 transition-transform bg-purple-100 dark:bg-purple-900" data-color="purple"></button>
+                            <button type="button" class="color-option w-10 h-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:scale-110 transition-transform bg-red-100 dark:bg-red-900" data-color="red"></button>
+                            <button type="button" class="color-option w-10 h-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:scale-110 transition-transform bg-yellow-100 dark:bg-yellow-900" data-color="yellow"></button>
+                            <button type="button" class="color-option w-10 h-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:scale-110 transition-transform bg-pink-100 dark:bg-pink-900" data-color="pink"></button>
+                            <button type="button" class="color-option w-10 h-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:scale-110 transition-transform bg-orange-100 dark:bg-orange-900" data-color="orange"></button>
+                        </div>
+                        <input type="hidden" id="selected-color" name="color" required />
+                    </div>
+
+                    <!-- Descripción (opcional) -->
+                    <div>
+                        <label class="block text-sm font-semibold text-text-light dark:text-text-dark mb-2" for="habit-description">
+                            Descripción (opcional)
+                        </label>
+                        <textarea 
+                            id="habit-description" 
+                            name="habit-description"
+                            rows="3"
+                            placeholder="Describe tu hábito..."
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-primary transition-all resize-none"
+                        ></textarea>
+                    </div>
+
+                    <!-- Frecuencia -->
+                    <div>
+                        <label class="block text-sm font-semibold text-text-light dark:text-text-dark mb-2" for="habit-frequency">
+                            Frecuencia *
+                        </label>
+                        <select 
+                            id="habit-frequency" 
+                            name="habit-frequency"
+                            required
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+                        >
+                            <option value="">Selecciona la frecuencia</option>
+                            <option value="diario">Diario</option>
+                            <option value="semanal">Semanal</option>
+                            <option value="mensual">Mensual</option>
+                        </select>
+                    </div>
+
+                    <!-- Selector de días (solo visible cuando es Diario) -->
+                    <div id="days-selector" class="hidden">
+                        <label class="block text-sm font-semibold text-text-light dark:text-text-dark mb-2">
+                            Días de la semana *
+                        </label>
+                        <div class="grid grid-cols-7 gap-2">
+                            <button type="button" class="day-option px-2 py-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-primary transition-all text-center" data-day="lun">
+                                <span class="text-xs font-semibold text-text-light dark:text-text-dark">L</span>
+                            </button>
+                            <button type="button" class="day-option px-2 py-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-primary transition-all text-center" data-day="mar">
+                                <span class="text-xs font-semibold text-text-light dark:text-text-dark">M</span>
+                            </button>
+                            <button type="button" class="day-option px-2 py-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-primary transition-all text-center" data-day="mie">
+                                <span class="text-xs font-semibold text-text-light dark:text-text-dark">M</span>
+                            </button>
+                            <button type="button" class="day-option px-2 py-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-primary transition-all text-center" data-day="jue">
+                                <span class="text-xs font-semibold text-text-light dark:text-text-dark">J</span>
+                            </button>
+                            <button type="button" class="day-option px-2 py-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-primary transition-all text-center" data-day="vie">
+                                <span class="text-xs font-semibold text-text-light dark:text-text-dark">V</span>
+                            </button>
+                            <button type="button" class="day-option px-2 py-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-primary transition-all text-center" data-day="sab">
+                                <span class="text-xs font-semibold text-text-light dark:text-text-dark">S</span>
+                            </button>
+                            <button type="button" class="day-option px-2 py-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-primary transition-all text-center" data-day="dom">
+                                <span class="text-xs font-semibold text-text-light dark:text-text-dark">D</span>
+                            </button>
+                        </div>
+                        <input type="hidden" id="selected-days" name="days" />
+                        <p class="text-xs text-subtext-light dark:text-subtext-dark mt-2">Selecciona al menos un día</p>
+                    </div>
+
+                    <!-- Botones -->
+                    <div class="flex gap-3 pt-4">
+                        <button 
+                            type="button" 
+                            id="cancel-button"
+                            class="flex-1 px-6 py-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 text-text-light dark:text-text-dark font-semibold hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
+                        >
+                            Cancelar
+                        </button>
+                        <button 
+                            type="submit" 
+                            class="flex-1 px-6 py-3 rounded-lg bg-primary text-white font-semibold hover:bg-blue-600 transition-all shadow-lg hover:shadow-xl"
+                        >
+                            Crear Hábito
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal para editar hábito -->
+        <div class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden flex items-center justify-center p-4" id="edit-habit-modal">
+            <div class="bg-card-light dark:bg-card-dark rounded-large p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl transform transition-all" id="edit-modal-content">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-text-light dark:text-text-dark">Editar Hábito</h2>
+                    <button class="text-subtext-light dark:text-subtext-dark hover:text-text-light dark:hover:text-text-dark" id="close-edit-modal">
+                        <span class="material-icons">close</span>
+                    </button>
+                </div>
+
+                <form id="edit-habit-form" class="space-y-5">
+                    <input type="hidden" id="edit-habit-id" />
+                    
+                    <!-- Nombre del hábito -->
+                    <div>
+                        <label class="block text-sm font-semibold text-text-light dark:text-text-dark mb-2" for="edit-habit-name">
+                            Nombre del hábito *
+                        </label>
+                        <input 
+                            type="text" 
+                            id="edit-habit-name" 
+                            name="edit-habit-name"
+                            required
+                            placeholder="Ej: Hacer ejercicio"
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+                        />
+                    </div>
+
+                    <!-- Categoría -->
+                    <div>
+                        <label class="block text-sm font-semibold text-text-light dark:text-text-dark mb-2" for="edit-habit-category">
+                            Categoría *
+                        </label>
+                        <select 
+                            id="edit-habit-category" 
+                            name="edit-habit-category"
+                            required
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+                        >
+                            <option value="">Selecciona una categoría</option>
+                            <option value="salud">Salud</option>
+                            <option value="desarrollo-personal">Desarrollo Personal</option>
+                            <option value="bienestar">Bienestar</option>
+                            <option value="productividad">Productividad</option>
+                            <option value="social">Social</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                    </div>
+
+                    <!-- Icono -->
+                    <div>
+                        <label class="block text-sm font-semibold text-text-light dark:text-text-dark mb-2">
+                            Icono *
+                        </label>
+                        <div class="grid grid-cols-6 gap-2" id="edit-icon-grid">
+                            <button type="button" class="edit-icon-option p-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-primary transition-all" data-icon="fitness_center">
+                                <span class="material-icons text-indigo-500">fitness_center</span>
+                            </button>
+                            <button type="button" class="edit-icon-option p-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-primary transition-all" data-icon="book">
+                                <span class="material-icons text-green-500">book</span>
+                            </button>
+                            <button type="button" class="edit-icon-option p-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-primary transition-all" data-icon="local_drink">
+                                <span class="material-icons text-blue-500">local_drink</span>
+                            </button>
+                            <button type="button" class="edit-icon-option p-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-primary transition-all" data-icon="self_improvement">
+                                <span class="material-icons text-purple-500">self_improvement</span>
+                            </button>
+                            <button type="button" class="edit-icon-option p-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-primary transition-all" data-icon="restaurant">
+                                <span class="material-icons text-red-500">restaurant</span>
+                            </button>
+                            <button type="button" class="edit-icon-option p-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-primary transition-all" data-icon="bedtime">
+                                <span class="material-icons text-indigo-400">bedtime</span>
+                            </button>
+                            <button type="button" class="edit-icon-option p-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-primary transition-all" data-icon="directions_run">
+                                <span class="material-icons text-orange-500">directions_run</span>
+                            </button>
+                            <button type="button" class="edit-icon-option p-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-primary transition-all" data-icon="laptop">
+                                <span class="material-icons text-gray-600">laptop</span>
+                            </button>
+                            <button type="button" class="edit-icon-option p-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-primary transition-all" data-icon="music_note">
+                                <span class="material-icons text-pink-500">music_note</span>
+                            </button>
+                            <button type="button" class="edit-icon-option p-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-primary transition-all" data-icon="brush">
+                                <span class="material-icons text-yellow-500">brush</span>
+                            </button>
+                            <button type="button" class="edit-icon-option p-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-primary transition-all" data-icon="pets">
+                                <span class="material-icons text-brown-500">pets</span>
+                            </button>
+                            <button type="button" class="edit-icon-option p-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-primary transition-all" data-icon="favorite">
+                                <span class="material-icons text-red-400">favorite</span>
+                            </button>
+                        </div>
+                        <input type="hidden" id="edit-selected-icon" name="edit-icon" required />
+                    </div>
+
+                    <!-- Color -->
+                    <div>
+                        <label class="block text-sm font-semibold text-text-light dark:text-text-dark mb-2">
+                            Color *
+                        </label>
+                        <div class="grid grid-cols-8 gap-2" id="edit-color-grid">
+                            <button type="button" class="edit-color-option w-10 h-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:scale-110 transition-transform bg-indigo-100 dark:bg-indigo-900" data-color="indigo"></button>
+                            <button type="button" class="edit-color-option w-10 h-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:scale-110 transition-transform bg-green-100 dark:bg-green-900" data-color="green"></button>
+                            <button type="button" class="edit-color-option w-10 h-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:scale-110 transition-transform bg-blue-100 dark:bg-blue-900" data-color="blue"></button>
+                            <button type="button" class="edit-color-option w-10 h-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:scale-110 transition-transform bg-purple-100 dark:bg-purple-900" data-color="purple"></button>
+                            <button type="button" class="edit-color-option w-10 h-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:scale-110 transition-transform bg-red-100 dark:bg-red-900" data-color="red"></button>
+                            <button type="button" class="edit-color-option w-10 h-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:scale-110 transition-transform bg-yellow-100 dark:bg-yellow-900" data-color="yellow"></button>
+                            <button type="button" class="edit-color-option w-10 h-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:scale-110 transition-transform bg-pink-100 dark:bg-pink-900" data-color="pink"></button>
+                            <button type="button" class="edit-color-option w-10 h-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:scale-110 transition-transform bg-orange-100 dark:bg-orange-900" data-color="orange"></button>
+                        </div>
+                        <input type="hidden" id="edit-selected-color" name="edit-color" required />
+                    </div>
+
+                    <!-- Frecuencia -->
+                    <div>
+                        <label class="block text-sm font-semibold text-text-light dark:text-text-dark mb-2" for="edit-habit-frequency">
+                            Frecuencia *
+                        </label>
+                        <select 
+                            id="edit-habit-frequency" 
+                            name="edit-habit-frequency"
+                            required
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+                        >
+                            <option value="">Selecciona la frecuencia</option>
+                            <option value="diario">Diario</option>
+                            <option value="semanal">Semanal</option>
+                            <option value="mensual">Mensual</option>
+                        </select>
+                    </div>
+
+                    <!-- Selector de días (solo visible cuando es Semanal) -->
+                    <div id="edit-days-selector" class="hidden">
+                        <label class="block text-sm font-semibold text-text-light dark:text-text-dark mb-2">
+                            Días de la semana *
+                        </label>
+                        <div class="grid grid-cols-7 gap-2">
+                            <button type="button" class="edit-day-option px-2 py-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-primary transition-all text-center" data-day="lun">
+                                <span class="text-xs font-semibold text-text-light dark:text-text-dark">L</span>
+                            </button>
+                            <button type="button" class="edit-day-option px-2 py-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-primary transition-all text-center" data-day="mar">
+                                <span class="text-xs font-semibold text-text-light dark:text-text-dark">M</span>
+                            </button>
+                            <button type="button" class="edit-day-option px-2 py-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-primary transition-all text-center" data-day="mie">
+                                <span class="text-xs font-semibold text-text-light dark:text-text-dark">M</span>
+                            </button>
+                            <button type="button" class="edit-day-option px-2 py-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-primary transition-all text-center" data-day="jue">
+                                <span class="text-xs font-semibold text-text-light dark:text-text-dark">J</span>
+                            </button>
+                            <button type="button" class="edit-day-option px-2 py-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-primary transition-all text-center" data-day="vie">
+                                <span class="text-xs font-semibold text-text-light dark:text-text-dark">V</span>
+                            </button>
+                            <button type="button" class="edit-day-option px-2 py-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-primary transition-all text-center" data-day="sab">
+                                <span class="text-xs font-semibold text-text-light dark:text-text-dark">S</span>
+                            </button>
+                            <button type="button" class="edit-day-option px-2 py-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-primary transition-all text-center" data-day="dom">
+                                <span class="text-xs font-semibold text-text-light dark:text-text-dark">D</span>
+                            </button>
+                        </div>
+                        <input type="hidden" id="edit-selected-days" name="edit-days" />
+                        <p class="text-xs text-subtext-light dark:text-subtext-dark mt-2">Selecciona al menos un día</p>
+                    </div>
+
+                    <!-- Botones -->
+                    <div class="flex gap-3 pt-4">
+                        <button 
+                            type="button" 
+                            id="delete-habit-button"
+                            class="px-6 py-3 rounded-lg border-2 border-red-500 text-red-500 font-semibold hover:bg-red-50 dark:hover:bg-red-900 dark:hover:bg-opacity-20 transition-all"
+                        >
+                            Eliminar
+                        </button>
+                        <button 
+                            type="button" 
+                            id="cancel-edit-button"
+                            class="flex-1 px-6 py-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 text-text-light dark:text-text-dark font-semibold hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
+                        >
+                            Cancelar
+                        </button>
+                        <button 
+                            type="submit" 
+                            class="flex-1 px-6 py-3 rounded-lg bg-primary text-white font-semibold hover:bg-blue-600 transition-all shadow-lg hover:shadow-xl"
+                        >
+                            Guardar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <!-- Main Content -->
         <div class="lg:ml-64 transition-all duration-300 ease-in-out min-h-screen pb-20 md:pb-24 lg:pb-8" id="main-content">
             <div class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
@@ -135,9 +467,6 @@
                         <span class="material-icons text-text-light dark:text-text-dark">menu</span>
                         <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-primary rounded-full border-2 border-background-light dark:border-background-dark"></span>
                     </button>
-                    <div class="w-12 h-12 sm:w-14 sm:h-14 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-xl sm:text-2xl ml-auto lg:ml-0">
-                        H
-                    </div>
                 </header>
 
                 <main>
@@ -146,7 +475,7 @@
                     <!-- Grid de hábitos responsivo -->
                     <div class="habits-grid mb-20 md:mb-24 lg:mb-8">
                         <!-- Habit Card 1 -->
-                        <div class="bg-card-light dark:bg-card-dark p-4 sm:p-5 rounded-large shadow-sm hover:shadow-md transition-shadow">
+                        <div class="bg-card-light dark:bg-card-dark p-4 sm:p-5 rounded-large shadow-sm hover:shadow-md transition-shadow" data-habit-id="1">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center flex-1 min-w-0">
                                     <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center mr-3 sm:mr-4 flex-shrink-0">
@@ -158,14 +487,20 @@
                                         <p class="text-xs text-subtext-light dark:text-subtext-dark mt-1">Racha: 7 días</p>
                                     </div>
                                 </div>
-                                <button class="text-subtext-light dark:text-subtext-dark hover:text-primary dark:hover:text-primary flex-shrink-0 ml-2">
+                                <button class="edit-habit-btn text-subtext-light dark:text-subtext-dark hover:text-primary dark:hover:text-primary flex-shrink-0 ml-2" 
+                                        data-name="Hacer ejercicio" 
+                                        data-category="salud" 
+                                        data-icon="fitness_center" 
+                                        data-color="indigo"
+                                        data-frequency="diario"
+                                        data-days="">
                                     <span class="material-icons">edit</span>
                                 </button>
                             </div>
                         </div>
 
                         <!-- Habit Card 2 -->
-                        <div class="bg-card-light dark:bg-card-dark p-4 sm:p-5 rounded-large shadow-sm hover:shadow-md transition-shadow">
+                        <div class="bg-card-light dark:bg-card-dark p-4 sm:p-5 rounded-large shadow-sm hover:shadow-md transition-shadow" data-habit-id="2">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center flex-1 min-w-0">
                                     <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-green-100 dark:bg-green-900 flex items-center justify-center mr-3 sm:mr-4 flex-shrink-0">
@@ -177,14 +512,20 @@
                                         <p class="text-xs text-subtext-light dark:text-subtext-dark mt-1">Racha: 7 días</p>
                                     </div>
                                 </div>
-                                <button class="text-subtext-light dark:text-subtext-dark hover:text-primary dark:hover:text-primary flex-shrink-0 ml-2">
+                                <button class="edit-habit-btn text-subtext-light dark:text-subtext-dark hover:text-primary dark:hover:text-primary flex-shrink-0 ml-2"
+                                        data-name="Leer un libro" 
+                                        data-category="desarrollo-personal" 
+                                        data-icon="book" 
+                                        data-color="green"
+                                        data-frequency="diario"
+                                        data-days="">
                                     <span class="material-icons">edit</span>
                                 </button>
                             </div>
                         </div>
 
                         <!-- Habit Card 3 - Ejemplo adicional -->
-                        <div class="bg-card-light dark:bg-card-dark p-4 sm:p-5 rounded-large shadow-sm hover:shadow-md transition-shadow">
+                        <div class="bg-card-light dark:bg-card-dark p-4 sm:p-5 rounded-large shadow-sm hover:shadow-md transition-shadow" data-habit-id="3">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center flex-1 min-w-0">
                                     <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center mr-3 sm:mr-4 flex-shrink-0">
@@ -196,14 +537,20 @@
                                         <p class="text-xs text-subtext-light dark:text-subtext-dark mt-1">Racha: 14 días</p>
                                     </div>
                                 </div>
-                                <button class="text-subtext-light dark:text-subtext-dark hover:text-primary dark:hover:text-primary flex-shrink-0 ml-2">
+                                <button class="edit-habit-btn text-subtext-light dark:text-subtext-dark hover:text-primary dark:hover:text-primary flex-shrink-0 ml-2"
+                                        data-name="Beber agua" 
+                                        data-category="salud" 
+                                        data-icon="local_drink" 
+                                        data-color="blue"
+                                        data-frequency="diario"
+                                        data-days="">
                                     <span class="material-icons">edit</span>
                                 </button>
                             </div>
                         </div>
 
                         <!-- Habit Card 4 - Ejemplo adicional -->
-                        <div class="bg-card-light dark:bg-card-dark p-4 sm:p-5 rounded-large shadow-sm hover:shadow-md transition-shadow">
+                        <div class="bg-card-light dark:bg-card-dark p-4 sm:p-5 rounded-large shadow-sm hover:shadow-md transition-shadow" data-habit-id="4">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center flex-1 min-w-0">
                                     <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-purple-100 dark:bg-purple-900 flex items-center justify-center mr-3 sm:mr-4 flex-shrink-0">
@@ -215,7 +562,13 @@
                                         <p class="text-xs text-subtext-light dark:text-subtext-dark mt-1">Racha: 3 días</p>
                                     </div>
                                 </div>
-                                <button class="text-subtext-light dark:text-subtext-dark hover:text-primary dark:hover:text-primary flex-shrink-0 ml-2">
+                                <button class="edit-habit-btn text-subtext-light dark:text-subtext-dark hover:text-primary dark:hover:text-primary flex-shrink-0 ml-2"
+                                        data-name="Meditar" 
+                                        data-category="bienestar" 
+                                        data-icon="self_improvement" 
+                                        data-color="purple"
+                                        data-frequency="semanal"
+                                        data-days="lun,mie,vie">
                                     <span class="material-icons">edit</span>
                                 </button>
                             </div>
@@ -232,11 +585,11 @@
                             <span class="material-icons text-xl sm:text-2xl">today</span>
                             <span class="text-xs sm:text-sm font-medium">hoy</span>
                         </button>
-                        <button class="flex flex-col items-center text-subtext-light dark:text-subtext-dark p-2 hover:text-primary transition-all hover:scale-110">
+                        <a href="calendario.html" class="flex flex-col items-center text-subtext-light dark:text-subtext-dark p-2 hover:text-primary transition-all hover:scale-110">
                             <span class="material-icons text-xl sm:text-2xl">calendar_today</span>
                             <span class="text-xs sm:text-sm">calendario</span>
-                        </button>
-                        <button class="bg-primary text-white w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center -translate-y-6 sm:-translate-y-8 shadow-lg hover:shadow-xl transition-all hover:scale-110">
+                        </a>
+                        <button id="add-habit-button" class="bg-primary text-white w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center -translate-y-6 sm:-translate-y-8 shadow-lg hover:shadow-xl transition-all hover:scale-110">
                             <span class="material-icons" style="font-size: 28px;">add</span>
                         </button>
                         <button class="flex flex-col items-center text-subtext-light dark:text-subtext-dark p-2 hover:text-primary transition-all hover:scale-110">
