@@ -1,4 +1,3 @@
-from rest_framework import serializers
 from rest_framework_mongoengine import serializers as mon
 
 from .models import Usuario, Habito, RegistroHabito, Rol, Categoria, Notificacion, Tool
@@ -15,7 +14,7 @@ class RolSerializer(mon.DocumentSerializer):
 
 
 class UsuarioSerializer(mon.DocumentSerializer):
-    rol = serializers.CharField()  # Solo se usa para crear con id
+    rol = mon.serializers.CharField()  # Solo se usa para crear con id
 
     class Meta:
         model = Usuario
@@ -66,19 +65,27 @@ class CategoriaSerializer(mon.DocumentSerializer):
         model = Categoria
         fields = '__all__'
 
-class HabitoSerializer(serializers.Serializer):
-    id = serializers.CharField(read_only=True)
-    nombre = serializers.CharField()
-    descripcion = serializers.CharField()
-    dificultad = serializers.CharField()
-    tipo_frecuencia = serializers.CharField()
-    dias = serializers.ListField(child=serializers.CharField(), required=False)
-    publico = serializers.BooleanField()
-    activo = serializers.BooleanField()
-    usuario = UsuarioSerializer()
-    categoria = CategoriaSerializer()
+class HabitoSerializer(mon.DocumentSerializer):
+    class Meta:
+        model = Habito
+        fields = '__all__'
+
+    def to_representation(self, instance):
+        """Muestra usuario y categoría completos al listar"""
+        data = super().to_representation(instance)
+        if instance.usuario:
+            data['usuario'] = UsuarioSerializer(instance.usuario).data
+        if instance.categoria:
+            data['categoria'] = CategoriaSerializer(instance.categoria).data
+        return data
 
 class RegistroHabitoSerializer(mon.DocumentSerializer):
     class Meta:
         model = RegistroHabito
         fields = '__all__'
+    
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if instance.habito:
+            data['habito'] = HabitoSerializer(instance.habito).data
+        return data

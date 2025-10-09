@@ -20,6 +20,9 @@ class CategoriaViewSet(viewsets.ModelViewSet):
     queryset = Categoria.objects.all()
     serializer_class = CategoriaSerializer
 
+class RegistroHabitoViewSet(viewsets.ModelViewSet):
+    queryset = RegistroHabito.objects.all()
+    serializer_class = RegistroHabitoSerializer
 """
 class UsuarioViewSet(viewsets.ViewSet):
     
