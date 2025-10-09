@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config
 
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
 
@@ -96,8 +97,8 @@ DATABASES = {
 from mongoengine import connect
 
 connect(
-    db='tracker_habitos_db',
-    host='mongodb+srv://admin:S37nmaxVe6z0uDXX@cluster0.4c7fi.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'
+    db=config('MONGO_DB'),
+    host=config('DATABASE_URL')
 )
 
 # Password validation
