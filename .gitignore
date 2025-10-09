@@ -74,3 +74,6 @@ $RECYCLE.BIN/
 /.nb-gradle/
 !**/src/main/**/build/
 !**/src/test/**/build/
+
+#Enviroment variables
+.ev
