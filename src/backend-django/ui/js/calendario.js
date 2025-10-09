@@ -85,6 +85,7 @@ themeToggle.addEventListener('click', (e) => {
 // ========== CALENDARIO ==========
 let currentDate = new Date();
 let selectedDate = new Date();
+let currentView = 'month'; // 'month' o 'week'
 
 // Hábitos de ejemplo (en producción vendrían del backend)
 const habitsData = [
@@ -281,6 +282,105 @@ function renderCalendar() {
     }
 }
 
+// Función para renderizar la vista semanal
+function renderWeekView() {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    const day = currentDate.getDate();
+    
+    // Obtener el inicio de la semana (domingo)
+    const currentDay = new Date(year, month, day);
+    const dayOfWeek = currentDay.getDay();
+    const weekStart = new Date(currentDay);
+    weekStart.setDate(currentDay.getDate() - dayOfWeek);
+    
+    // Actualizar título con el rango de la semana
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 6);
+    
+    const startMonth = monthNames[weekStart.getMonth()];
+    const endMonth = monthNames[weekEnd.getMonth()];
+    const startDay = weekStart.getDate();
+    const endDay = weekEnd.getDate();
+    
+    if (weekStart.getMonth() === weekEnd.getMonth()) {
+        document.getElementById('current-month-year').textContent = 
+            `${startDay} - ${endDay} de ${startMonth} ${year}`;
+    } else {
+        document.getElementById('current-month-year').textContent = 
+            `${startDay} ${startMonth} - ${endDay} ${endMonth} ${year}`;
+    }
+    
+    // Contenedor de días
+    const calendarDays = document.getElementById('calendar-days');
+    calendarDays.innerHTML = '';
+    
+    const today = new Date();
+    const todayStr = formatDate(today);
+    
+    // Renderizar los 7 días de la semana
+    for (let i = 0; i < 7; i++) {
+        const date = new Date(weekStart);
+        date.setDate(weekStart.getDate() + i);
+        const dateStr = formatDate(date);
+        const isToday = dateStr === todayStr;
+        const isSelected = dateStr === formatDate(selectedDate);
+        const progress = getDayProgress(date);
+        
+        const dayElement = document.createElement('div');
+        dayElement.className = `rounded-lg border-2 ${
+            isSelected 
+                ? 'border-primary bg-primary bg-opacity-10' 
+                : 'border-gray-200 dark:border-gray-700'
+        } p-3 cursor-pointer hover:border-primary transition-all flex flex-col min-h-[120px]`;
+        
+        // Número del día
+        const dayNumber = document.createElement('div');
+        dayNumber.className = `text-lg font-semibold ${
+            isToday 
+                ? 'text-primary' 
+                : 'text-text-light dark:text-text-dark'
+        } mb-2`;
+        dayNumber.textContent = date.getDate();
+        dayElement.appendChild(dayNumber);
+        
+        // Indicador de progreso
+        if (progress.total > 0) {
+            const progressBar = document.createElement('div');
+            progressBar.className = 'flex-1 flex flex-col justify-end';
+            
+            const progressBarBg = document.createElement('div');
+            progressBarBg.className = 'w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden mb-2';
+            
+            const progressBarFill = document.createElement('div');
+            progressBarFill.className = `h-full ${
+                progress.percentage === 100 ? 'bg-green-500' : 'bg-primary'
+            } rounded-full transition-all`;
+            progressBarFill.style.width = `${progress.percentage}%`;
+            
+            progressBarBg.appendChild(progressBarFill);
+            progressBar.appendChild(progressBarBg);
+            
+            // Texto de progreso
+            const progressText = document.createElement('div');
+            progressText.className = 'text-sm text-center text-subtext-light dark:text-subtext-dark';
+            progressText.textContent = `${progress.completed}/${progress.total}`;
+            progressBar.appendChild(progressText);
+            
+            dayElement.appendChild(progressBar);
+        }
+        
+        // Event listener para seleccionar día
+        dayElement.addEventListener('click', () => {
+            selectedDate = date;
+            renderWeekView();
+            renderHabitsForDay(date);
+        });
+        
+        calendarDays.appendChild(dayElement);
+    }
+}
+
 // Función para renderizar hábitos del día seleccionado
 function renderHabitsForDay(date) {
     const dateStr = formatDate(date);
@@ -380,19 +480,48 @@ function toggleHabitCompletion(habitId, dateStr) {
     console.log('Hábito actualizado:', { habitId, dateStr, completed: index === -1 });
     
     // Actualizar vistas
-    renderCalendar();
+    if (currentView === 'month') {
+        renderCalendar();
+    } else {
+        renderWeekView();
+    }
     renderHabitsForDay(selectedDate);
 }
 
-// Navegación de meses
-document.getElementById('prev-month').addEventListener('click', () => {
-    currentDate.setMonth(currentDate.getMonth() - 1);
+// Cambio de vista
+document.getElementById('month-view-btn').addEventListener('click', () => {
+    currentView = 'month';
+    document.getElementById('month-view-btn').className = 'px-4 py-2 rounded-lg bg-primary text-white font-semibold';
+    document.getElementById('week-view-btn').className = 'px-4 py-2 rounded-lg bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark font-semibold hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors';
     renderCalendar();
 });
 
+document.getElementById('week-view-btn').addEventListener('click', () => {
+    currentView = 'week';
+    document.getElementById('week-view-btn').className = 'px-4 py-2 rounded-lg bg-primary text-white font-semibold';
+    document.getElementById('month-view-btn').className = 'px-4 py-2 rounded-lg bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark font-semibold hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors';
+    renderWeekView();
+});
+
+// Navegación (mes o semana según la vista)
+document.getElementById('prev-month').addEventListener('click', () => {
+    if (currentView === 'month') {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        renderCalendar();
+    } else {
+        currentDate.setDate(currentDate.getDate() - 7);
+        renderWeekView();
+    }
+});
+
 document.getElementById('next-month').addEventListener('click', () => {
-    currentDate.setMonth(currentDate.getMonth() + 1);
-    renderCalendar();
+    if (currentView === 'month') {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        renderCalendar();
+    } else {
+        currentDate.setDate(currentDate.getDate() + 7);
+        renderWeekView();
+    }
 });
 
 // Inicializar calendario
