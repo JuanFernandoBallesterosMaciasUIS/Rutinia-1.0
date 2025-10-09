@@ -1,7 +1,8 @@
 from django.shortcuts import render
 
 # Create your views here.
-from rest_framework import viewsets, status
+#from rest_framework import viewsets, status
+from rest_framework_mongoengine import viewsets
 from rest_framework.response import Response
 from .models import Usuario, Habito, RegistroHabito, Rol, Categoria, Notificacion, Tool
 from .serializers import UsuarioSerializer, RolSerializer, HabitoSerializer, CategoriaSerializer, RegistroHabitoSerializer, ToolSerializer, NotificacionSerializer
@@ -23,6 +24,10 @@ class CategoriaViewSet(viewsets.ModelViewSet):
 class RegistroHabitoViewSet(viewsets.ModelViewSet):
     queryset = RegistroHabito.objects.all()
     serializer_class = RegistroHabitoSerializer
+
+class HabitoViewSet(viewsets.ModelViewSet):
+    queryset = Habito.objects.all()
+    serializer_class = HabitoSerializer
 """
 class UsuarioViewSet(viewsets.ViewSet):
     
