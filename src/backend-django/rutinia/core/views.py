@@ -63,8 +63,51 @@ class RegistroHabitoViewSet(viewsets.ModelViewSet):
     serializer_class = RegistroHabitoSerializer
 
 class HabitoViewSet(viewsets.ModelViewSet):
-    queryset = Habito.objects.all()
     serializer_class = HabitoSerializer
+
+    def get_queryset(self):
+        queryset = Habito.objects.all()
+        usuario = self.request.query_params.get('usuario')
+        categoria = self.request.query_params.get('categoria')
+        nombre = self.request.query_params.get('nombre')
+        descripcion = self.request.query_params.get('descripcion')
+        dificultad = self.request.query_params.get('dificultad')
+        fecha_inicio = self.request.query_params.get('fecha_inicio')
+        tipo_frecuencia = self.request.query_params.get('tipo_frecuencia') 
+        #dias = self.request.query_params.get('dias') 
+        publico = self.request.query_params.get('publico') 
+        activo = self.request.query_params.get('activo') 
+        #noticaciones = self.request.query_params.get('notificaciones')
+        
+        if usuario:
+            queryset = queryset.filter(usuario=usuario)
+        if categoria:
+            queryset = queryset.filter(categoria=categoria)
+        if dificultad:
+            queryset = queryset.filter(dificultad__icontains=dificultad)
+        if publico is not None:
+            queryset = queryset.filter(publico=(publico.lower() == 'true'))
+        if activo is not None:
+            queryset = queryset.filter(activo=(activo.lower() == 'true'))
+        if tipo_frecuencia:
+            queryset = queryset.filter(tipo_frecuencia__icontains=tipo_frecuencia)
+        if nombre:
+            queryset = queryset.filter(nombre__icontains=nombre)
+        if descripcion:
+            queryset = queryset.filter(descripcion__icontains=descripcion)
+        ordering = self.request.query_params.get('ordering')  # Ejemplo: ?ordering=-fecha_inicio
+        
+        if ordering:
+            allowed_fields = [
+                'nombre',
+                'dificultad',
+                'fecha_inicio'
+            ]
+            field = ordering.lstrip('-')
+            if field in allowed_fields:
+                queryset = queryset.order_by(ordering)
+
+        return queryset
 """
 class UsuarioViewSet(viewsets.ViewSet):
     
