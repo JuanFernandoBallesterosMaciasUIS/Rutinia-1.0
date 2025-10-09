@@ -1,3 +1,4 @@
+from rest_framework import serializers
 from rest_framework_mongoengine import serializers as mon
 
 from .models import Usuario, Habito, RegistroHabito, Rol, Categoria, Notificacion, Tool
@@ -14,18 +15,40 @@ class RolSerializer(mon.DocumentSerializer):
 
 
 class UsuarioSerializer(mon.DocumentSerializer):
-    rol = mon.serializers.CharField()  # Solo se usa para crear con id
+    rol = mon.serializers.CharField(required=False)  # se puede omitir si no cambia
 
     class Meta:
         model = Usuario
         fields = '__all__'
 
     def to_representation(self, instance):
-        #Muestra el rol completo al hacer GET
+        # Muestra el rol completo al hacer GET
         data = super().to_representation(instance)
         if instance.rol:
             data['rol'] = RolSerializer(instance.rol).data
         return data
+
+    def update(self, instance, validated_data):
+        """
+        Permite actualizar el usuario y manejar correctamente el campo 'rol'
+        que llega como un id en el cuerpo del request.
+        """
+        rol_id = validated_data.pop('rol', None)
+
+        # Si se envía un rol, busca el objeto correspondiente
+        if rol_id:
+            try:
+                rol_obj = Rol.objects.get(id=rol_id)
+                instance.rol = rol_obj
+            except Rol.DoesNotExist:
+                raise serializers.ValidationError({'rol': 'El rol especificado no existe.'})
+
+        # Actualiza los demás campos normalmente
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+        return instance
     
     
 
