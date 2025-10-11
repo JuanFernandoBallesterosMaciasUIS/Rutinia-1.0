@@ -74,19 +74,7 @@ Sigue las instrucciones detalladas en: [`backend-django/CORS_SETUP.md`](backend-
 
 ---
 
-## 📱 Acceso desde Celular
 
-El frontend está configurado para ser accesible desde otros dispositivos en la misma red WiFi.
-
-1. Asegúrate de que tu PC y celular estén en la misma red WiFi
-2. Cuando inicies `npm run dev`, verás algo como:
-   ```
-   ➜  Local:   http://localhost:5173/
-   ➜  Network: http://192.168.1.30:5173/
-   ```
-3. Abre la URL "Network" en el navegador de tu celular
-
----
 
 ## 📚 Documentación
 
