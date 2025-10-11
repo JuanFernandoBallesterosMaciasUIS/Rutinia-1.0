@@ -5,6 +5,7 @@ import HabitCard from './components/HabitCard';
 import NewHabitModal from './components/NewHabitModal';
 import EditHabitModal from './components/EditHabitModal';
 import Calendar from './components/Calendar';
+import HabitsView from './components/HabitsView';
 import { habitsData as initialHabitsData } from './data/habitsData';
 
 function App() {
@@ -233,16 +234,11 @@ function App() {
             )}
 
             {currentView === 'habits' && (
-              <>
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-text-light dark:text-text-dark mb-4 md:mb-6">
-                  Todos los hábitos
-                </h1>
-                <div className="text-center py-12 text-subtext-light dark:text-subtext-dark">
-                  <span className="material-icons text-6xl mb-4">checklist</span>
-                  <p className="text-xl">Vista de todos los hábitos</p>
-                  <p className="text-sm mt-2">Próximamente...</p>
-                </div>
-              </>
+              <HabitsView 
+                habits={habitsData}
+                onEditHabit={handleEditHabit}
+                onDeleteHabit={handleDeleteHabit}
+              />
             )}
 
             {currentView === 'analytics' && (
