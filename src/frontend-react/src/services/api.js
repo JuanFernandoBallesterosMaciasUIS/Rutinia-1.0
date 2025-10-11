@@ -42,6 +42,7 @@ export const getHabito = async (id) => {
  * @returns {Promise<Object>} Hábito creado
  */
 export const createHabito = async (habitoData) => {
+  console.log('📤 Enviando al backend:', JSON.stringify(habitoData, null, 2));
   const response = await fetch(`${API_BASE_URL}/habitos/`, {
     method: 'POST',
     headers: {
@@ -49,6 +50,12 @@ export const createHabito = async (habitoData) => {
     },
     body: JSON.stringify(habitoData),
   });
+  
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    console.error('❌ Error del backend:', errorData);
+  }
+  
   return handleResponse(response);
 };
 
@@ -184,19 +191,36 @@ export const createCategoria = async (categoriaData) => {
  * @returns {Object} Hábito en formato backend
  */
 export const mapHabitoToBackend = (frontendHabito, usuarioId = '507f1f77bcf86cd799439011') => {
-  return {
+  // Normalizar frecuencia
+  const frecuencia = (frontendHabito.frequency || 'diario').toLowerCase();
+  const tipo_frecuencia = frecuencia === 'diario' ? 'Diaria' : 
+                          frecuencia === 'semanal' ? 'Semanal' : 
+                          frecuencia === 'mensual' ? 'Mensual' : 'Diaria';
+  
+  // Preparar datos básicos
+  const data = {
     usuario: usuarioId,
-    categoria: frontendHabito.category || null, // ID de categoría
     nombre: frontendHabito.name,
-    descripcion: frontendHabito.description || '',
-    dificultad: 'media', // Valor por defecto
-    fecha_inicio: new Date().toISOString().split('T')[0], // Fecha actual YYYY-MM-DD
-    tipo_frecuencia: frontendHabito.frequency,
-    dias: frontendHabito.frequency === 'semanal' ? frontendHabito.days : [],
+    dificultad: 'media',
+    fecha_inicio: new Date().toISOString().split('T')[0],
+    tipo_frecuencia: tipo_frecuencia,
+    dias: frecuencia === 'semanal' ? (frontendHabito.days || []) : [],
     publico: false,
     activo: true,
     notificaciones: []
   };
+  
+  // Solo agregar descripción si no está vacía
+  if (frontendHabito.description && frontendHabito.description.trim() !== '') {
+    data.descripcion = frontendHabito.description;
+  }
+  
+  // Solo agregar categoría si existe Y es un ObjectId válido (24 caracteres hex)
+  if (frontendHabito.category && frontendHabito.category.length === 24) {
+    data.categoria = frontendHabito.category;
+  }
+  
+  return data;
 };
 
 /**
