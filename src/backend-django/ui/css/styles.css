@@ -53,3 +53,35 @@ body {
         transform: translateX(0) !important;
     }
 }
+
+/* Altura fija para tarjetas de hábitos */
+.habit-card {
+    height: 200px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+}
+
+.habit-card-with-button {
+    height: 240px !important;
+}
+
+@media (min-width: 640px) {
+    .habit-card {
+        height: 200px !important;
+    }
+    
+    .habit-card-with-button {
+        height: 240px !important;
+    }
+}
+
+@media (min-width: 1024px) {
+    .habit-card {
+        height: 210px !important;
+    }
+    
+    .habit-card-with-button {
+        height: 250px !important;
+    }
+}

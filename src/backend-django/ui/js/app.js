@@ -5,6 +5,168 @@ const mainContent = document.getElementById('main-content');
 const appContainer = document.getElementById('app-container');
 const sidebarOverlay = document.getElementById('sidebar-overlay');
 
+// ========== GESTIÓN DE HÁBITOS DEL DÍA ==========
+// Datos de ejemplo de hábitos (en producción vendrían del backend)
+const habitsData = [
+    {
+        id: 1,
+        name: 'Hacer ejercicio',
+        category: 'Salud',
+        icon: 'fitness_center',
+        color: 'indigo',
+        frequency: 'diario',
+        days: [],
+        streak: 7
+    },
+    {
+        id: 2,
+        name: 'Leer un libro',
+        category: 'Educación',
+        icon: 'menu_book',
+        color: 'green',
+        frequency: 'diario',
+        days: [],
+        streak: 3
+    },
+    {
+        id: 3,
+        name: 'Meditar',
+        category: 'Bienestar',
+        icon: 'self_improvement',
+        color: 'purple',
+        frequency: 'semanal',
+        days: ['lun', 'mie', 'vie'],
+        streak: 2
+    },
+    {
+        id: 4,
+        name: 'Revisar finanzas',
+        category: 'Finanzas',
+        icon: 'account_balance',
+        color: 'yellow',
+        frequency: 'mensual',
+        days: [],
+        streak: 0
+    },
+    {
+        id: 5,
+        name: 'Estudiar programación',
+        category: 'Educación',
+        icon: 'code',
+        color: 'blue',
+        frequency: 'diario',
+        days: [],
+        streak: 15
+    },
+    {
+        id: 6,
+        name: 'Yoga',
+        category: 'Salud',
+        icon: 'spa',
+        color: 'pink',
+        frequency: 'semanal',
+        days: ['mar', 'jue', 'sab'],
+        streak: 4
+    }
+];
+
+// Registro de hábitos completados (formato: fecha -> [ids de hábitos])
+const completedHabits = JSON.parse(localStorage.getItem('completedHabits')) || {};
+
+// Función para obtener el día de la semana en español
+function getDayOfWeek(date = new Date()) {
+    const days = ['dom', 'lun', 'mar', 'mie', 'jue', 'vie', 'sab'];
+    return days[date.getDay()];
+}
+
+// Función para obtener la fecha actual en formato YYYY-MM-DD
+function getCurrentDateString() {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+}
+
+// Función para verificar si un hábito aplica al día actual
+function habitAppliesToToday(habit) {
+    const today = new Date();
+    const currentDay = getDayOfWeek(today);
+    
+    if (habit.frequency === 'diario') {
+        return true;
+    } else if (habit.frequency === 'semanal') {
+        return habit.days.includes(currentDay);
+    } else if (habit.frequency === 'mensual') {
+        // Para mensual, solo mostrar el primer día del mes (puedes ajustar esta lógica)
+        return today.getDate() === 1;
+    }
+    return false;
+}
+
+// Función para verificar si un hábito está completado hoy
+function isHabitCompletedToday(habitId) {
+    const dateStr = getCurrentDateString();
+    return completedHabits[dateStr]?.includes(habitId) || false;
+}
+
+// Función para marcar/desmarcar hábito como completado
+function toggleHabitCompletion(habitId) {
+    const dateStr = getCurrentDateString();
+    
+    if (!completedHabits[dateStr]) {
+        completedHabits[dateStr] = [];
+    }
+    
+    const index = completedHabits[dateStr].indexOf(habitId);
+    if (index > -1) {
+        // Desmarcar
+        completedHabits[dateStr].splice(index, 1);
+    } else {
+        // Marcar como completado
+        completedHabits[dateStr].push(habitId);
+    }
+    
+    // Guardar en localStorage
+    localStorage.setItem('completedHabits', JSON.stringify(completedHabits));
+    
+    // Actualizar la vista
+    renderTodayHabits();
+}
+
+// Función para renderizar los hábitos del día
+function renderTodayHabits() {
+    const habitsGrid = document.querySelector('.habits-grid');
+    if (!habitsGrid) return;
+    
+    // Filtrar hábitos que aplican hoy
+    const todayHabits = habitsData.filter(habit => habitAppliesToToday(habit));
+    
+    habitsGrid.innerHTML = '';
+    
+    if (todayHabits.length === 0) {
+        habitsGrid.innerHTML = `
+            <div class="col-span-full text-center py-12">
+                <span class="material-icons text-6xl text-subtext-light dark:text-subtext-dark mb-4">event_available</span>
+                <p class="text-xl text-subtext-light dark:text-subtext-dark">No hay hábitos para hoy</p>
+                <p class="text-sm text-subtext-light dark:text-subtext-dark mt-2">¡Disfruta tu día libre!</p>
+            </div>
+        `;
+        return;
+    }
+    
+    todayHabits.forEach(habit => {
+        const isCompleted = isHabitCompletedToday(habit.id);
+        
+        // Usar el componente reutilizable
+        const habitCard = createHabitCard(habit, {
+            showCompleteButton: true,
+            isCompleted: isCompleted,
+            onComplete: toggleHabitCompletion,
+            onEdit: openEditModal
+        });
+        
+        habitsGrid.appendChild(habitCard);
+    });
+}
+
 // Función para abrir/cerrar sidebar en móvil
 function toggleSidebar() {
     sidebar.classList.toggle('-translate-x-full');
@@ -92,19 +254,9 @@ themeToggle.addEventListener('click', (e) => {
     }
 });
 
-// Animaciones de hover para las tarjetas de hábitos
+// Inicializar hábitos del día cuando carga la página
 document.addEventListener('DOMContentLoaded', () => {
-    const habitCards = document.querySelectorAll('.habits-grid > div');
-    
-    habitCards.forEach(card => {
-        card.addEventListener('mouseenter', () => {
-            card.style.transform = 'translateY(-2px)';
-        });
-        
-        card.addEventListener('mouseleave', () => {
-            card.style.transform = 'translateY(0)';
-        });
-    });
+    renderTodayHabits();
 });
 
 // ========== MODAL DE NUEVO HÁBITO ==========
@@ -312,62 +464,23 @@ habitForm?.addEventListener('submit', (e) => {
     console.log('Nuevo hábito:', formData);
     
     // Aquí se enviaría al backend
-    // Por ahora, solo mostramos un mensaje y agregamos visualmente
-    addHabitToGrid(formData);
+    // Por ahora, agregamos el hábito al array local
+    const newHabit = {
+        id: habitsData.length + 1,
+        ...formData,
+        streak: 0
+    };
+    habitsData.push(newHabit);
+    
+    // Actualizar vista
+    renderTodayHabits();
     
     // Cerrar modal
     closeModal();
     
-    // Mostrar mensaje de éxito (opcional)
+    // Mostrar mensaje de éxito
     showSuccessMessage('¡Hábito creado exitosamente!');
 });
-
-// Función para agregar hábito al grid (temporal, hasta conectar con backend)
-function addHabitToGrid(habit) {
-    const habitsGrid = document.querySelector('.habits-grid');
-    
-    const colorClasses = {
-        indigo: 'bg-indigo-100 dark:bg-indigo-900 text-indigo-500',
-        green: 'bg-green-100 dark:bg-green-900 text-green-500',
-        blue: 'bg-blue-100 dark:bg-blue-900 text-blue-500',
-        purple: 'bg-purple-100 dark:bg-purple-900 text-purple-500',
-        red: 'bg-red-100 dark:bg-red-900 text-red-500',
-        yellow: 'bg-yellow-100 dark:bg-yellow-900 text-yellow-500',
-        pink: 'bg-pink-100 dark:bg-pink-900 text-pink-500',
-        orange: 'bg-orange-100 dark:bg-orange-900 text-orange-500',
-    };
-    
-    const habitCard = document.createElement('div');
-    habitCard.className = 'bg-card-light dark:bg-card-dark p-4 sm:p-5 rounded-large shadow-sm hover:shadow-md transition-shadow';
-    habitCard.innerHTML = `
-        <div class="flex items-center justify-between">
-            <div class="flex items-center flex-1 min-w-0">
-                <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-lg ${colorClasses[habit.color]} flex items-center justify-center mr-3 sm:mr-4 flex-shrink-0">
-                    <span class="material-icons text-xl sm:text-2xl">${habit.icon}</span>
-                </div>
-                <div class="min-w-0 flex-1">
-                    <p class="font-semibold text-text-light dark:text-text-dark truncate">${habit.name}</p>
-                    <p class="text-sm text-subtext-light dark:text-subtext-dark">${habit.category}</p>
-                    <p class="text-xs text-subtext-light dark:text-subtext-dark mt-1">Racha: 0 días</p>
-                </div>
-            </div>
-            <button class="text-subtext-light dark:text-subtext-dark hover:text-primary dark:hover:text-primary flex-shrink-0 ml-2">
-                <span class="material-icons">edit</span>
-            </button>
-        </div>
-    `;
-    
-    // Agregar al grid con animación
-    habitCard.style.opacity = '0';
-    habitCard.style.transform = 'scale(0.9)';
-    habitsGrid.appendChild(habitCard);
-    
-    setTimeout(() => {
-        habitCard.style.transition = 'all 0.3s ease';
-        habitCard.style.opacity = '1';
-        habitCard.style.transform = 'scale(1)';
-    }, 10);
-}
 
 // Función para mostrar mensaje de éxito
 function showSuccessMessage(message) {
@@ -628,64 +741,30 @@ editHabitForm?.addEventListener('submit', (e) => {
     
     console.log('Hábito editado:', formData);
     
-    // Aquí se enviaría al backend para actualizar
-    updateHabitInGrid(formData);
+    // Actualizar en el array local
+    const habitIndex = habitsData.findIndex(h => h.id === formData.id);
+    if (habitIndex !== -1) {
+        habitsData[habitIndex] = { ...habitsData[habitIndex], ...formData };
+    }
+    
+    // Actualizar vista
+    renderTodayHabits();
     
     closeEditModal();
     showSuccessMessage('¡Hábito actualizado exitosamente!');
 });
 
-// Función para actualizar hábito en el grid
-function updateHabitInGrid(habit) {
-    const habitCard = document.querySelector(`[data-habit-id="${habit.id}"]`);
-    if (!habitCard) return;
-    
-    const colorClasses = {
-        indigo: 'bg-indigo-100 dark:bg-indigo-900 text-indigo-500',
-        green: 'bg-green-100 dark:bg-green-900 text-green-500',
-        blue: 'bg-blue-100 dark:bg-blue-900 text-blue-500',
-        purple: 'bg-purple-100 dark:bg-purple-900 text-purple-500',
-        red: 'bg-red-100 dark:bg-red-900 text-red-500',
-        yellow: 'bg-yellow-100 dark:bg-yellow-900 text-yellow-500',
-        pink: 'bg-pink-100 dark:bg-pink-900 text-pink-500',
-        orange: 'bg-orange-100 dark:bg-orange-900 text-orange-500',
-    };
-    
-    const iconContainer = habitCard.querySelector('.w-12.h-12, .sm\\:w-14.sm\\:h-14');
-    const nameElement = habitCard.querySelector('.font-semibold');
-    const categoryElement = habitCard.querySelector('.text-sm');
-    const editButton = habitCard.querySelector('.edit-habit-btn');
-    
-    // Actualizar icono y color
-    iconContainer.className = `w-12 h-12 sm:w-14 sm:h-14 rounded-lg ${colorClasses[habit.color]} flex items-center justify-center mr-3 sm:mr-4 flex-shrink-0`;
-    iconContainer.querySelector('.material-icons').textContent = habit.icon;
-    
-    // Actualizar nombre y categoría
-    nameElement.textContent = habit.name;
-    categoryElement.textContent = habit.category;
-    
-    // Actualizar data attributes del botón de editar
-    editButton.dataset.name = habit.name;
-    editButton.dataset.category = habit.category;
-    editButton.dataset.icon = habit.icon;
-    editButton.dataset.color = habit.color;
-    editButton.dataset.frequency = habit.frequency;
-    editButton.dataset.days = habit.days.join(',');
-}
-
 // Eliminar hábito
 deleteHabitButton?.addEventListener('click', () => {
     if (confirm('¿Estás seguro de que quieres eliminar este hábito?')) {
-        const habitCard = document.querySelector(`[data-habit-id="${currentEditHabitId}"]`);
-        if (habitCard) {
-            habitCard.style.transition = 'all 0.3s ease';
-            habitCard.style.opacity = '0';
-            habitCard.style.transform = 'scale(0.9)';
-            
-            setTimeout(() => {
-                habitCard.remove();
-            }, 300);
+        // Eliminar del array local
+        const habitIndex = habitsData.findIndex(h => h.id === currentEditHabitId);
+        if (habitIndex !== -1) {
+            habitsData.splice(habitIndex, 1);
         }
+        
+        // Actualizar vista
+        renderTodayHabits();
         
         closeEditModal();
         showSuccessMessage('Hábito eliminado exitosamente');
