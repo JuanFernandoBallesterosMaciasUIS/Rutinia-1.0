@@ -25,11 +25,6 @@ const HabitsView = ({ habits, onEditHabit, onDeleteHabit }) => {
 
   return (
     <div className="max-w-7xl mx-auto">
-      {/* Encabezado con título */}
-      <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-text-light dark:text-text-dark mb-6">
-        Mis Hábitos
-      </h1>
-
       {/* Filtros */}
       <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
         <button

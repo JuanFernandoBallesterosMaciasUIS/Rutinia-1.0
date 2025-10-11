@@ -8,6 +8,40 @@ import Calendar from './components/Calendar';
 import HabitsView from './components/HabitsView';
 import { habitsData as initialHabitsData } from './data/habitsData';
 
+// Componente simple de Toast
+function ToastContainer() {
+  const [toasts, setToasts] = useState([]);
+
+  useEffect(() => {
+    const handleShowToast = (event) => {
+      const id = Date.now();
+      const newToast = { id, message: event.detail.message };
+      setToasts(prev => [...prev, newToast]);
+      
+      setTimeout(() => {
+        setToasts(prev => prev.filter(toast => toast.id !== id));
+      }, 3000);
+    };
+
+    window.addEventListener('showToast', handleShowToast);
+    return () => window.removeEventListener('showToast', handleShowToast);
+  }, []);
+
+  return (
+    <div className="fixed top-20 right-4 z-50 space-y-2">
+      {toasts.map(toast => (
+        <div
+          key={toast.id}
+          className="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 animate-in slide-in-from-right"
+        >
+          <span className="material-icons">check_circle</span>
+          <span>{toast.message}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
@@ -183,27 +217,38 @@ function App() {
       )}
 
       {/* Main Content */}
-      <div className="lg:ml-64 transition-all duration-300 ease-in-out min-h-screen pb-20 md:pb-24 lg:pb-8">
-        <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
-          <header className="flex justify-between items-center mb-6 md:mb-8">
-            <button 
-              className="relative p-2 lg:hidden"
-              onClick={() => setSidebarOpen(true)}
-            >
-              <span className="material-icons text-text-light dark:text-text-dark">menu</span>
-              <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-primary rounded-full border-2 border-background-light dark:border-background-dark"></span>
-            </button>
-          </header>
+      <div className="lg:ml-64 transition-all duration-300 ease-in-out min-h-screen">
+        {/* Header fijo con título de sección */}
+        <header className="sticky top-0 z-20 bg-background-light dark:bg-background-dark border-b border-gray-200 dark:border-gray-700">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-3">
+                <button 
+                  className="relative p-2 lg:hidden hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                  onClick={() => setSidebarOpen(true)}
+                >
+                  <span className="material-icons text-text-light dark:text-text-dark">menu</span>
+                  <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-primary rounded-full border-2 border-background-light dark:border-background-dark"></span>
+                </button>
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-text-light dark:text-text-dark">
+                  {currentView === 'today' && 'Hábitos del día'}
+                  {currentView === 'calendar' && 'Calendario'}
+                  {currentView === 'habits' && 'Mis Hábitos'}
+                  {currentView === 'analytics' && 'Análisis'}
+                </h1>
+              </div>
+            </div>
+          </div>
+        </header>
 
-          <main>
+        {/* Contenido principal con padding para header y footer */}
+        <main className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8">
+          <div>
             {currentView === 'today' && (
               <>
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-text-light dark:text-text-dark mb-4 md:mb-6">
-                  Hábitos del día
-                </h1>
                 
                 {/* Grid de hábitos */}
-                <div className="habits-grid mb-20 md:mb-24 lg:mb-8">
+                <div className="habits-grid">
                   {todayHabits.length === 0 ? (
                     <div className="col-span-full text-center py-12">
                       <span className="material-icons text-6xl text-subtext-light dark:text-subtext-dark mb-4">event_available</span>
@@ -243,9 +288,6 @@ function App() {
 
             {currentView === 'analytics' && (
               <>
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-text-light dark:text-text-dark mb-4 md:mb-6">
-                  Análisis
-                </h1>
                 <div className="text-center py-12 text-subtext-light dark:text-subtext-dark">
                   <span className="material-icons text-6xl mb-4">analytics</span>
                   <p className="text-xl">Estadísticas y análisis</p>
@@ -253,8 +295,8 @@ function App() {
                 </div>
               </>
             )}
-          </main>
-        </div>
+          </div>
+        </main>
 
         {/* Footer Navigation */}
         <Footer 
@@ -266,40 +308,6 @@ function App() {
 
       {/* Toast Container */}
       <ToastContainer />
-    </div>
-  );
-}
-
-// Componente simple de Toast
-function ToastContainer() {
-  const [toasts, setToasts] = useState([]);
-
-  useEffect(() => {
-    const handleShowToast = (event) => {
-      const id = Date.now();
-      const newToast = { id, message: event.detail.message };
-      setToasts(prev => [...prev, newToast]);
-      
-      setTimeout(() => {
-        setToasts(prev => prev.filter(toast => toast.id !== id));
-      }, 3000);
-    };
-
-    window.addEventListener('showToast', handleShowToast);
-    return () => window.removeEventListener('showToast', handleShowToast);
-  }, []);
-
-  return (
-    <div className="fixed top-20 right-4 z-50 space-y-2">
-      {toasts.map(toast => (
-        <div
-          key={toast.id}
-          className="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 animate-in slide-in-from-right"
-        >
-          <span className="material-icons">check_circle</span>
-          <span>{toast.message}</span>
-        </div>
-      ))}
     </div>
   );
 }

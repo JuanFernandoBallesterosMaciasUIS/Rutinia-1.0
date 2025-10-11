@@ -313,9 +313,6 @@ function Calendar({ habitsData, completedHabits, onToggleHabit }) {
     <div>
       {/* Navegación del calendario */}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-text-light dark:text-text-dark">
-          Calendario
-        </h1>
         <div className="flex items-center gap-2">
           <button 
             onClick={handlePrevious}
