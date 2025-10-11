@@ -1,0 +1,267 @@
+import { useState, useEffect } from 'react';
+import Sidebar from './components/Sidebar';
+import Footer from './components/Footer';
+import HabitCard from './components/HabitCard';
+import NewHabitModal from './components/NewHabitModal';
+import EditHabitModal from './components/EditHabitModal';
+import { habitsData as initialHabitsData } from './data/habitsData';
+
+function App() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+  const [showNewHabitModal, setShowNewHabitModal] = useState(false);
+  const [showEditHabitModal, setShowEditHabitModal] = useState(false);
+  const [currentEditHabit, setCurrentEditHabit] = useState(null);
+  const [habitsData, setHabitsData] = useState(initialHabitsData);
+  const [completedHabits, setCompletedHabits] = useState(() => {
+    const saved = localStorage.getItem('completedHabits');
+    return saved ? JSON.parse(saved) : {};
+  });
+
+  // Cargar tema guardado
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      setDarkMode(true);
+      document.documentElement.classList.add('dark');
+    }
+  }, []);
+
+  // Toggle dark mode
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+    if (!darkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  };
+
+  // Funciones para obtener día y fecha
+  const getDayOfWeek = (date = new Date()) => {
+    const days = ['dom', 'lun', 'mar', 'mie', 'jue', 'vie', 'sab'];
+    return days[date.getDay()];
+  };
+
+  const getCurrentDateString = () => {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+  };
+
+  // Verificar si un hábito aplica al día actual
+  const habitAppliesToToday = (habit) => {
+    const today = new Date();
+    const currentDay = getDayOfWeek(today);
+    
+    if (habit.frequency === 'diario') {
+      return true;
+    } else if (habit.frequency === 'semanal') {
+      return habit.days.includes(currentDay);
+    } else if (habit.frequency === 'mensual') {
+      return today.getDate() === 1;
+    }
+    return false;
+  };
+
+  // Verificar si un hábito está completado hoy
+  const isHabitCompletedToday = (habitId) => {
+    const dateStr = getCurrentDateString();
+    return completedHabits[dateStr]?.includes(habitId) || false;
+  };
+
+  // Toggle completar hábito
+  const toggleHabitCompletion = (habitId) => {
+    const dateStr = getCurrentDateString();
+    const newCompletedHabits = { ...completedHabits };
+    
+    if (!newCompletedHabits[dateStr]) {
+      newCompletedHabits[dateStr] = [];
+    }
+    
+    const index = newCompletedHabits[dateStr].indexOf(habitId);
+    if (index > -1) {
+      newCompletedHabits[dateStr].splice(index, 1);
+    } else {
+      newCompletedHabits[dateStr].push(habitId);
+    }
+    
+    setCompletedHabits(newCompletedHabits);
+    localStorage.setItem('completedHabits', JSON.stringify(newCompletedHabits));
+  };
+
+  // Obtener hábitos del día
+  const todayHabits = habitsData.filter(habit => habitAppliesToToday(habit));
+
+  // Manejar creación de nuevo hábito
+  const handleCreateHabit = (newHabitData) => {
+    const newHabit = {
+      id: habitsData.length + 1,
+      ...newHabitData,
+      streak: 0
+    };
+    setHabitsData([...habitsData, newHabit]);
+    setShowNewHabitModal(false);
+    showSuccessMessage('¡Hábito creado exitosamente!');
+  };
+
+  // Manejar edición de hábito
+  const handleEditHabit = (editedHabitData) => {
+    const updatedHabits = habitsData.map(habit =>
+      habit.id === editedHabitData.id ? { ...habit, ...editedHabitData } : habit
+    );
+    setHabitsData(updatedHabits);
+    setShowEditHabitModal(false);
+    setCurrentEditHabit(null);
+    showSuccessMessage('¡Hábito actualizado exitosamente!');
+  };
+
+  // Manejar eliminación de hábito
+  const handleDeleteHabit = (habitId) => {
+    if (window.confirm('¿Estás seguro de que quieres eliminar este hábito?')) {
+      const updatedHabits = habitsData.filter(habit => habit.id !== habitId);
+      setHabitsData(updatedHabits);
+      setShowEditHabitModal(false);
+      setCurrentEditHabit(null);
+      showSuccessMessage('Hábito eliminado exitosamente');
+    }
+  };
+
+  // Abrir modal de edición
+  const openEditModal = (habit) => {
+    setCurrentEditHabit(habit);
+    setShowEditHabitModal(true);
+  };
+
+  // Mostrar mensaje de éxito
+  const showSuccessMessage = (message) => {
+    const event = new CustomEvent('showToast', { detail: { message } });
+    window.dispatchEvent(event);
+  };
+
+  return (
+    <div className="relative w-full min-h-screen bg-background-light dark:bg-background-dark font-display">
+      {/* Sidebar */}
+      <Sidebar 
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        darkMode={darkMode}
+        onToggleDarkMode={toggleDarkMode}
+      />
+
+      {/* Overlay para móvil */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Modal para crear nuevo hábito */}
+      <NewHabitModal
+        isOpen={showNewHabitModal}
+        onClose={() => setShowNewHabitModal(false)}
+        onSubmit={handleCreateHabit}
+      />
+
+      {/* Modal para editar hábito */}
+      {currentEditHabit && (
+        <EditHabitModal
+          isOpen={showEditHabitModal}
+          onClose={() => {
+            setShowEditHabitModal(false);
+            setCurrentEditHabit(null);
+          }}
+          onSubmit={handleEditHabit}
+          onDelete={handleDeleteHabit}
+          habitData={currentEditHabit}
+        />
+      )}
+
+      {/* Main Content */}
+      <div className="lg:ml-64 transition-all duration-300 ease-in-out min-h-screen pb-20 md:pb-24 lg:pb-8">
+        <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+          <header className="flex justify-between items-center mb-6 md:mb-8">
+            <button 
+              className="relative p-2 lg:hidden"
+              onClick={() => setSidebarOpen(true)}
+            >
+              <span className="material-icons text-text-light dark:text-text-dark">menu</span>
+              <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-primary rounded-full border-2 border-background-light dark:border-background-dark"></span>
+            </button>
+          </header>
+
+          <main>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-text-light dark:text-text-dark mb-4 md:mb-6">
+              Hábitos del día
+            </h1>
+            
+            {/* Grid de hábitos */}
+            <div className="habits-grid mb-20 md:mb-24 lg:mb-8">
+              {todayHabits.length === 0 ? (
+                <div className="col-span-full text-center py-12">
+                  <span className="material-icons text-6xl text-subtext-light dark:text-subtext-dark mb-4">event_available</span>
+                  <p className="text-xl text-subtext-light dark:text-subtext-dark">No hay hábitos para hoy</p>
+                  <p className="text-sm text-subtext-light dark:text-subtext-dark mt-2">¡Disfruta tu día libre!</p>
+                </div>
+              ) : (
+                todayHabits.map(habit => (
+                  <HabitCard
+                    key={habit.id}
+                    habit={habit}
+                    isCompleted={isHabitCompletedToday(habit.id)}
+                    onToggleComplete={toggleHabitCompletion}
+                    onEdit={openEditModal}
+                  />
+                ))
+              )}
+            </div>
+          </main>
+        </div>
+
+        {/* Footer Navigation */}
+        <Footer onAddHabit={() => setShowNewHabitModal(true)} />
+      </div>
+
+      {/* Toast Container */}
+      <ToastContainer />
+    </div>
+  );
+}
+
+// Componente simple de Toast
+function ToastContainer() {
+  const [toasts, setToasts] = useState([]);
+
+  useEffect(() => {
+    const handleShowToast = (event) => {
+      const id = Date.now();
+      const newToast = { id, message: event.detail.message };
+      setToasts(prev => [...prev, newToast]);
+      
+      setTimeout(() => {
+        setToasts(prev => prev.filter(toast => toast.id !== id));
+      }, 3000);
+    };
+
+    window.addEventListener('showToast', handleShowToast);
+    return () => window.removeEventListener('showToast', handleShowToast);
+  }, []);
+
+  return (
+    <div className="fixed top-20 right-4 z-50 space-y-2">
+      {toasts.map(toast => (
+        <div
+          key={toast.id}
+          className="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 animate-in slide-in-from-right"
+        >
+          <span className="material-icons">check_circle</span>
+          <span>{toast.message}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export default App;
