@@ -1,0 +1,87 @@
+/* Material Icons */
+.material-icons {
+    font-family: 'Material Icons';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-feature-settings: 'liga';
+    font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Estilos base */
+body {
+    min-height: 100vh;
+}
+
+/* Estilos para grid responsivo de hábitos */
+.habits-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+@media (min-width: 640px) {
+    .habits-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .habits-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+    }
+}
+
+@media (min-width: 1280px) {
+    .habits-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* Sidebar responsivo */
+@media (min-width: 1024px) {
+    #sidebar.lg-visible {
+        transform: translateX(0) !important;
+    }
+}
+
+/* Altura fija para tarjetas de hábitos */
+.habit-card {
+    height: 200px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+}
+
+.habit-card-with-button {
+    height: 240px !important;
+}
+
+@media (min-width: 640px) {
+    .habit-card {
+        height: 200px !important;
+    }
+    
+    .habit-card-with-button {
+        height: 240px !important;
+    }
+}
+
+@media (min-width: 1024px) {
+    .habit-card {
+        height: 210px !important;
+    }
+    
+    .habit-card-with-button {
+        height: 250px !important;
+    }
+}

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Rutinia - Calendario</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+    <link href="css/styles.css" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#3B82F6",
+                        "background-light": "#F9FAFB",
+                        "background-dark": "#111827",
+                        "card-light": "#FFFFFF",
+                        "card-dark": "#1F2937",
+                        "text-light": "#1F2937",
+                        "text-dark": "#F9FAFB",
+                        "subtext-light": "#6B7280",
+                        "subtext-dark": "#9CA3AF",
+                    },
+                    fontFamily: {
+                        display: ["Poppins", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "1rem",
+                        "large": "1.5rem"
+                    },
+                },
+            },
+        };
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+    <div class="relative w-full min-h-screen bg-background-light dark:bg-background-dark" id="app-container">
+        <!-- Sidebar -->
+        <div class="fixed top-0 left-0 h-full w-64 bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out z-30 flex flex-col p-6 shadow-xl" id="sidebar">
+            <div class="flex flex-col items-center mb-8">
+                <div class="w-24 h-24 rounded-full bg-gray-300 dark:bg-gray-600 mb-4 flex items-center justify-center overflow-hidden">
+                    <img alt="Foto de perfil" class="w-full h-full object-cover rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1azmRfQtcdGrH3vbYZzXAuM1N0sOALbS5UBWjzEocm5LeomZnmmKBfGO6KgssDgSkPvlXO3J_lbQJslLQ7SfMexE2tgiNs-m491_NNKZgpKgPsgtSFGVe2AIrsNXSUdEch3P2rPoAklrAtrjxEX4u0MGTlWNbaVaLu7cQ0VUm8hkFHBPxvpgGkYMDNKpKjJAfR6XZlPJA4hL2sObi3XRQ282l1RwZ1EKq4z33W5VV9D9NALjnbCh379XD08r8QsbY972VJac4uuU"/>
+                </div>
+                <p class="font-semibold text-lg">Nombre usuario</p>
+            </div>
+            
+            <nav class="flex flex-col space-y-2 flex-grow">
+                <a class="flex items-center p-3 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" href="#" id="theme-toggle">
+                    <span class="material-icons mr-4">dark_mode</span>
+                    <span id="theme-text">Tema: oscuro</span>
+                </a>
+                <a class="flex items-center p-3 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" href="#">
+                    <span class="material-icons mr-4">edit</span>
+                    <span>Editar perfil</span>
+                </a>
+                <a class="flex items-center p-3 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors relative" href="#">
+                    <span class="material-icons mr-4">notifications</span>
+                    <span>Notificaciones</span>
+                    <span class="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full"></span>
+                </a>
+            </nav>
+            
+            <div class="mt-auto">
+                <a class="flex items-center p-3 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" href="#">
+                    <span class="material-icons mr-4">logout</span>
+                    <span>Cerrar sesión</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Overlay para móvil -->
+        <div class="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden hidden" id="sidebar-overlay"></div>
+
+        <!-- Main Content -->
+        <div class="lg:ml-64 transition-all duration-300 ease-in-out min-h-screen pb-20 md:pb-24 lg:pb-8" id="main-content">
+            <div class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+                <header class="flex justify-between items-center mb-6 md:mb-8">
+                    <button class="relative p-2 lg:hidden" id="menu-button">
+                        <span class="material-icons text-text-light dark:text-text-dark">menu</span>
+                        <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-primary rounded-full border-2 border-background-light dark:border-background-dark"></span>
+                    </button>
+                </header>
+
+                <main>
+                    <!-- Navegación del calendario -->
+                    <div class="flex items-center justify-between mb-6">
+                        <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-text-light dark:text-text-dark">Calendario</h1>
+                        <div class="flex items-center gap-2">
+                            <button id="prev-month" class="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                                <span class="material-icons text-text-light dark:text-text-dark">chevron_left</span>
+                            </button>
+                            <span class="text-lg font-semibold text-text-light dark:text-text-dark px-4" id="current-month-year"></span>
+                            <button id="next-month" class="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                                <span class="material-icons text-text-light dark:text-text-dark">chevron_right</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Selector de vista -->
+                    <div class="flex gap-2 mb-6">
+                        <button class="px-4 py-2 rounded-lg bg-primary text-white font-semibold" id="month-view-btn">
+                            Mes
+                        </button>
+                        <button class="px-4 py-2 rounded-lg bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark font-semibold hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" id="week-view-btn">
+                            Semana
+                        </button>
+                    </div>
+
+                    <!-- Calendario -->
+                    <div class="bg-card-light dark:bg-card-dark rounded-large p-4 sm:p-6 shadow-sm mb-6">
+                        <!-- Días de la semana -->
+                        <div class="grid grid-cols-7 gap-2 mb-4">
+                            <div class="text-center font-semibold text-sm text-subtext-light dark:text-subtext-dark">Dom</div>
+                            <div class="text-center font-semibold text-sm text-subtext-light dark:text-subtext-dark">Lun</div>
+                            <div class="text-center font-semibold text-sm text-subtext-light dark:text-subtext-dark">Mar</div>
+                            <div class="text-center font-semibold text-sm text-subtext-light dark:text-subtext-dark">Mié</div>
+                            <div class="text-center font-semibold text-sm text-subtext-light dark:text-subtext-dark">Jue</div>
+                            <div class="text-center font-semibold text-sm text-subtext-light dark:text-subtext-dark">Vie</div>
+                            <div class="text-center font-semibold text-sm text-subtext-light dark:text-subtext-dark">Sáb</div>
+                        </div>
+
+                        <!-- Días del mes -->
+                        <div class="grid grid-cols-7 gap-2" id="calendar-days">
+                            <!-- Los días se generarán dinámicamente con JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Resumen de hábitos del día seleccionado -->
+                    <div class="bg-card-light dark:bg-card-dark rounded-large p-4 sm:p-6 shadow-sm">
+                        <h2 class="text-xl font-bold text-text-light dark:text-text-dark mb-4" id="selected-date-title">
+                            Hábitos de Hoy
+                        </h2>
+                        <div id="habits-for-day" class="space-y-3">
+                            <!-- Los hábitos se cargarán dinámicamente -->
+                        </div>
+                    </div>
+                </main>
+            </div>
+
+            <!-- Footer Navigation -->
+            <footer class="fixed bottom-0 left-0 right-0 lg:left-64 bg-card-light dark:bg-card-dark p-2 sm:p-3 shadow-[0_-4px_15px_-5px_rgba(0,0,0,0.1)] z-10">
+                <div class="max-w-7xl mx-auto">
+                    <div class="flex justify-around items-center">
+                        <a href="index.html" class="flex flex-col items-center text-subtext-light dark:text-subtext-dark p-2 hover:text-primary transition-all hover:scale-110">
+                            <span class="material-icons text-xl sm:text-2xl">today</span>
+                            <span class="text-xs sm:text-sm">hoy</span>
+                        </a>
+                        <button class="flex flex-col items-center text-primary p-2 transition-all hover:scale-110">
+                            <span class="material-icons text-xl sm:text-2xl">calendar_today</span>
+                            <span class="text-xs sm:text-sm font-medium">calendario</span>
+                        </button>
+                        <button id="add-habit-button" class="bg-primary text-white w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center -translate-y-6 sm:-translate-y-8 shadow-lg hover:shadow-xl transition-all hover:scale-110">
+                            <span class="material-icons" style="font-size: 28px;">add</span>
+                        </button>
+                        <a href="habitos.html" class="flex flex-col items-center text-subtext-light dark:text-subtext-dark p-2 hover:text-primary transition-all hover:scale-110">
+                            <span class="material-icons text-xl sm:text-2xl">checklist</span>
+                            <span class="text-xs sm:text-sm">hábitos</span>
+                        </a>
+                        <button class="flex flex-col items-center text-subtext-light dark:text-subtext-dark p-2 hover:text-primary transition-all hover:scale-110">
+                            <span class="material-icons text-xl sm:text-2xl">analytics</span>
+                            <span class="text-xs sm:text-sm">Análisis</span>
+                        </button>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <script src="js/calendario.js"></script>
+</body>
+</html>
