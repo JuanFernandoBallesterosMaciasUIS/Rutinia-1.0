@@ -7,6 +7,8 @@ import EditHabitModal from './components/EditHabitModal';
 import Calendar from './components/Calendar';
 import HabitsView from './components/HabitsView';
 import { habitsData as initialHabitsData } from './data/habitsData';
+import * as api from './services/api';
+import * as localStorageService from './services/localStorage';
 
 // Componente simple de Toast
 function ToastContainer() {
@@ -49,11 +51,42 @@ function App() {
   const [showNewHabitModal, setShowNewHabitModal] = useState(false);
   const [showEditHabitModal, setShowEditHabitModal] = useState(false);
   const [currentEditHabit, setCurrentEditHabit] = useState(null);
-  const [habitsData, setHabitsData] = useState(initialHabitsData);
+  const [habitsData, setHabitsData] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [completedHabits, setCompletedHabits] = useState(() => {
-    const saved = localStorage.getItem('completedHabits');
-    return saved ? JSON.parse(saved) : {};
+    return localStorageService.getCompletedHabits();
   });
+
+  // Usuario temporal (hasta implementar autenticación)
+  const TEMP_USER_ID = '68ea57f5fc52f3058c8233ab';
+
+  // Cargar hábitos del backend al iniciar
+  useEffect(() => {
+    loadHabitsFromBackend();
+  }, []);
+
+  // Función para cargar hábitos del backend
+  const loadHabitsFromBackend = async () => {
+    try {
+      setLoading(true);
+      const backendHabits = await api.getHabitos();
+      
+      // Mapear hábitos del backend al formato frontend
+      const visualData = localStorageService.getVisualData();
+      const mappedHabits = backendHabits.map(habit => 
+        api.mapHabitoToFrontend(habit, visualData[habit.id])
+      );
+      
+      setHabitsData(mappedHabits);
+    } catch (error) {
+      console.error('Error al cargar hábitos:', error);
+      // NO usar datos de ejemplo, solo mostrar error
+      setHabitsData([]);
+      showErrorMessage('No se pudieron cargar los hábitos. Verifica que el servidor esté corriendo en http://localhost:8000');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Cargar tema guardado
   useEffect(() => {
@@ -78,7 +111,7 @@ function App() {
 
   // Funciones para obtener día y fecha
   const getDayOfWeek = (date = new Date()) => {
-    const days = ['dom', 'lun', 'mar', 'mie', 'jue', 'vie', 'sab'];
+    const days = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'];
     return days[date.getDay()];
   };
 
@@ -92,11 +125,14 @@ function App() {
     const today = new Date();
     const currentDay = getDayOfWeek(today);
     
-    if (habit.frequency === 'diario') {
+    // Convertir a minúsculas para comparación
+    const frequency = (habit.frequency || '').toLowerCase();
+    
+    if (frequency === 'diario' || frequency === 'diaria') {
       return true;
-    } else if (habit.frequency === 'semanal') {
-      return habit.days.includes(currentDay);
-    } else if (habit.frequency === 'mensual') {
+    } else if (frequency === 'semanal') {
+      return habit.days && habit.days.includes(currentDay);
+    } else if (frequency === 'mensual') {
       return today.getDate() === 1;
     }
     return false;
@@ -109,59 +145,120 @@ function App() {
   };
 
   // Toggle completar hábito
-  const toggleHabitCompletion = (habitId, dateStr = null) => {
+  const toggleHabitCompletion = async (habitId, dateStr = null) => {
     const date = dateStr || getCurrentDateString();
-    const newCompletedHabits = { ...completedHabits };
+    const wasCompleted = completedHabits[date]?.includes(habitId) || false;
+    const newStatus = !wasCompleted;
     
-    if (!newCompletedHabits[date]) {
-      newCompletedHabits[date] = [];
-    }
-    
-    const index = newCompletedHabits[date].indexOf(habitId);
-    if (index > -1) {
-      newCompletedHabits[date].splice(index, 1);
-    } else {
-      newCompletedHabits[date].push(habitId);
-    }
-    
+    // Actualizar localStorage
+    const newCompletedHabits = localStorageService.toggleHabitCompletion(habitId, date, newStatus);
     setCompletedHabits(newCompletedHabits);
-    localStorage.setItem('completedHabits', JSON.stringify(newCompletedHabits));
+    
+    // Intentar sincronizar con backend
+    try {
+      if (newStatus) {
+        // Crear registro en backend
+        await api.createRegistro({
+          habito: habitId,
+          fecha: date,
+          estado: true
+        });
+      } else {
+        // TODO: Buscar y eliminar registro en backend
+        // Por ahora solo actualizamos localStorage
+      }
+    } catch (error) {
+      console.error('Error al sincronizar con backend:', error);
+      // El cambio ya se guardó en localStorage, continuar
+    }
   };
 
   // Obtener hábitos del día
   const todayHabits = habitsData.filter(habit => habitAppliesToToday(habit));
 
   // Manejar creación de nuevo hábito
-  const handleCreateHabit = (newHabitData) => {
-    const newHabit = {
-      id: habitsData.length + 1,
-      ...newHabitData,
-      streak: 0
-    };
-    setHabitsData([...habitsData, newHabit]);
-    setShowNewHabitModal(false);
-    showSuccessMessage('¡Hábito creado exitosamente!');
+  const handleCreateHabit = async (newHabitData) => {
+    try {
+      // Guardar datos visuales en localStorage
+      const visualData = {
+        icon: newHabitData.icon,
+        color: newHabitData.color
+      };
+      
+      // Mapear al formato del backend
+      const backendData = api.mapHabitoToBackend(newHabitData, TEMP_USER_ID);
+      
+      // Crear en el backend
+      const createdHabit = await api.createHabito(backendData);
+      
+      // Guardar datos visuales con el ID del backend
+      localStorageService.saveVisualData(createdHabit.id, visualData);
+      
+      // Mapear de vuelta al frontend y agregar a la lista
+      const frontendHabit = api.mapHabitoToFrontend(createdHabit, visualData);
+      setHabitsData([...habitsData, frontendHabit]);
+      
+      setShowNewHabitModal(false);
+      showSuccessMessage('¡Hábito creado exitosamente!');
+    } catch (error) {
+      console.error('Error al crear hábito:', error);
+      showErrorMessage('Error al crear el hábito. Intenta de nuevo.');
+    }
   };
 
   // Manejar edición de hábito
-  const handleEditHabit = (editedHabitData) => {
-    const updatedHabits = habitsData.map(habit =>
-      habit.id === editedHabitData.id ? { ...habit, ...editedHabitData } : habit
-    );
-    setHabitsData(updatedHabits);
-    setShowEditHabitModal(false);
-    setCurrentEditHabit(null);
-    showSuccessMessage('¡Hábito actualizado exitosamente!');
+  const handleEditHabit = async (editedHabitData) => {
+    try {
+      // Actualizar datos visuales en localStorage
+      const visualData = {
+        icon: editedHabitData.icon,
+        color: editedHabitData.color
+      };
+      localStorageService.saveVisualData(editedHabitData.id, visualData);
+      
+      // Mapear al formato del backend (solo campos que acepta)
+      const backendData = api.mapHabitoToBackend(editedHabitData, TEMP_USER_ID);
+      
+      // Actualizar en el backend
+      const updatedHabit = await api.updateHabito(editedHabitData.id, backendData);
+      
+      // Actualizar en el estado local
+      const frontendHabit = api.mapHabitoToFrontend(updatedHabit, visualData);
+      const updatedHabits = habitsData.map(habit =>
+        habit.id === editedHabitData.id ? frontendHabit : habit
+      );
+      setHabitsData(updatedHabits);
+      
+      setShowEditHabitModal(false);
+      setCurrentEditHabit(null);
+      showSuccessMessage('¡Hábito actualizado exitosamente!');
+    } catch (error) {
+      console.error('Error al actualizar hábito:', error);
+      showErrorMessage('Error al actualizar el hábito. Intenta de nuevo.');
+    }
   };
 
   // Manejar eliminación de hábito
-  const handleDeleteHabit = (habitId) => {
+  const handleDeleteHabit = async (habitId) => {
     if (window.confirm('¿Estás seguro de que quieres eliminar este hábito?')) {
-      const updatedHabits = habitsData.filter(habit => habit.id !== habitId);
-      setHabitsData(updatedHabits);
-      setShowEditHabitModal(false);
-      setCurrentEditHabit(null);
-      showSuccessMessage('Hábito eliminado exitosamente');
+      try {
+        // Eliminar del backend
+        await api.deleteHabito(habitId);
+        
+        // Eliminar datos visuales
+        localStorageService.deleteVisualData(habitId);
+        
+        // Actualizar estado local
+        const updatedHabits = habitsData.filter(habit => habit.id !== habitId);
+        setHabitsData(updatedHabits);
+        
+        setShowEditHabitModal(false);
+        setCurrentEditHabit(null);
+        showSuccessMessage('Hábito eliminado exitosamente');
+      } catch (error) {
+        console.error('Error al eliminar hábito:', error);
+        showErrorMessage('Error al eliminar el hábito. Intenta de nuevo.');
+      }
     }
   };
 
@@ -177,8 +274,24 @@ function App() {
     window.dispatchEvent(event);
   };
 
+  // Mostrar mensaje de error
+  const showErrorMessage = (message) => {
+    const event = new CustomEvent('showToast', { detail: { message } });
+    window.dispatchEvent(event);
+  };
+
   return (
     <div className="relative w-full min-h-screen bg-background-light dark:bg-background-dark font-display">
+      {/* Indicador de carga */}
+      {loading && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+          <div className="bg-card-light dark:bg-card-dark rounded-lg p-8 flex flex-col items-center gap-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
+            <p className="text-text-light dark:text-text-dark font-semibold">Cargando hábitos...</p>
+          </div>
+        </div>
+      )}
+      
       {/* Sidebar */}
       <Sidebar 
         isOpen={sidebarOpen}
