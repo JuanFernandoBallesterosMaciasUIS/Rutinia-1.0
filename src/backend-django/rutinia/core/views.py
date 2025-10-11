@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from .models import Usuario, Habito, RegistroHabito, Rol, Categoria, Notificacion, Tool
 from .serializers import UsuarioSerializer, RolSerializer, HabitoSerializer, CategoriaSerializer, RegistroHabitoSerializer, ToolSerializer, NotificacionSerializer
 
+from .pagination import HabitoPagination
 
 class RolViewSet(viewsets.ModelViewSet):
     queryset = Rol.objects.all()
@@ -64,6 +65,7 @@ class RegistroHabitoViewSet(viewsets.ModelViewSet):
 
 class HabitoViewSet(viewsets.ModelViewSet):
     serializer_class = HabitoSerializer
+    pagination_class = HabitoPagination
 
     def get_queryset(self):
         queryset = Habito.objects.all()
