@@ -4,11 +4,13 @@ import Footer from './components/Footer';
 import HabitCard from './components/HabitCard';
 import NewHabitModal from './components/NewHabitModal';
 import EditHabitModal from './components/EditHabitModal';
+import Calendar from './components/Calendar';
 import { habitsData as initialHabitsData } from './data/habitsData';
 
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+  const [currentView, setCurrentView] = useState('today'); // 'today', 'calendar', 'habits', 'analytics'
   const [showNewHabitModal, setShowNewHabitModal] = useState(false);
   const [showEditHabitModal, setShowEditHabitModal] = useState(false);
   const [currentEditHabit, setCurrentEditHabit] = useState(null);
@@ -72,19 +74,19 @@ function App() {
   };
 
   // Toggle completar hábito
-  const toggleHabitCompletion = (habitId) => {
-    const dateStr = getCurrentDateString();
+  const toggleHabitCompletion = (habitId, dateStr = null) => {
+    const date = dateStr || getCurrentDateString();
     const newCompletedHabits = { ...completedHabits };
     
-    if (!newCompletedHabits[dateStr]) {
-      newCompletedHabits[dateStr] = [];
+    if (!newCompletedHabits[date]) {
+      newCompletedHabits[date] = [];
     }
     
-    const index = newCompletedHabits[dateStr].indexOf(habitId);
+    const index = newCompletedHabits[date].indexOf(habitId);
     if (index > -1) {
-      newCompletedHabits[dateStr].splice(index, 1);
+      newCompletedHabits[date].splice(index, 1);
     } else {
-      newCompletedHabits[dateStr].push(habitId);
+      newCompletedHabits[date].push(habitId);
     }
     
     setCompletedHabits(newCompletedHabits);
@@ -193,35 +195,77 @@ function App() {
           </header>
 
           <main>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-text-light dark:text-text-dark mb-4 md:mb-6">
-              Hábitos del día
-            </h1>
-            
-            {/* Grid de hábitos */}
-            <div className="habits-grid mb-20 md:mb-24 lg:mb-8">
-              {todayHabits.length === 0 ? (
-                <div className="col-span-full text-center py-12">
-                  <span className="material-icons text-6xl text-subtext-light dark:text-subtext-dark mb-4">event_available</span>
-                  <p className="text-xl text-subtext-light dark:text-subtext-dark">No hay hábitos para hoy</p>
-                  <p className="text-sm text-subtext-light dark:text-subtext-dark mt-2">¡Disfruta tu día libre!</p>
+            {currentView === 'today' && (
+              <>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-text-light dark:text-text-dark mb-4 md:mb-6">
+                  Hábitos del día
+                </h1>
+                
+                {/* Grid de hábitos */}
+                <div className="habits-grid mb-20 md:mb-24 lg:mb-8">
+                  {todayHabits.length === 0 ? (
+                    <div className="col-span-full text-center py-12">
+                      <span className="material-icons text-6xl text-subtext-light dark:text-subtext-dark mb-4">event_available</span>
+                      <p className="text-xl text-subtext-light dark:text-subtext-dark">No hay hábitos para hoy</p>
+                      <p className="text-sm text-subtext-light dark:text-subtext-dark mt-2">¡Disfruta tu día libre!</p>
+                    </div>
+                  ) : (
+                    todayHabits.map(habit => (
+                      <HabitCard
+                        key={habit.id}
+                        habit={habit}
+                        isCompleted={isHabitCompletedToday(habit.id)}
+                        onToggleComplete={toggleHabitCompletion}
+                        onEdit={openEditModal}
+                      />
+                    ))
+                  )}
                 </div>
-              ) : (
-                todayHabits.map(habit => (
-                  <HabitCard
-                    key={habit.id}
-                    habit={habit}
-                    isCompleted={isHabitCompletedToday(habit.id)}
-                    onToggleComplete={toggleHabitCompletion}
-                    onEdit={openEditModal}
-                  />
-                ))
-              )}
-            </div>
+              </>
+            )}
+
+            {currentView === 'calendar' && (
+              <Calendar 
+                habitsData={habitsData}
+                completedHabits={completedHabits}
+                onToggleHabit={toggleHabitCompletion}
+              />
+            )}
+
+            {currentView === 'habits' && (
+              <>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-text-light dark:text-text-dark mb-4 md:mb-6">
+                  Todos los hábitos
+                </h1>
+                <div className="text-center py-12 text-subtext-light dark:text-subtext-dark">
+                  <span className="material-icons text-6xl mb-4">checklist</span>
+                  <p className="text-xl">Vista de todos los hábitos</p>
+                  <p className="text-sm mt-2">Próximamente...</p>
+                </div>
+              </>
+            )}
+
+            {currentView === 'analytics' && (
+              <>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-text-light dark:text-text-dark mb-4 md:mb-6">
+                  Análisis
+                </h1>
+                <div className="text-center py-12 text-subtext-light dark:text-subtext-dark">
+                  <span className="material-icons text-6xl mb-4">analytics</span>
+                  <p className="text-xl">Estadísticas y análisis</p>
+                  <p className="text-sm mt-2">Próximamente...</p>
+                </div>
+              </>
+            )}
           </main>
         </div>
 
         {/* Footer Navigation */}
-        <Footer onAddHabit={() => setShowNewHabitModal(true)} />
+        <Footer 
+          onAddHabit={() => setShowNewHabitModal(true)}
+          currentView={currentView}
+          onChangeView={setCurrentView}
+        />
       </div>
 
       {/* Toast Container */}
