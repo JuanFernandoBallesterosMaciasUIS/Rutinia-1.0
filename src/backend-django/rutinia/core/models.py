@@ -48,6 +48,8 @@ class Habito(Document):
     publico = fields.BooleanField(default=False)
     activo = fields.BooleanField(default=True)
     notificaciones = fields.EmbeddedDocumentListField(Notificacion)
+    icono = fields.StringField(max_length=50)
+    color = fields.StringField(max_length=20)
 
 
 # --- Registro de Hábito ---
