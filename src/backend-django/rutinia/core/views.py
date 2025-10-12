@@ -145,11 +145,20 @@ class HabitoViewSet(viewsets.ModelViewSet):
             fecha__gte=inicio_semana,
             fecha__lte=fin_semana
         )
-        #TODO:implementar logica de progreso si el habito esta marcado como semanal o mensual
+        #TODO:Implementar logica si el habito es mensual
         #total = registros.count()
-        completados = registros.filter(estado=True).count()
-        progreso = completados / 7 * 100 #Si es diario si no me toca dividir entre otro valor
+        if(str.capitalize(habito.tipo_frecuencia) == "Diaria"):
+            total = 7
 
+        elif(str.capitalize(habito.tipo_frecuencia) == "Semanal"):
+            total = len(habito.dias)
+        
+        else:
+            total = 0
+
+        completados = registros.filter(estado=True).count()
+        progreso = (completados / total * 100) if total > 0 else 0 #Por si total llega a ser 0
+        
         return Response({
             "habito_id":str(habito.id),
             "habito": habito.nombre,
@@ -167,6 +176,7 @@ class HabitoViewSet(viewsets.ModelViewSet):
 
         # Calcular primer y último día del mes actual
         inicio_mes = hoy.replace(day=1)
+        semanas_mes = calendar.monthcalendar(hoy.year, hoy.month)
         _, ultimo_dia = calendar.monthrange(hoy.year, hoy.month)
         fin_mes = hoy.replace(day=ultimo_dia)
 
@@ -176,12 +186,18 @@ class HabitoViewSet(viewsets.ModelViewSet):
             fecha__lte=fin_mes
         )
 
-        #TODO:implementar logica de progreso si el habito esta marcado como semanal o mensual
+        #TODO:implementar logica de progreso si el habito es mensual
+        if(str.capitalize(habito.tipo_frecuencia) == "Diaria"):
+            total = ultimo_dia
+
+        elif(str.capitalize(habito.tipo_frecuencia) == "Semanal"):
+            total = len(habito.dias) * len(semanas_mes)
         
-        total = registros.count()
+        else:
+            total = 0
+
         completados = registros.filter(estado=True).count()
-        progreso = completados / ultimo_dia * 100 #Progreso si el habito es diario
-        #progreso = (completados / total * 100) if total > 0 else 0
+        progreso = (completados / total * 100) if total > 0 else 0
 
         return Response({
             "habito": habito.nombre,
