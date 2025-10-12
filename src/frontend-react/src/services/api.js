@@ -66,6 +66,9 @@ export const createHabito = async (habitoData) => {
  * @returns {Promise<Object>} Hábito actualizado
  */
 export const updateHabito = async (id, habitoData) => {
+  console.log('📝 Actualizando hábito:', id);
+  console.log('📤 Datos a enviar:', JSON.stringify(habitoData, null, 2));
+  
   const response = await fetch(`${API_BASE_URL}/habitos/${id}/`, {
     method: 'PATCH',
     headers: {
@@ -73,6 +76,12 @@ export const updateHabito = async (id, habitoData) => {
     },
     body: JSON.stringify(habitoData),
   });
+  
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    console.error('❌ Error al actualizar:', errorData);
+  }
+  
   return handleResponse(response);
 };
 
