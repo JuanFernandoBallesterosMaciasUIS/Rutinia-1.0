@@ -65,7 +65,7 @@ class RegistroHabitoViewSet(viewsets.ModelViewSet):
 
 class HabitoViewSet(viewsets.ModelViewSet):
     serializer_class = HabitoSerializer
-    pagination_class = HabitoPagination
+    #pagination_class = HabitoPagination
 
     def get_queryset(self):
         queryset = Habito.objects.all()
