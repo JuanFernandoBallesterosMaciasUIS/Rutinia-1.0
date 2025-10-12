@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { availableIcons, availableColors, categories, frequencies, daysOfWeek } from '../data/habitsData';
 
 const EditHabitModal = ({ isOpen, onClose, onSubmit, onDelete, habitData }) => {
@@ -9,80 +9,70 @@ const EditHabitModal = ({ isOpen, onClose, onSubmit, onDelete, habitData }) => {
     icon: '',
     color: '',
     description: '',
-    frequency: 'diario',
+    frequency: '',
     days: []
   });
 
-  const [selectedIcon, setSelectedIcon] = useState('');
-  const [selectedColor, setSelectedColor] = useState('');
+  const [selectedIcon, setSelectedIcon] = useState(null);
+  const [selectedColor, setSelectedColor] = useState(null);
   const [selectedDays, setSelectedDays] = useState([]);
 
-  const weekDays = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'];
-
-  // Pre-llenar formulario cuando se abre el modal
   useEffect(() => {
     if (isOpen && habitData) {
+      // Los datos ya vienen normalizados desde api.js (mapHabitoToFrontend)
       setFormData({
-        id: habitData.id,
-        name: habitData.name,
+        id: habitData.id || '',
+        name: habitData.name || '',
         category: habitData.category || '',
-        icon: habitData.icon,
-        color: habitData.color,
+        icon: habitData.icon || '',
+        color: habitData.color || '',
         description: habitData.description || '',
-        frequency: habitData.frequency?.toLowerCase() || 'diario',
+        frequency: habitData.frequency || '',
         days: habitData.days || []
       });
-      setSelectedIcon(habitData.icon);
-      setSelectedColor(habitData.color);
+      
+      setSelectedIcon(habitData.icon || null);
+      setSelectedColor(habitData.color || null);
       setSelectedDays(habitData.days || []);
     }
   }, [isOpen, habitData]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
   const handleIconSelect = (icon) => {
     setSelectedIcon(icon);
-    setFormData(prev => ({ ...prev, icon }));
+    setFormData({ ...formData, icon });
   };
 
   const handleColorSelect = (color) => {
     setSelectedColor(color);
-    setFormData(prev => ({ ...prev, color }));
+    setFormData({ ...formData, color });
   };
 
   const handleDayToggle = (day) => {
-    let newDays;
-    if (selectedDays.includes(day)) {
-      newDays = selectedDays.filter(d => d !== day);
-    } else {
-      newDays = [...selectedDays, day];
-    }
+    const newDays = selectedDays.includes(day)
+      ? selectedDays.filter(d => d !== day)
+      : [...selectedDays, day];
     setSelectedDays(newDays);
-    setFormData(prev => ({ ...prev, days: newDays }));
+    setFormData({ ...formData, days: newDays });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    // Validaciones
+    
     if (!formData.icon) {
       alert('Por favor selecciona un icono');
       return;
     }
-
+    
     if (!formData.color) {
       alert('Por favor selecciona un color');
       return;
     }
-
+    
     if (formData.frequency === 'semanal' && selectedDays.length === 0) {
       alert('Por favor selecciona al menos un día de la semana');
       return;
     }
-
+    
     onSubmit(formData);
   };
 
@@ -92,185 +82,214 @@ const EditHabitModal = ({ isOpen, onClose, onSubmit, onDelete, habitData }) => {
     }
   };
 
+  const getIconColorClass = (iconName) => {
+    const icon = availableIcons.find(i => i.name === iconName);
+    const colorMap = {
+      indigo: 'text-indigo-500',
+      green: 'text-green-500',
+      blue: 'text-blue-500',
+      purple: 'text-purple-500',
+      red: 'text-red-500',
+      yellow: 'text-yellow-500',
+      pink: 'text-pink-500',
+      orange: 'text-orange-500',
+      gray: 'text-gray-600',
+      brown: 'text-brown-500'
+    };
+    return icon ? colorMap[icon.color] || 'text-gray-600' : 'text-gray-600';
+  };
+
+  const getColorBgClass = (color) => {
+    const colorMap = {
+      indigo: 'bg-indigo-100 dark:bg-indigo-900',
+      green: 'bg-green-100 dark:bg-green-900',
+      blue: 'bg-blue-100 dark:bg-blue-900',
+      purple: 'bg-purple-100 dark:bg-purple-900',
+      red: 'bg-red-100 dark:bg-red-900',
+      yellow: 'bg-yellow-100 dark:bg-yellow-900',
+      pink: 'bg-pink-100 dark:bg-pink-900',
+      orange: 'bg-orange-100 dark:bg-orange-900'
+    };
+    return colorMap[color] || colorMap.blue;
+  };
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-card-light dark:bg-card-dark rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-card-light dark:bg-card-dark border-b border-gray-200 dark:border-gray-700 p-6 z-10">
-          <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-bold text-text-light dark:text-text-dark">
-              Editar Hábito
-            </h2>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
-            >
-              <span className="material-icons text-text-light dark:text-text-dark">close</span>
-            </button>
-          </div>
+    <div 
+      className="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center p-2 sm:p-4"
+      onClick={onClose}
+    >
+      <div 
+        className="bg-card-light dark:bg-card-dark rounded-lg sm:rounded-large p-4 sm:p-6 w-full max-w-2xl max-h-[95vh] overflow-y-auto shadow-2xl transform transition-all"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex justify-between items-center mb-3 sm:mb-4">
+          <h2 className="text-lg sm:text-xl font-bold text-text-light dark:text-text-dark">Editar Hábito</h2>
+          <button 
+            className="text-subtext-light dark:text-subtext-dark hover:text-text-light dark:hover:text-text-dark"
+            onClick={onClose}
+          >
+            <span className="material-icons text-xl">close</span>
+          </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {/* Nombre */}
-          <div>
-            <label className="block text-sm font-semibold text-text-light dark:text-text-dark mb-2">
-              Nombre del hábito *
-            </label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-text-light dark:text-text-dark focus:ring-2 focus:ring-primary focus:border-transparent"
-              placeholder="Ej: Hacer ejercicio"
-            />
-          </div>
-
-          {/* Categoría */}
-          <div>
-            <label className="block text-sm font-semibold text-text-light dark:text-text-dark mb-2">
-              Categoría
-            </label>
-            <select
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-text-light dark:text-text-dark focus:ring-2 focus:ring-primary focus:border-transparent"
-            >
-              <option value="">Sin categoría</option>
-              <option value="salud">Salud</option>
-              <option value="productividad">Productividad</option>
-              <option value="finanzas">Finanzas</option>
-              <option value="relaciones">Relaciones</option>
-              <option value="creatividad">Creatividad</option>
-            </select>
-          </div>
-
-          {/* Selector de Icono */}
-          <div>
-            <label className="block text-sm font-semibold text-text-light dark:text-text-dark mb-2">
-              Icono *
-            </label>
-            <div className="grid grid-cols-6 gap-2">
-              {availableIcons.map((iconObj) => (
-                <button
-                  key={iconObj.name}
-                  type="button"
-                  onClick={() => handleIconSelect(iconObj.name)}
-                  className={`p-3 rounded-lg border-2 transition-all ${
-                    selectedIcon === iconObj.name
-                      ? 'border-primary bg-primary bg-opacity-10'
-                      : 'border-gray-300 dark:border-gray-600 hover:border-primary'
-                  }`}
-                >
-                  <span className="material-icons text-2xl text-text-light dark:text-text-dark">
-                    {iconObj.name}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Selector de Color */}
-          <div>
-            <label className="block text-sm font-semibold text-text-light dark:text-text-dark mb-2">
-              Color *
-            </label>
-            <div className="grid grid-cols-6 gap-2">
-              {availableColors.map((color) => (
-                <button
-                  key={color}
-                  type="button"
-                  onClick={() => handleColorSelect(color)}
-                  className={`h-12 rounded-lg border-2 transition-all ${
-                    selectedColor === color
-                      ? 'border-text-light dark:border-text-dark scale-110'
-                      : 'border-transparent hover:scale-105'
-                  } bg-${color}-500`}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* Descripción */}
-          <div>
-            <label className="block text-sm font-semibold text-text-light dark:text-text-dark mb-2">
-              Descripción
-            </label>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              rows="3"
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-text-light dark:text-text-dark focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
-              placeholder="Agrega una descripción opcional..."
-            />
-          </div>
-
-          {/* Frecuencia */}
-          <div>
-            <label className="block text-sm font-semibold text-text-light dark:text-text-dark mb-2">
-              Frecuencia
-            </label>
-            <select
-              name="frequency"
-              value={formData.frequency}
-              onChange={handleChange}
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-text-light dark:text-text-dark focus:ring-2 focus:ring-primary focus:border-transparent"
-            >
-              <option value="diario">Diario</option>
-              <option value="semanal">Semanal</option>
-              <option value="mensual">Mensual</option>
-            </select>
-          </div>
-
-          {/* Selector de días (solo si es semanal) */}
-          {formData.frequency === 'semanal' && (
+        <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-semibold text-text-light dark:text-text-dark mb-2">
-                Días de la semana *
+              <label className="block text-xs sm:text-sm font-semibold text-text-light dark:text-text-dark mb-1">
+                Nombre del hábito *
               </label>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {weekDays.map((day) => (
-                  <button
-                    key={day}
+              <input 
+                type="text" 
+                required
+                placeholder="Ej: Hacer ejercicio"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs sm:text-sm font-semibold text-text-light dark:text-text-dark mb-1">
+                Categoría *
+              </label>
+              <select 
+                required
+                value={formData.category}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+              >
+                <option value="">Selecciona una categoría</option>
+                {categories.map(cat => (
+                  <option key={cat.value} value={cat.value}>{cat.label}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs sm:text-sm font-semibold text-text-light dark:text-text-dark mb-1">
+                Icono *
+              </label>
+              <div className="grid grid-cols-6 gap-1.5">
+                {availableIcons.map(icon => (
+                  <button 
+                    key={icon.name}
                     type="button"
-                    onClick={() => handleDayToggle(day)}
-                    className={`px-4 py-2 rounded-lg font-semibold transition-all ${
-                      selectedDays.includes(day)
-                        ? 'bg-primary text-white'
-                        : 'bg-gray-200 dark:bg-gray-700 text-text-light dark:text-text-dark hover:bg-gray-300 dark:hover:bg-gray-600'
+                    onClick={() => handleIconSelect(icon.name)}
+                    className={`p-2 rounded-lg border-2 hover:border-primary transition-all ${
+                      selectedIcon === icon.name
+                        ? 'border-primary bg-primary bg-opacity-10'
+                        : 'border-gray-300 dark:border-gray-600'
                     }`}
                   >
-                    {day}
+                    <span className={`material-icons text-lg ${getIconColorClass(icon.name)}`}>
+                      {icon.name}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs sm:text-sm font-semibold text-text-light dark:text-text-dark mb-1">
+                Color *
+              </label>
+              <div className="grid grid-cols-6 gap-1.5">
+                {availableColors.map(color => (
+                  <button 
+                    key={color}
+                    type="button"
+                    onClick={() => handleColorSelect(color)}
+                    className={`p-2 aspect-square rounded-lg border-2 hover:scale-105 transition-transform ${getColorBgClass(color)} ${
+                      selectedColor === color
+                        ? 'ring-2 ring-primary'
+                        : 'border-gray-300 dark:border-gray-600'
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs sm:text-sm font-semibold text-text-light dark:text-text-dark mb-1">
+                Frecuencia *
+              </label>
+              <select 
+                required
+                value={formData.frequency}
+                onChange={(e) => setFormData({ ...formData, frequency: e.target.value })}
+                className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+              >
+                <option value="">Selecciona la frecuencia</option>
+                {frequencies.map(freq => (
+                  <option key={freq.value} value={freq.value}>{freq.label}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs sm:text-sm font-semibold text-text-light dark:text-text-dark mb-1">
+                Descripción (opcional)
+              </label>
+              <textarea 
+                rows="2"
+                placeholder="Describe tu hábito..."
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-primary transition-all resize-none"
+              />
+            </div>
+          </div>
+
+          {formData.frequency === 'semanal' && (
+            <div>
+              <label className="block text-xs sm:text-sm font-semibold text-text-light dark:text-text-dark mb-1">
+                Días de la semana *
+              </label>
+              <div className="grid grid-cols-7 gap-1.5">
+                {daysOfWeek.map(day => (
+                  <button 
+                    key={day.value}
+                    type="button"
+                    onClick={() => handleDayToggle(day.value)}
+                    className={`px-1 py-2 rounded-lg border-2 hover:border-primary transition-all text-center ${
+                      selectedDays.includes(day.value)
+                        ? 'border-primary bg-primary text-white'
+                        : 'border-gray-300 dark:border-gray-600'
+                    }`}
+                  >
+                    <span className="text-[10px] sm:text-xs font-semibold">{day.label}</span>
                   </button>
                 ))}
               </div>
             </div>
           )}
 
-          {/* Botones de acción */}
-          <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <button
-              type="button"
+          <div className="flex gap-2 sm:gap-3 pt-2">
+            <button 
+              type="button" 
               onClick={handleDelete}
-              className="flex-1 px-6 py-3 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
+              className="px-4 py-2 text-sm sm:text-base rounded-lg border-2 border-red-500 text-red-500 font-semibold hover:bg-red-50 dark:hover:bg-red-900 transition-all"
             >
-              <span className="material-icons">delete</span>
-              <span>Eliminar</span>
+              Eliminar
             </button>
-            <button
-              type="button"
+            
+            <button 
+              type="button" 
               onClick={onClose}
-              className="flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-text-light dark:text-text-dark font-semibold rounded-lg transition-colors"
+              className="flex-1 px-4 py-2 text-sm sm:text-base rounded-lg border-2 border-gray-300 dark:border-gray-600 text-text-light dark:text-text-dark font-semibold hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
             >
               Cancelar
             </button>
-            <button
-              type="submit"
-              className="flex-1 px-6 py-3 bg-primary hover:bg-primary-dark text-white font-semibold rounded-lg transition-colors"
+            
+            <button 
+              type="submit" 
+              className="flex-1 px-4 py-2 text-sm sm:text-base rounded-lg bg-primary text-white font-semibold hover:bg-blue-600 transition-all shadow-lg hover:shadow-xl"
             >
               Guardar Cambios
             </button>

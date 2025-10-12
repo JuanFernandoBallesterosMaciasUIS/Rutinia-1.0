@@ -241,15 +241,42 @@ export const mapHabitoToBackend = (frontendHabito, usuarioId = '507f1f77bcf86cd7
  * @returns {Object} Hábito en formato frontend
  */
 export const mapHabitoToFrontend = (backendHabito) => {
+  // Normalizar frecuencia: "Diaria" -> "diario", "Semanal" -> "semanal", "Mensual" -> "mensual"
+  const normalizeFrequency = (freq) => {
+    if (!freq) return 'diario';
+    const lower = freq.toLowerCase();
+    if (lower === 'diaria') return 'diario';
+    if (lower === 'semanal') return 'semanal';
+    if (lower === 'mensual') return 'mensual';
+    return lower;
+  };
+
+  // Normalizar categoría: Extraer nombre si es objeto, convertir a lowercase con guiones
+  const normalizeCategory = (cat) => {
+    console.log('🔍 Categoría del backend:', cat);
+    console.log('🔍 Tipo de categoría:', typeof cat);
+    
+    if (!cat) return '';
+    
+    // Si es un objeto con nombre, usar el nombre
+    const categoryName = typeof cat === 'object' ? cat.nombre : cat;
+    if (!categoryName) return '';
+    
+    // Convertir a lowercase y reemplazar espacios con guiones
+    const normalized = categoryName.toLowerCase().replace(/\s+/g, '-');
+    console.log('✅ Categoría normalizada:', normalized);
+    return normalized;
+  };
+
   return {
     id: backendHabito.id,
     name: backendHabito.nombre,
-    category: backendHabito.categoria?.nombre || backendHabito.categoria || '',
+    category: normalizeCategory(backendHabito.categoria),
     // ✨ Ahora icon y color vienen del backend
     icon: backendHabito.icono || 'fitness_center',
     color: backendHabito.color || 'blue',
     description: backendHabito.descripcion || '',
-    frequency: backendHabito.tipo_frecuencia,
+    frequency: normalizeFrequency(backendHabito.tipo_frecuencia),
     days: backendHabito.dias || [],
     // Campos adicionales del backend
     dificultad: backendHabito.dificultad,
