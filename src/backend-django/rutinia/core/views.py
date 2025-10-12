@@ -2,6 +2,7 @@ from django.shortcuts import render
 
 #Librerias para el manejo de timepo y fechas
 from datetime import datetime, timedelta, date
+import calendar
 
 # Create your views here.
 #from rest_framework import viewsets, status
@@ -132,10 +133,10 @@ class HabitoViewSet(viewsets.ModelViewSet):
             fecha__gte=inicio_semana,
             fecha__lte=fin_semana
         )
-
+        #TODO:implementar logica de progreso si el habito esta marcado como semanal o mensual
         #total = registros.count()
         completados = registros.filter(estado=True).count()
-        progreso = completados / 7 * 100
+        progreso = completados / 7 * 100 #Si es diario si no me toca dividir entre otro valor
 
         return Response({
             "habito_id":str(habito.id),
@@ -143,6 +144,39 @@ class HabitoViewSet(viewsets.ModelViewSet):
             "inicio_semana": inicio_semana,
             "fin_semana":fin_semana,
             "progreso_semanal": round(progreso, 2),
+            "completados": completados
+        })
+    
+    @action(detail=True, methods=['get'])
+    def progreso_mensual(self, request, id=None):
+        """Calcula el progreso del hábito en el mes actual."""
+        habito = self.get_object()
+        hoy = date.today()
+
+        # Calcular primer y último día del mes actual
+        inicio_mes = hoy.replace(day=1)
+        _, ultimo_dia = calendar.monthrange(hoy.year, hoy.month)
+        fin_mes = hoy.replace(day=ultimo_dia)
+
+        registros = RegistroHabito.objects(
+            habito=habito,
+            fecha__gte=inicio_mes,
+            fecha__lte=fin_mes
+        )
+
+        #TODO:implementar logica de progreso si el habito esta marcado como semanal o mensual
+        
+        total = registros.count()
+        completados = registros.filter(estado=True).count()
+        progreso = completados / ultimo_dia * 100 #Progreso si el habito es diario
+        #progreso = (completados / total * 100) if total > 0 else 0
+
+        return Response({
+            "habito": habito.nombre,
+            "inicio_mes": inicio_mes,
+            "fin_mes": fin_mes,
+            "progreso_mensual": round(progreso, 2),
+            "registros_totales": total,
             "completados": completados
         })
 
