@@ -1,14 +1,20 @@
 from django.shortcuts import render
 
+#Librerias para el manejo de timepo y fechas
+from datetime import datetime, timedelta, date
+
 # Create your views here.
 #from rest_framework import viewsets, status
 from rest_framework_mongoengine import viewsets
 
+#Librerias rest
 from rest_framework.response import Response
+from rest_framework.decorators import action
 from .models import Usuario, Habito, RegistroHabito, Rol, Categoria, Notificacion, Tool
 from .serializers import UsuarioSerializer, RolSerializer, HabitoSerializer, CategoriaSerializer, RegistroHabitoSerializer, ToolSerializer, NotificacionSerializer
 
 from .pagination import HabitoPagination
+
 
 class RolViewSet(viewsets.ModelViewSet):
     queryset = Rol.objects.all()
@@ -110,6 +116,36 @@ class HabitoViewSet(viewsets.ModelViewSet):
                 queryset = queryset.order_by(ordering)
 
         return queryset
+    
+    @action(detail=True, methods=['get'])
+    def progreso_semanal(self, request, id=None):
+        """Calcula el progreso del hábito en la semana actual (lunes a domingo)."""
+        habito = self.get_object()
+        hoy = date.today()
+
+        # Calcular lunes y domingo de esta semana
+        inicio_semana = hoy - timedelta(days=hoy.weekday())  # lunes
+        fin_semana = inicio_semana + timedelta(days=6)        # domingo
+
+        registros = RegistroHabito.objects(
+            habito=habito,
+            fecha__gte=inicio_semana,
+            fecha__lte=fin_semana
+        )
+
+        #total = registros.count()
+        completados = registros.filter(estado=True).count()
+        progreso = completados / 7 * 100
+
+        return Response({
+            "habito_id":str(habito.id),
+            "habito": habito.nombre,
+            "inicio_semana": inicio_semana,
+            "fin_semana":fin_semana,
+            "progreso_semanal": round(progreso, 2),
+            "completados": completados
+        })
+
 """
 class UsuarioViewSet(viewsets.ViewSet):
     
