@@ -216,7 +216,10 @@ export const mapHabitoToBackend = (frontendHabito, usuarioId = '507f1f77bcf86cd7
     dias: frecuencia === 'semanal' ? (frontendHabito.days || []) : [],
     publico: false,
     activo: true,
-    notificaciones: []
+    notificaciones: [],
+    // ✨ NUEVOS CAMPOS: icono y color
+    icono: frontendHabito.icon || 'fitness_center',
+    color: frontendHabito.color || 'blue'
   };
   
   // Solo agregar descripción si no está vacía
@@ -235,16 +238,16 @@ export const mapHabitoToBackend = (frontendHabito, usuarioId = '507f1f77bcf86cd7
 /**
  * Mapear datos del backend al formato del frontend
  * @param {Object} backendHabito - Hábito del backend
- * @param {Object} visualData - Datos visuales del localStorage (color, icono)
  * @returns {Object} Hábito en formato frontend
  */
-export const mapHabitoToFrontend = (backendHabito, visualData = {}) => {
+export const mapHabitoToFrontend = (backendHabito) => {
   return {
     id: backendHabito.id,
     name: backendHabito.nombre,
     category: backendHabito.categoria?.nombre || backendHabito.categoria || '',
-    icon: visualData.icon || 'fitness_center',
-    color: visualData.color || 'blue',
+    // ✨ Ahora icon y color vienen del backend
+    icon: backendHabito.icono || 'fitness_center',
+    color: backendHabito.color || 'blue',
     description: backendHabito.descripcion || '',
     frequency: backendHabito.tipo_frecuencia,
     days: backendHabito.dias || [],

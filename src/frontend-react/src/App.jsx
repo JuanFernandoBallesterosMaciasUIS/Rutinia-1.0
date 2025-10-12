@@ -72,9 +72,9 @@ function App() {
       const backendHabits = await api.getHabitos();
       
       // Mapear hábitos del backend al formato frontend
-      const visualData = localStorageService.getVisualData();
+      // ✨ YA NO necesitamos visualData de localStorage
       const mappedHabits = backendHabits.map(habit => 
-        api.mapHabitoToFrontend(habit, visualData[habit.id])
+        api.mapHabitoToFrontend(habit)
       );
       
       setHabitsData(mappedHabits);
@@ -179,23 +179,14 @@ function App() {
   // Manejar creación de nuevo hábito
   const handleCreateHabit = async (newHabitData) => {
     try {
-      // Guardar datos visuales en localStorage
-      const visualData = {
-        icon: newHabitData.icon,
-        color: newHabitData.color
-      };
-      
-      // Mapear al formato del backend
+      // ✨ Mapear al formato del backend (INCLUYE icon y color)
       const backendData = api.mapHabitoToBackend(newHabitData, TEMP_USER_ID);
       
       // Crear en el backend
       const createdHabit = await api.createHabito(backendData);
       
-      // Guardar datos visuales con el ID del backend
-      localStorageService.saveVisualData(createdHabit.id, visualData);
-      
-      // Mapear de vuelta al frontend y agregar a la lista
-      const frontendHabit = api.mapHabitoToFrontend(createdHabit, visualData);
+      // ✨ Mapear de vuelta al frontend (icon y color ya vienen del backend)
+      const frontendHabit = api.mapHabitoToFrontend(createdHabit);
       setHabitsData([...habitsData, frontendHabit]);
       
       setShowNewHabitModal(false);
@@ -209,21 +200,14 @@ function App() {
   // Manejar edición de hábito
   const handleEditHabit = async (editedHabitData) => {
     try {
-      // Actualizar datos visuales en localStorage
-      const visualData = {
-        icon: editedHabitData.icon,
-        color: editedHabitData.color
-      };
-      localStorageService.saveVisualData(editedHabitData.id, visualData);
-      
-      // Mapear al formato del backend (solo campos que acepta)
+      // ✨ Mapear al formato del backend (INCLUYE icon y color)
       const backendData = api.mapHabitoToBackend(editedHabitData, TEMP_USER_ID);
       
       // Actualizar en el backend
       const updatedHabit = await api.updateHabito(editedHabitData.id, backendData);
       
-      // Actualizar en el estado local
-      const frontendHabit = api.mapHabitoToFrontend(updatedHabit, visualData);
+      // ✨ Actualizar en el estado local (icon y color vienen del backend)
+      const frontendHabit = api.mapHabitoToFrontend(updatedHabit);
       const updatedHabits = habitsData.map(habit =>
         habit.id === editedHabitData.id ? frontendHabit : habit
       );
@@ -245,8 +229,7 @@ function App() {
         // Eliminar del backend
         await api.deleteHabito(habitId);
         
-        // Eliminar datos visuales
-        localStorageService.deleteVisualData(habitId);
+        // ✨ YA NO necesitamos eliminar de localStorage (icon y color están en backend)
         
         // Actualizar estado local
         const updatedHabits = habitsData.filter(habit => habit.id !== habitId);
