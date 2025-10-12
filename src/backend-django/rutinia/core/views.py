@@ -67,8 +67,20 @@ class CategoriaViewSet(viewsets.ModelViewSet):
     serializer_class = CategoriaSerializer
 
 class RegistroHabitoViewSet(viewsets.ModelViewSet):
-    queryset = RegistroHabito.objects.all()
+    #queryset = RegistroHabito.objects.all()
     serializer_class = RegistroHabitoSerializer
+
+    def get_queryset(self):
+        queryset = RegistroHabito.objects.all()
+
+        id_habito = self.request.query_params.get('habito')
+
+        if id_habito:
+            queryset = queryset.filter(habito=id_habito)
+
+        
+        return queryset
+
 
 class HabitoViewSet(viewsets.ModelViewSet):
     serializer_class = HabitoSerializer
