@@ -147,7 +147,7 @@ class HabitoViewSet(viewsets.ModelViewSet):
         )
         #TODO:Implementar logica si el habito es mensual
         #total = registros.count()
-        if(str.capitalize(habito.tipo_frecuencia) == "Diaria"):
+        if(str.capitalize(habito.tipo_frecuencia) == "Diario"):
             total = 7
 
         elif(str.capitalize(habito.tipo_frecuencia) == "Semanal"):
@@ -187,7 +187,7 @@ class HabitoViewSet(viewsets.ModelViewSet):
         )
 
         #TODO:implementar logica de progreso si el habito es mensual
-        if(str.capitalize(habito.tipo_frecuencia) == "Diaria"):
+        if(str.capitalize(habito.tipo_frecuencia) == "Diario"):
             total = ultimo_dia
 
         elif(str.capitalize(habito.tipo_frecuencia) == "Semanal"):
