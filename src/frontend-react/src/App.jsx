@@ -13,6 +13,29 @@ import { habitsData as initialHabitsData } from './data/habitsData';
 import * as api from './services/api';
 import * as localStorageService from './services/localStorage';
 
+// 🔧 Función helper para normalizar nombres de días
+// Convierte abreviaturas ('lun', 'mar') a nombres completos ('Lunes', 'Martes')
+const normalizeDayName = (day) => {
+  const dayMap = {
+    'dom': 'Domingo',
+    'lun': 'Lunes',
+    'mar': 'Martes',
+    'mie': 'Miercoles',
+    'jue': 'Jueves',
+    'vie': 'Viernes',
+    'sab': 'Sabado',
+    // También aceptar nombres completos (por si acaso)
+    'Domingo': 'Domingo',
+    'Lunes': 'Lunes',
+    'Martes': 'Martes',
+    'Miercoles': 'Miercoles',
+    'Jueves': 'Jueves',
+    'Viernes': 'Viernes',
+    'Sabado': 'Sabado'
+  };
+  return dayMap[day] || day;
+};
+
 // Componente simple de Toast
 function ToastContainer() {
   const [toasts, setToasts] = useState([]);
@@ -144,18 +167,26 @@ function App() {
       if (habitsData.length === 0) return; // Esperar a que carguen los hábitos
       
       const today = getCurrentDateString();
+      const currentDay = getDayOfWeek(new Date());
       
-      // Obtener hábitos que aplican para hoy
+      // Obtener hábitos que aplican para hoy (misma lógica que habitAppliesToToday)
       const todayHabitsToInit = habitsData.filter(habit => {
-        const currentDay = getDayOfWeek(new Date());
         const frequency = (habit.frequency || '').toLowerCase();
         
         if (frequency === 'diario' || frequency === 'diaria') {
           return true;
         } else if (frequency === 'semanal') {
-          return habit.days && habit.days.includes(currentDay);
+          // Verificar que el hábito tenga días configurados y que hoy esté incluido
+          if (!habit.days || habit.days.length === 0) {
+            return false;
+          }
+          // 🔧 NORMALIZAR LOS DÍAS: Convertir 'lun' -> 'Lunes', etc.
+          const normalizedHabitDays = habit.days.map(day => normalizeDayName(day));
+          return normalizedHabitDays.includes(currentDay);
         } else if (frequency === 'mensual') {
-          return new Date().getDate() === 1;
+          // Los hábitos mensuales se muestran todos los días del mes
+          // La lógica de "ya completado" se maneja después al consultar el backend
+          return true;
         }
         return false;
       });
@@ -248,6 +279,7 @@ function App() {
   const habitAppliesToToday = (habit) => {
     const today = new Date();
     const currentDay = getDayOfWeek(today);
+    const todayStr = getCurrentDateString();
     
     // Convertir a minúsculas para comparación
     const frequency = (habit.frequency || '').toLowerCase();
@@ -255,9 +287,35 @@ function App() {
     if (frequency === 'diario' || frequency === 'diaria') {
       return true;
     } else if (frequency === 'semanal') {
-      return habit.days && habit.days.includes(currentDay);
+      // Verificar que el hábito tenga días configurados y que hoy esté incluido
+      if (!habit.days || habit.days.length === 0) {
+        console.warn(`⚠️ Hábito semanal "${habit.name}" no tiene días configurados`);
+        return false;
+      }
+      
+      // 🔧 NORMALIZAR LOS DÍAS: Convertir 'lun' -> 'Lunes', etc.
+      const normalizedHabitDays = habit.days.map(day => normalizeDayName(day));
+      const applies = normalizedHabitDays.includes(currentDay);
+      
+      console.log(`📅 Hábito "${habit.name}"`);
+      console.log(`   Días originales: [${habit.days.join(', ')}]`);
+      console.log(`   Días normalizados: [${normalizedHabitDays.join(', ')}]`);
+      console.log(`   Hoy: ${currentDay}`);
+      console.log(`   Aplica: ${applies}`);
+      
+      return applies;
     } else if (frequency === 'mensual') {
-      return today.getDate() === 1;
+      // 🆕 CAMBIO CRÍTICO: Los hábitos mensuales se muestran TODOS LOS DÍAS del mes
+      // hasta que se completen en ese día específico
+      const isCompletedToday = completedHabits[todayStr]?.includes(habit.id) || false;
+      
+      // Si ya está completado hoy, no mostrarlo
+      if (isCompletedToday) {
+        return false;
+      }
+      
+      // Si no está completado, mostrarlo todos los días del mes
+      return true;
     }
     return false;
   };
