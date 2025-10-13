@@ -7,6 +7,7 @@ import calendar
 # Create your views here.
 #from rest_framework import viewsets, status
 from rest_framework_mongoengine import viewsets
+from rest_framework import status
 
 #Librerias rest
 from rest_framework.response import Response
@@ -80,6 +81,87 @@ class RegistroHabitoViewSet(viewsets.ModelViewSet):
 
         
         return queryset
+    
+    @action(detail=False, methods=['post'])
+    def toggle_completado(self, request):
+        """
+        Marca o desmarca un hábito como completado para una fecha específica.
+        Previene duplicados.
+        
+        Body: {
+            "habito_id": "68ea57f5fc52f3058c8233ab",
+            "fecha": "2025-10-12",
+            "completado": true/false
+        }
+        """
+        from bson import ObjectId
+        
+        habito_id = request.data.get('habito_id')
+        fecha_str = request.data.get('fecha')
+        completado = request.data.get('completado', True)
+        
+        if not habito_id or not fecha_str:
+            return Response(
+                {"error": "Se requieren habito_id y fecha"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Parsear fecha
+        try:
+            fecha = datetime.strptime(fecha_str, '%Y-%m-%d').date()
+        except ValueError:
+            return Response(
+                {"error": "Formato de fecha inválido. Use YYYY-MM-DD"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Buscar hábito
+        try:
+            habito = Habito.objects.get(id=ObjectId(habito_id))
+        except Habito.DoesNotExist:
+            return Response(
+                {"error": "Hábito no encontrado"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Buscar o crear registro (prevenir duplicados)
+        registro_existente = RegistroHabito.objects(
+            habito=habito,
+            fecha=fecha
+        ).first()
+        
+        if registro_existente:
+            # Actualizar registro existente
+            registro_existente.estado = completado
+            registro_existente.save()
+            
+            return Response({
+                "mensaje": "Registro actualizado",
+                "registro": {
+                    "id": str(registro_existente.id),
+                    "habito": habito.nombre,
+                    "fecha": str(fecha),
+                    "estado": completado
+                }
+            })
+        else:
+            # Crear nuevo registro
+            nuevo_registro = RegistroHabito(
+                habito=habito,
+                fecha=fecha,
+                estado=completado
+            )
+            nuevo_registro.save()
+            
+            return Response({
+                "mensaje": "Registro creado",
+                "registro": {
+                    "id": str(nuevo_registro.id),
+                    "habito": habito.nombre,
+                    "fecha": str(fecha),
+                    "estado": completado
+                }
+            }, status=status.HTTP_201_CREATED)
 
 
 class HabitoViewSet(viewsets.ModelViewSet):
@@ -165,7 +247,8 @@ class HabitoViewSet(viewsets.ModelViewSet):
             "inicio_semana": inicio_semana,
             "fin_semana":fin_semana,
             "progreso_semanal": round(progreso, 2),
-            "completados": completados
+            "completados": completados,
+            "total": total
         })
     
     @action(detail=True, methods=['get'])

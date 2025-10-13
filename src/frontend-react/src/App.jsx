@@ -6,6 +6,7 @@ import NewHabitModal from './components/NewHabitModal';
 import EditHabitModal from './components/EditHabitModal';
 import Calendar from './components/Calendar';
 import HabitsView from './components/HabitsView';
+import ProgressDashboard from './components/ProgressDashboard';
 import { habitsData as initialHabitsData } from './data/habitsData';
 import * as api from './services/api';
 import * as localStorageService from './services/localStorage';
@@ -150,26 +151,20 @@ function App() {
     const wasCompleted = completedHabits[date]?.includes(habitId) || false;
     const newStatus = !wasCompleted;
     
-    // Actualizar localStorage
+    // Actualizar localStorage inmediatamente (optimistic update)
     const newCompletedHabits = localStorageService.toggleHabitCompletion(habitId, date, newStatus);
     setCompletedHabits(newCompletedHabits);
     
-    // Intentar sincronizar con backend
+    // Sincronizar con backend usando el nuevo endpoint que previene duplicados
     try {
-      if (newStatus) {
-        // Crear registro en backend
-        await api.createRegistro({
-          habito: habitId,
-          fecha: date,
-          estado: true
-        });
-      } else {
-        // TODO: Buscar y eliminar registro en backend
-        // Por ahora solo actualizamos localStorage
-      }
+      await api.toggleHabitoCompletado(habitId, date, newStatus);
+      showSuccessMessage(newStatus ? '¡Hábito completado! 🎉' : 'Hábito desmarcado');
     } catch (error) {
       console.error('Error al sincronizar con backend:', error);
-      // El cambio ya se guardó en localStorage, continuar
+      // Revertir el cambio en localStorage si falla
+      const revertedHabits = localStorageService.toggleHabitCompletion(habitId, date, wasCompleted);
+      setCompletedHabits(revertedHabits);
+      showErrorMessage('Error al guardar. Intenta de nuevo.');
     }
   };
 
@@ -329,8 +324,8 @@ function App() {
                 <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-text-light dark:text-text-dark">
                   {currentView === 'today' && 'Hábitos del día'}
                   {currentView === 'calendar' && 'Calendario'}
-                  {currentView === 'habits' && 'Mis Hábitos'}
-                  {currentView === 'analytics' && 'Análisis'}
+                  {currentView === 'habits' && 'Todos mis hábitos'}
+                  {currentView === 'analytics' && 'Dashboard de Progreso'}
                 </h1>
               </div>
             </div>
@@ -383,13 +378,7 @@ function App() {
             )}
 
             {currentView === 'analytics' && (
-              <>
-                <div className="text-center py-12 text-subtext-light dark:text-subtext-dark">
-                  <span className="material-icons text-6xl mb-4">analytics</span>
-                  <p className="text-xl">Estadísticas y análisis</p>
-                  <p className="text-sm mt-2">Próximamente...</p>
-                </div>
-              </>
+              <ProgressDashboard habitos={habitsData} />
             )}
           </div>
         </main>

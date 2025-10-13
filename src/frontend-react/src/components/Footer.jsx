@@ -56,9 +56,9 @@ function Footer({ onAddHabit, currentView, onChangeView }) {
                 : 'text-subtext-light dark:text-subtext-dark'
             }`}
           >
-            <span className="material-icons text-xl sm:text-2xl">analytics</span>
+            <span className="material-icons text-xl sm:text-2xl">insights</span>
             <span className={`text-xs sm:text-sm ${currentView === 'analytics' ? 'font-medium' : ''}`}>
-              Análisis
+              progreso
             </span>
           </button>
         </div>
