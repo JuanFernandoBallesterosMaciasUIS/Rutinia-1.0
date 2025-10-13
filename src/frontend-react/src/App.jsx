@@ -7,9 +7,105 @@ import EditHabitModal from './components/EditHabitModal';
 import Calendar from './components/Calendar';
 import HabitsView from './components/HabitsView';
 import ProgressDashboard from './components/ProgressDashboard';
+import Login from './components/Login';
+import EditProfile from './components/EditProfile';
 import { habitsData as initialHabitsData } from './data/habitsData';
 import * as api from './services/api';
 import * as localStorageService from './services/localStorage';
+
+// 🔧 Función helper para normalizar nombres de días
+// Convierte abreviaturas ('lun', 'mar') a nombres completos ('Lunes', 'Martes')
+const normalizeDayName = (day) => {
+  const dayMap = {
+    'dom': 'Domingo',
+    'lun': 'Lunes',
+    'mar': 'Martes',
+    'mie': 'Miercoles',
+    'jue': 'Jueves',
+    'vie': 'Viernes',
+    'sab': 'Sabado',
+    // También aceptar nombres completos (por si acaso)
+    'Domingo': 'Domingo',
+    'Lunes': 'Lunes',
+    'Martes': 'Martes',
+    'Miercoles': 'Miercoles',
+    'Jueves': 'Jueves',
+    'Viernes': 'Viernes',
+    'Sabado': 'Sabado'
+  };
+  return dayMap[day] || day;
+};
+
+// 🔥 Función para calcular la racha actual de un hábito
+// Cuenta cuántos días consecutivos (según la frecuencia del hábito) se ha completado
+const calculateStreak = (habit, completedHabits) => {
+  if (!habit || !completedHabits) return 0;
+
+  const frequency = (habit.frequency || '').toLowerCase();
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // Normalizar a medianoche
+  
+  // Función helper para verificar si un hábito aplica en una fecha específica
+  const habitAppliesOnDate = (date) => {
+    if (frequency === 'diario') return true;
+    
+    if (frequency === 'semanal' && habit.days && habit.days.length > 0) {
+      const dayNames = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'];
+      const dayName = dayNames[date.getDay()];
+      const normalizedHabitDays = habit.days.map(day => normalizeDayName(day));
+      return normalizedHabitDays.includes(dayName);
+    }
+    
+    if (frequency === 'mensual') return true;
+    
+    return false;
+  };
+
+  // Función helper para formatear fecha como "YYYY-MM-DD"
+  const formatDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  let streak = 0;
+  let checkDate = new Date(today);
+  let foundFirstCompletion = false;
+  
+  // Retroceder día por día contando días consecutivos
+  for (let i = 0; i < 365; i++) { // Límite de 365 días
+    const dateStr = formatDate(checkDate);
+    
+    // Si este día aplica para el hábito
+    if (habitAppliesOnDate(checkDate)) {
+      const isCompleted = completedHabits[dateStr] && completedHabits[dateStr].includes(habit.id);
+      
+      if (isCompleted) {
+        streak++;
+        foundFirstCompletion = true;
+      } else {
+        // Si no está completado, verificar si es hoy
+        const isToday = checkDate.getTime() === today.getTime();
+        
+        if (isToday) {
+          // Es hoy y no está completado, continuar contando (permitir que hoy no esté hecho)
+          // No incrementar streak, pero no romperlo todavía
+        } else if (foundFirstCompletion) {
+          // Ya encontramos al menos un día completado y este día anterior no está completado
+          // La racha se rompió
+          break;
+        }
+        // Si nunca hemos encontrado un día completado, seguir buscando hacia atrás
+      }
+    }
+    
+    // Retroceder un día
+    checkDate.setDate(checkDate.getDate() - 1);
+  }
+
+  return streak;
+};
 
 // Componente simple de Toast
 function ToastContainer() {
@@ -46,11 +142,16 @@ function ToastContainer() {
 }
 
 function App() {
+  // Estado de autenticación
+  const [usuario, setUsuario] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [currentView, setCurrentView] = useState('today'); // 'today', 'calendar', 'habits', 'analytics'
   const [showNewHabitModal, setShowNewHabitModal] = useState(false);
   const [showEditHabitModal, setShowEditHabitModal] = useState(false);
+  const [showEditProfileModal, setShowEditProfileModal] = useState(false);
   const [currentEditHabit, setCurrentEditHabit] = useState(null);
   const [habitsData, setHabitsData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -58,22 +159,56 @@ function App() {
     return localStorageService.getCompletedHabits();
   });
 
-  // Usuario temporal (hasta implementar autenticación)
-  const TEMP_USER_ID = '68ea57f5fc52f3058c8233ab';
+  // Función auxiliar para obtener el ID del usuario actual
+  const getUserId = () => {
+    return usuario?.id || usuario?._id || null;
+  };
 
-  // Cargar hábitos del backend al iniciar
+  // Verificar si hay usuario guardado en localStorage al cargar
   useEffect(() => {
-    loadHabitsFromBackend();
+    const savedUser = localStorage.getItem('usuario');
+    if (savedUser) {
+      try {
+        const parsedUser = JSON.parse(savedUser);
+        setUsuario(parsedUser);
+        setIsAuthenticated(true);
+      } catch (error) {
+        console.error('Error al parsear usuario:', error);
+        localStorage.removeItem('usuario');
+      }
+    }
   }, []);
+
+  // Cargar hábitos del backend al iniciar (solo si está autenticado)
+  useEffect(() => {
+    if (isAuthenticated && usuario) {
+      loadHabitsFromBackend();
+    }
+  }, [isAuthenticated, usuario]);
 
   // Función para cargar hábitos del backend
   const loadHabitsFromBackend = async () => {
     try {
       setLoading(true);
-      const backendHabits = await api.getHabitos();
+      
+      // Obtener el ID del usuario
+      const userId = usuario?.id || usuario?._id;
+      
+      if (!userId) {
+        console.error('❌ No se encontró el ID del usuario');
+        setHabitsData([]);
+        setLoading(false);
+        return;
+      }
+      
+      console.log('🔍 Cargando hábitos para el usuario:', userId);
+      
+      // Obtener solo los hábitos del usuario actual
+      const backendHabits = await api.getHabitos({ usuarioId: userId });
+      
+      console.log(`✅ Se encontraron ${backendHabits.length} hábitos del usuario`);
       
       // Mapear hábitos del backend al formato frontend
-      // ✨ YA NO necesitamos visualData de localStorage
       const mappedHabits = backendHabits.map(habit => 
         api.mapHabitoToFrontend(habit)
       );
@@ -81,7 +216,6 @@ function App() {
       setHabitsData(mappedHabits);
     } catch (error) {
       console.error('Error al cargar hábitos:', error);
-      // NO usar datos de ejemplo, solo mostrar error
       setHabitsData([]);
       showErrorMessage('No se pudieron cargar los hábitos. Verifica que el servidor esté corriendo en http://localhost:8000');
     } finally {
@@ -104,18 +238,26 @@ function App() {
       if (habitsData.length === 0) return; // Esperar a que carguen los hábitos
       
       const today = getCurrentDateString();
+      const currentDay = getDayOfWeek(new Date());
       
-      // Obtener hábitos que aplican para hoy
+      // Obtener hábitos que aplican para hoy (misma lógica que habitAppliesToToday)
       const todayHabitsToInit = habitsData.filter(habit => {
-        const currentDay = getDayOfWeek(new Date());
         const frequency = (habit.frequency || '').toLowerCase();
         
         if (frequency === 'diario' || frequency === 'diaria') {
           return true;
         } else if (frequency === 'semanal') {
-          return habit.days && habit.days.includes(currentDay);
+          // Verificar que el hábito tenga días configurados y que hoy esté incluido
+          if (!habit.days || habit.days.length === 0) {
+            return false;
+          }
+          // 🔧 NORMALIZAR LOS DÍAS: Convertir 'lun' -> 'Lunes', etc.
+          const normalizedHabitDays = habit.days.map(day => normalizeDayName(day));
+          return normalizedHabitDays.includes(currentDay);
         } else if (frequency === 'mensual') {
-          return new Date().getDate() === 1;
+          // Los hábitos mensuales se muestran todos los días del mes
+          // La lógica de "ya completado" se maneja después al consultar el backend
+          return true;
         }
         return false;
       });
@@ -167,6 +309,32 @@ function App() {
     }
   };
 
+  // Manejar login exitoso
+  const handleLoginSuccess = (userData) => {
+    setUsuario(userData);
+    setIsAuthenticated(true);
+    console.log('✅ Usuario autenticado:', userData);
+  };
+
+  // Manejar logout
+  const handleLogout = () => {
+    setUsuario(null);
+    setIsAuthenticated(false);
+    localStorage.removeItem('usuario');
+    setHabitsData([]);
+    setCompletedHabits({});
+    setCurrentView('today');
+    console.log('👋 Sesión cerrada');
+  };
+
+  // Manejar actualización de perfil
+  const handleUpdateProfile = (updatedUser) => {
+    setUsuario(updatedUser);
+    console.log('✅ Perfil actualizado:', updatedUser);
+    // Mostrar mensaje de éxito
+    showSuccessMessage('Perfil actualizado correctamente');
+  };
+
   // Funciones para obtener día y fecha
   const getDayOfWeek = (date = new Date()) => {
     const days = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'];
@@ -182,6 +350,7 @@ function App() {
   const habitAppliesToToday = (habit) => {
     const today = new Date();
     const currentDay = getDayOfWeek(today);
+    const todayStr = getCurrentDateString();
     
     // Convertir a minúsculas para comparación
     const frequency = (habit.frequency || '').toLowerCase();
@@ -189,9 +358,63 @@ function App() {
     if (frequency === 'diario' || frequency === 'diaria') {
       return true;
     } else if (frequency === 'semanal') {
-      return habit.days && habit.days.includes(currentDay);
+      // Verificar que el hábito tenga días configurados y que hoy esté incluido
+      if (!habit.days || habit.days.length === 0) {
+        console.warn(`⚠️ Hábito semanal "${habit.name}" no tiene días configurados`);
+        return false;
+      }
+      
+      // 🔧 NORMALIZAR LOS DÍAS: Convertir 'lun' -> 'Lunes', etc.
+      const normalizedHabitDays = habit.days.map(day => normalizeDayName(day));
+      const applies = normalizedHabitDays.includes(currentDay);
+      
+      console.log(`📅 Hábito "${habit.name}"`);
+      console.log(`   Días originales: [${habit.days.join(', ')}]`);
+      console.log(`   Días normalizados: [${normalizedHabitDays.join(', ')}]`);
+      console.log(`   Hoy: ${currentDay}`);
+      console.log(`   Aplica: ${applies}`);
+      
+      return applies;
     } else if (frequency === 'mensual') {
-      return today.getDate() === 1;
+      // 🔧 HÁBITOS MENSUALES: Se muestran todos los días del mes hasta que se completen
+      // Una vez completado en CUALQUIER día del mes, no se vuelven a mostrar en ese mes
+      
+      const today = new Date();
+      const currentMonth = today.getMonth();
+      const currentYear = today.getFullYear();
+      
+      // Verificar si ya se completó en algún día de este mes
+      let completadoEsteMes = false;
+      
+      for (const dateStr in completedHabits) {
+        if (completedHabits[dateStr]?.includes(habit.id)) {
+          // Parsear la fecha del registro completado
+          const [year, month, day] = dateStr.split('-').map(Number);
+          const completedDate = new Date(year, month - 1, day);
+          
+          // Verificar si es del mismo mes y año
+          if (completedDate.getMonth() === currentMonth && 
+              completedDate.getFullYear() === currentYear) {
+            // Verificar si fue completado en un día ANTERIOR a hoy
+            const todayDateOnly = new Date(currentYear, currentMonth, today.getDate());
+            const completedDateOnly = new Date(year, month - 1, day);
+            
+            if (completedDateOnly < todayDateOnly) {
+              // Fue completado en un día anterior de este mes
+              completadoEsteMes = true;
+              break;
+            }
+          }
+        }
+      }
+      
+      // Si ya se completó en un día anterior de este mes, no mostrarlo
+      if (completadoEsteMes) {
+        return false;
+      }
+      
+      // Si no se ha completado o se completó hoy, mostrarlo
+      return true;
     }
     return false;
   };
@@ -231,8 +454,15 @@ function App() {
   // Manejar creación de nuevo hábito
   const handleCreateHabit = async (newHabitData) => {
     try {
+      const userId = getUserId();
+      
+      if (!userId) {
+        showErrorMessage('No se pudo identificar el usuario. Por favor, inicia sesión nuevamente.');
+        return;
+      }
+      
       // ✨ Mapear al formato del backend (INCLUYE icon y color)
-      const backendData = api.mapHabitoToBackend(newHabitData, TEMP_USER_ID);
+      const backendData = api.mapHabitoToBackend(newHabitData, userId);
       
       // Crear en el backend
       const createdHabit = await api.createHabito(backendData);
@@ -252,8 +482,15 @@ function App() {
   // Manejar edición de hábito
   const handleEditHabit = async (editedHabitData) => {
     try {
+      const userId = getUserId();
+      
+      if (!userId) {
+        showErrorMessage('No se pudo identificar el usuario. Por favor, inicia sesión nuevamente.');
+        return;
+      }
+      
       // ✨ Mapear al formato del backend (INCLUYE icon y color)
-      const backendData = api.mapHabitoToBackend(editedHabitData, TEMP_USER_ID);
+      const backendData = api.mapHabitoToBackend(editedHabitData, userId);
       
       // Actualizar en el backend
       const updatedHabit = await api.updateHabito(editedHabitData.id, backendData);
@@ -317,31 +554,39 @@ function App() {
 
   return (
     <div className="relative w-full min-h-screen bg-background-light dark:bg-background-dark font-display">
-      {/* Indicador de carga */}
-      {loading && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-          <div className="bg-card-light dark:bg-card-dark rounded-lg p-8 flex flex-col items-center gap-4">
-            <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
-            <p className="text-text-light dark:text-text-dark font-semibold">Cargando hábitos...</p>
-          </div>
-        </div>
-      )}
-      
-      {/* Sidebar */}
-      <Sidebar 
-        isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
-        darkMode={darkMode}
-        onToggleDarkMode={toggleDarkMode}
-      />
+      {/* Mostrar Login si no está autenticado */}
+      {!isAuthenticated ? (
+        <Login onLoginSuccess={handleLoginSuccess} />
+      ) : (
+        <>
+          {/* Indicador de carga */}
+          {loading && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+              <div className="bg-card-light dark:bg-card-dark rounded-lg p-8 flex flex-col items-center gap-4">
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
+                <p className="text-text-light dark:text-text-dark font-semibold">Cargando hábitos...</p>
+              </div>
+            </div>
+          )}
+          
+          {/* Sidebar */}
+          <Sidebar 
+            isOpen={sidebarOpen}
+            onClose={() => setSidebarOpen(false)}
+            darkMode={darkMode}
+            onToggleDarkMode={toggleDarkMode}
+            onLogout={handleLogout}
+            usuario={usuario}
+            onEditProfile={() => setShowEditProfileModal(true)}
+          />
 
-      {/* Overlay para móvil */}
-      {sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
+          {/* Overlay para móvil */}
+          {sidebarOpen && (
+            <div 
+              className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
+              onClick={() => setSidebarOpen(false)}
+            />
+          )}
 
       {/* Modal para crear nuevo hábito */}
       <NewHabitModal
@@ -363,6 +608,14 @@ function App() {
           habitData={currentEditHabit}
         />
       )}
+
+      {/* Modal para editar perfil */}
+      <EditProfile
+        isOpen={showEditProfileModal}
+        onClose={() => setShowEditProfileModal(false)}
+        usuario={usuario}
+        onUpdateSuccess={handleUpdateProfile}
+      />
 
       {/* Main Content */}
       <div className="lg:ml-64 transition-all duration-300 ease-in-out min-h-screen">
@@ -393,8 +646,7 @@ function App() {
         <main className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 pb-40 sm:pb-36 lg:pb-16">
           <div>
             {currentView === 'today' && (
-              <>
-                
+              <div>
                 {/* Grid de hábitos */}
                 <div className="habits-grid mb-8">
                   {todayHabits.length === 0 ? (
@@ -407,7 +659,10 @@ function App() {
                     todayHabits.map(habit => (
                       <HabitCard
                         key={habit.id}
-                        habit={habit}
+                        habit={{
+                          ...habit,
+                          streak: calculateStreak(habit, completedHabits)
+                        }}
                         isCompleted={isHabitCompletedToday(habit.id)}
                         onComplete={toggleHabitCompletion}
                         onEdit={openEditModal}
@@ -416,7 +671,7 @@ function App() {
                     ))
                   )}
                 </div>
-              </>
+              </div>
             )}
 
             {currentView === 'calendar' && (
@@ -429,6 +684,8 @@ function App() {
             {currentView === 'habits' && (
               <HabitsView 
                 habits={habitsData}
+                completedHabits={completedHabits}
+                calculateStreak={calculateStreak}
                 onEditHabit={openEditModal}
                 onDeleteHabit={handleDeleteHabit}
               />
@@ -450,6 +707,8 @@ function App() {
 
       {/* Toast Container */}
       <ToastContainer />
+      </>
+      )}
     </div>
   );
 }

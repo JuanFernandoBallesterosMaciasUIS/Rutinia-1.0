@@ -10,6 +10,78 @@ const handleResponse = async (response) => {
   return response.json();
 };
 
+// ==================== AUTENTICACIÓN Y USUARIOS ====================
+
+/**
+ * Iniciar sesión de usuario
+ * @param {Object} credentials - { correo, clave }
+ * @returns {Promise<Object>} Usuario autenticado
+ */
+export const loginUsuario = async (credentials) => {
+  const response = await fetch(`${API_BASE_URL}/usuarios/`, {
+    method: 'GET',
+  });
+  
+  const usuarios = await handleResponse(response);
+  
+  // Buscar usuario por correo y clave (temporal, hasta implementar auth real)
+  const usuario = usuarios.find(
+    u => u.correo === credentials.correo && u.clave === credentials.clave
+  );
+  
+  if (!usuario) {
+    throw new Error('Credenciales inválidas');
+  }
+  
+  return usuario;
+};
+
+/**
+ * Registrar nuevo usuario
+ * @param {Object} userData - { nombre, apellido, correo, clave, tema }
+ * @returns {Promise<Object>} Usuario creado
+ */
+export const registrarUsuario = async (userData) => {
+  const response = await fetch(`${API_BASE_URL}/usuarios/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      ...userData,
+      tema: userData.tema || 'light'
+    }),
+  });
+  return handleResponse(response);
+};
+
+/**
+ * Obtener información de un usuario
+ * @param {string} id - ID del usuario
+ * @returns {Promise<Object>} Usuario
+ */
+export const getUsuario = async (id) => {
+  const response = await fetch(`${API_BASE_URL}/usuarios/${id}/`);
+  return handleResponse(response);
+};
+
+/**
+ * Actualizar información de usuario
+ * @param {string} id - ID del usuario
+ * @param {Object} userData - Datos a actualizar
+ * @returns {Promise<Object>} Usuario actualizado
+ */
+export const updateUsuario = async (id, userData) => {
+  const response = await fetch(`${API_BASE_URL}/usuarios/${id}/`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(userData),
+  });
+  return handleResponse(response);
+};
+
 // ==================== HÁBITOS ====================
 
 /**
