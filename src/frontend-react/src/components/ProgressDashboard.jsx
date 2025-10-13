@@ -5,7 +5,6 @@ import { getProgresosMultiples } from '../services/api';
 const ProgressDashboard = ({ habitos }) => {
   const [progresos, setProgresos] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [vista, setVista] = useState('grid'); // 'grid' o 'list'
   const [filtro, setFiltro] = useState('todos'); // 'todos', 'alto', 'medio', 'bajo'
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -111,57 +110,21 @@ const ProgressDashboard = ({ habitos }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50 p-4 sm:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-6 sm:mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-            <div>
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-2">
-                📊 Dashboard de Progreso
-              </h1>
-              <p className="text-sm sm:text-base text-gray-600">
-                Visualiza el rendimiento de tus hábitos
-              </p>
-            </div>
+        {/* Stats Card */}
+        <div className="mb-6">
+          <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl shadow-xl p-4 sm:p-6 text-white relative">
+            {/* Botón de actualizar en la esquina superior derecha */}
+            <button
+              onClick={handleRefresh}
+              className="absolute top-4 right-4 p-2 rounded-lg bg-white/20 hover:bg-white/30 text-white transition-colors"
+              title="Actualizar datos"
+              disabled={loading}
+            >
+              <span className={`material-icons ${loading ? 'animate-spin' : ''}`}>
+                refresh
+              </span>
+            </button>
             
-            {/* Controles de vista */}
-            <div className="flex items-center gap-2">
-              <button
-                onClick={handleRefresh}
-                className="p-2 rounded-lg bg-white text-gray-600 hover:bg-gray-100 transition-colors"
-                title="Actualizar datos"
-                disabled={loading}
-              >
-                <span className={`material-icons ${loading ? 'animate-spin' : ''}`}>
-                  refresh
-                </span>
-              </button>
-              <button
-                onClick={() => setVista('grid')}
-                className={`p-2 rounded-lg transition-colors ${
-                  vista === 'grid'
-                    ? 'bg-indigo-600 text-white'
-                    : 'bg-white text-gray-600 hover:bg-gray-100'
-                }`}
-                title="Vista en cuadrícula"
-              >
-                <span className="material-icons">grid_view</span>
-              </button>
-              <button
-                onClick={() => setVista('list')}
-                className={`p-2 rounded-lg transition-colors ${
-                  vista === 'list'
-                    ? 'bg-indigo-600 text-white'
-                    : 'bg-white text-gray-600 hover:bg-gray-100'
-                }`}
-                title="Vista en lista"
-              >
-                <span className="material-icons">view_list</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Stats Card */}
-          <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl shadow-xl p-4 sm:p-6 text-white">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="text-center sm:text-left">
                 <p className="text-sm opacity-90 mb-1">Progreso Promedio</p>
@@ -238,11 +201,7 @@ const ProgressDashboard = ({ habitos }) => {
 
         {/* Grid de Progress Cards */}
         {habitosFiltrados.length > 0 ? (
-          <div className={
-            vista === 'grid'
-              ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6'
-              : 'space-y-4 sm:space-y-6'
-          }>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {habitosFiltrados.map(habito => (
               <ProgressCard key={habito.id} habito={habito} />
             ))}
