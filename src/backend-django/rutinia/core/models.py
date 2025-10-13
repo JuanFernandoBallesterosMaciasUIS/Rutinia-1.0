@@ -2,7 +2,7 @@ from django.db import models
 
 # Create your models here.
 from mongoengine import (
-    Document, EmbeddedDocument, fields, CASCADE
+    Document, EmbeddedDocument, fields, CASCADE, NULLIFY
 )
 
 
@@ -37,8 +37,8 @@ class Notificacion(EmbeddedDocument):
 
 # --- Hábito ---
 class Habito(Document):
-    usuario = fields.ReferenceField(Usuario)
-    categoria = fields.ReferenceField(Categoria)
+    usuario = fields.ReferenceField(Usuario, reverse_delete_rule=CASCADE)
+    categoria = fields.ReferenceField(Categoria, reverse_delete_rule=NULLIFY)
     nombre = fields.StringField(max_length=50)
     descripcion = fields.StringField(max_length=100)
     dificultad = fields.StringField(max_length=50)
