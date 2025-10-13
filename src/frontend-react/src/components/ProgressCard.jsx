@@ -12,6 +12,9 @@ const ProgressCard = ({ habito }) => {
     const fetchProgreso = async () => {
       if (!habito || !habito.id) return;
       
+      // Log para ver la estructura del hábito
+      console.log('Estructura del hábito:', habito);
+      
       setLoading(true);
       setError(null);
       
@@ -28,6 +31,17 @@ const ProgressCard = ({ habito }) => {
           completados: semanal.completados,
           total: semanal.total,
           progreso: semanal.progreso_semanal
+        });
+        
+        console.log('Progreso mensual para', habito.name, ':', mensual);
+        console.log('Campos del progreso mensual:', {
+          inicio: mensual.inicio_mes,
+          fin: mensual.fin_mes,
+          completados: mensual.completados,
+          total: mensual.total,
+          registros_totales: mensual.registros_totales,
+          progreso: mensual.progreso_mensual,
+          todosLosCampos: Object.keys(mensual)
         });
         
         setProgresoSemanal(semanal);
@@ -79,9 +93,43 @@ const ProgressCard = ({ habito }) => {
 
   // Calcular el porcentaje de progreso
   const completados = progresoActual.completados;
-  const total = vistaActual === 'semanal' 
-    ? progresoActual.total || 7 
-    : progresoActual.registros_totales;
+  
+  // Calcular el total correcto en el frontend si el backend envía 0
+  let total = vistaActual === 'semanal' 
+    ? progresoActual.total 
+    : (progresoActual.total || progresoActual.registros_totales || 0);
+
+  // Si el total es 0, calcularlo basándose en la frecuencia del hábito
+  if (total === 0 && habito.frequency) {
+    if (vistaActual === 'semanal') {
+      // Calcular total semanal
+      if (habito.frequency === 'diario' || habito.frequency === 'Diario') {
+        total = 7; // Todos los días de la semana
+      } else if (habito.frequency === 'semanal' || habito.frequency === 'Semanal') {
+        total = habito.days && habito.days.length > 0 ? habito.days.length : 1;
+      } else if (habito.frequency === 'mensual' || habito.frequency === 'Mensual') {
+        total = 1; // Una vez por semana para hábitos mensuales
+      }
+    } else {
+      // Calcular total mensual
+      const hoy = new Date();
+      const diasEnMes = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0).getDate();
+      
+      if (habito.frequency === 'diario' || habito.frequency === 'Diario') {
+        total = diasEnMes; // Todos los días del mes
+      } else if (habito.frequency === 'semanal' || habito.frequency === 'Semanal') {
+        // Aproximadamente 4 semanas por mes
+        const diasPorSemana = habito.days && habito.days.length > 0 ? habito.days.length : 1;
+        total = Math.ceil(diasEnMes / 7) * diasPorSemana;
+      } else if (habito.frequency === 'mensual' || habito.frequency === 'Mensual') {
+        total = 1; // Una vez al mes
+      }
+    }
+  }
+
+  // Debug: ver qué valores estamos usando
+  console.log(`[${habito.name}] Vista: ${vistaActual}, Completados: ${completados}, Total: ${total}`);
+  console.log(`[${habito.name}] Objeto completo progresoActual:`, JSON.stringify(progresoActual, null, 2));
 
   // Usar el porcentaje del backend, pero recalcular si es necesario
   let progresoPorcentaje = vistaActual === 'semanal' 
