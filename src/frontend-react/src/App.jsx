@@ -429,7 +429,7 @@ function App() {
             {currentView === 'habits' && (
               <HabitsView 
                 habits={habitsData}
-                onEditHabit={handleEditHabit}
+                onEditHabit={openEditModal}
                 onDeleteHabit={handleDeleteHabit}
               />
             )}
