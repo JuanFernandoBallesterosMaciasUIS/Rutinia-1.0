@@ -1,4 +1,29 @@
 function Sidebar({ isOpen, onClose, darkMode, onToggleDarkMode, onLogout, usuario, onEditProfile }) {
+  // Función para obtener las iniciales del usuario
+  const getInitials = () => {
+    if (!usuario) return 'U';
+    
+    const nombre = usuario.nombre || '';
+    const apellido = usuario.apellido || '';
+    
+    // Obtener la primera letra del nombre y apellido
+    const inicialNombre = nombre.charAt(0).toUpperCase();
+    const inicialApellido = apellido.charAt(0).toUpperCase();
+    
+    // Si tiene ambos, retornar ambas iniciales
+    if (inicialNombre && inicialApellido) {
+      return inicialNombre + inicialApellido;
+    }
+    
+    // Si solo tiene nombre, retornar las dos primeras letras del nombre
+    if (inicialNombre && nombre.length > 1) {
+      return inicialNombre + nombre.charAt(1).toUpperCase();
+    }
+    
+    // En caso contrario, retornar lo que se tenga
+    return inicialNombre || inicialApellido || 'U';
+  };
+
   return (
     <div 
       className={`fixed top-0 left-0 h-full w-64 bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark transform ${
@@ -7,7 +32,9 @@ function Sidebar({ isOpen, onClose, darkMode, onToggleDarkMode, onLogout, usuari
     >
       <div className="flex flex-col items-center mb-8 px-2">
         <div className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 mb-4 flex items-center justify-center overflow-hidden shadow-lg">
-          <span className="material-icons text-white text-5xl">account_circle</span>
+          <span className="text-white text-4xl font-bold">
+            {getInitials()}
+          </span>
         </div>
         <h2 className="font-bold text-base text-center leading-tight mb-1 text-text-light dark:text-text-dark">
           {usuario ? `${usuario.nombre} ${usuario.apellido}` : 'Usuario'}
