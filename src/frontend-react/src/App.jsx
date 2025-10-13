@@ -390,13 +390,13 @@ function App() {
         </header>
 
         {/* Contenido principal con padding para header y footer */}
-        <main className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8">
+        <main className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 pb-40 sm:pb-36 lg:pb-16">
           <div>
             {currentView === 'today' && (
               <>
                 
                 {/* Grid de hábitos */}
-                <div className="habits-grid">
+                <div className="habits-grid mb-8">
                   {todayHabits.length === 0 ? (
                     <div className="col-span-full text-center py-12">
                       <span className="material-icons text-6xl text-subtext-light dark:text-subtext-dark mb-4">event_available</span>
