@@ -305,16 +305,44 @@ function App() {
       
       return applies;
     } else if (frequency === 'mensual') {
-      // 🆕 CAMBIO CRÍTICO: Los hábitos mensuales se muestran TODOS LOS DÍAS del mes
-      // hasta que se completen en ese día específico
-      const isCompletedToday = completedHabits[todayStr]?.includes(habit.id) || false;
+      // 🔧 HÁBITOS MENSUALES: Se muestran todos los días del mes hasta que se completen
+      // Una vez completado en CUALQUIER día del mes, no se vuelven a mostrar en ese mes
       
-      // Si ya está completado hoy, no mostrarlo
-      if (isCompletedToday) {
+      const today = new Date();
+      const currentMonth = today.getMonth();
+      const currentYear = today.getFullYear();
+      
+      // Verificar si ya se completó en algún día de este mes
+      let completadoEsteMes = false;
+      
+      for (const dateStr in completedHabits) {
+        if (completedHabits[dateStr]?.includes(habit.id)) {
+          // Parsear la fecha del registro completado
+          const [year, month, day] = dateStr.split('-').map(Number);
+          const completedDate = new Date(year, month - 1, day);
+          
+          // Verificar si es del mismo mes y año
+          if (completedDate.getMonth() === currentMonth && 
+              completedDate.getFullYear() === currentYear) {
+            // Verificar si fue completado en un día ANTERIOR a hoy
+            const todayDateOnly = new Date(currentYear, currentMonth, today.getDate());
+            const completedDateOnly = new Date(year, month - 1, day);
+            
+            if (completedDateOnly < todayDateOnly) {
+              // Fue completado en un día anterior de este mes
+              completadoEsteMes = true;
+              break;
+            }
+          }
+        }
+      }
+      
+      // Si ya se completó en un día anterior de este mes, no mostrarlo
+      if (completadoEsteMes) {
         return false;
       }
       
-      // Si no está completado, mostrarlo todos los días del mes
+      // Si no se ha completado o se completó hoy, mostrarlo
       return true;
     }
     return false;
