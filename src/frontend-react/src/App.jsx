@@ -65,8 +65,10 @@ function App() {
     return localStorageService.getCompletedHabits();
   });
 
-  // Usuario temporal (hasta implementar autenticación)
-  const TEMP_USER_ID = '68ea57f5fc52f3058c8233ab';
+  // Función auxiliar para obtener el ID del usuario actual
+  const getUserId = () => {
+    return usuario?.id || usuario?._id || null;
+  };
 
   // Verificar si hay usuario guardado en localStorage al cargar
   useEffect(() => {
@@ -94,10 +96,25 @@ function App() {
   const loadHabitsFromBackend = async () => {
     try {
       setLoading(true);
-      const backendHabits = await api.getHabitos();
+      
+      // Obtener el ID del usuario
+      const userId = usuario?.id || usuario?._id;
+      
+      if (!userId) {
+        console.error('❌ No se encontró el ID del usuario');
+        setHabitsData([]);
+        setLoading(false);
+        return;
+      }
+      
+      console.log('🔍 Cargando hábitos para el usuario:', userId);
+      
+      // Obtener solo los hábitos del usuario actual
+      const backendHabits = await api.getHabitos({ usuarioId: userId });
+      
+      console.log(`✅ Se encontraron ${backendHabits.length} hábitos del usuario`);
       
       // Mapear hábitos del backend al formato frontend
-      // ✨ YA NO necesitamos visualData de localStorage
       const mappedHabits = backendHabits.map(habit => 
         api.mapHabitoToFrontend(habit)
       );
@@ -105,7 +122,6 @@ function App() {
       setHabitsData(mappedHabits);
     } catch (error) {
       console.error('Error al cargar hábitos:', error);
-      // NO usar datos de ejemplo, solo mostrar error
       setHabitsData([]);
       showErrorMessage('No se pudieron cargar los hábitos. Verifica que el servidor esté corriendo en http://localhost:8000');
     } finally {
@@ -281,8 +297,15 @@ function App() {
   // Manejar creación de nuevo hábito
   const handleCreateHabit = async (newHabitData) => {
     try {
+      const userId = getUserId();
+      
+      if (!userId) {
+        showErrorMessage('No se pudo identificar el usuario. Por favor, inicia sesión nuevamente.');
+        return;
+      }
+      
       // ✨ Mapear al formato del backend (INCLUYE icon y color)
-      const backendData = api.mapHabitoToBackend(newHabitData, TEMP_USER_ID);
+      const backendData = api.mapHabitoToBackend(newHabitData, userId);
       
       // Crear en el backend
       const createdHabit = await api.createHabito(backendData);
@@ -302,8 +325,15 @@ function App() {
   // Manejar edición de hábito
   const handleEditHabit = async (editedHabitData) => {
     try {
+      const userId = getUserId();
+      
+      if (!userId) {
+        showErrorMessage('No se pudo identificar el usuario. Por favor, inicia sesión nuevamente.');
+        return;
+      }
+      
       // ✨ Mapear al formato del backend (INCLUYE icon y color)
-      const backendData = api.mapHabitoToBackend(editedHabitData, TEMP_USER_ID);
+      const backendData = api.mapHabitoToBackend(editedHabitData, userId);
       
       // Actualizar en el backend
       const updatedHabit = await api.updateHabito(editedHabitData.id, backendData);
