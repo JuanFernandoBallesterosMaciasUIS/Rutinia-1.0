@@ -16,7 +16,7 @@ const HabitsView = ({ habits, onEditHabit, onDeleteHabit }) => {
 
   // Función para obtener el estilo del botón de filtro
   const getFilterButtonClass = (filter) => {
-    const baseClass = 'px-4 py-2 rounded-lg font-semibold whitespace-nowrap transition-colors';
+    const baseClass = 'px-3 sm:px-4 py-2 rounded-lg font-semibold text-sm transition-colors';
     if (currentFilter === filter) {
       return `${baseClass} bg-primary text-white`;
     }
@@ -26,30 +26,42 @@ const HabitsView = ({ habits, onEditHabit, onDeleteHabit }) => {
   return (
     <div className="max-w-7xl mx-auto">
       {/* Filtros */}
-      <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+      <div className="flex flex-wrap gap-2 mb-6">
         <button
           className={getFilterButtonClass('todos')}
           onClick={() => setCurrentFilter('todos')}
         >
-          Todos
+          <span className="flex items-center gap-1.5">
+            <span className="material-icons text-base sm:text-lg">apps</span>
+            <span>Todos</span>
+          </span>
         </button>
         <button
           className={getFilterButtonClass('diario')}
           onClick={() => setCurrentFilter('diario')}
         >
-          Diarios
+          <span className="flex items-center gap-1.5">
+            <span className="material-icons text-base sm:text-lg">today</span>
+            <span>Diarios</span>
+          </span>
         </button>
         <button
           className={getFilterButtonClass('semanal')}
           onClick={() => setCurrentFilter('semanal')}
         >
-          Semanales
+          <span className="flex items-center gap-1.5">
+            <span className="material-icons text-base sm:text-lg">date_range</span>
+            <span>Semanales</span>
+          </span>
         </button>
         <button
           className={getFilterButtonClass('mensual')}
           onClick={() => setCurrentFilter('mensual')}
         >
-          Mensuales
+          <span className="flex items-center gap-1.5">
+            <span className="material-icons text-base sm:text-lg">calendar_month</span>
+            <span>Mensuales</span>
+          </span>
         </button>
       </div>
 
