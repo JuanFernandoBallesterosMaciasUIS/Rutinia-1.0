@@ -98,6 +98,63 @@ function App() {
     }
   }, []);
 
+  // 🆕 Efecto para inicializar registros del día automáticamente
+  useEffect(() => {
+    const initializeDailyRecords = async () => {
+      if (habitsData.length === 0) return; // Esperar a que carguen los hábitos
+      
+      const today = getCurrentDateString();
+      
+      // Obtener hábitos que aplican para hoy
+      const todayHabitsToInit = habitsData.filter(habit => {
+        const currentDay = getDayOfWeek(new Date());
+        const frequency = (habit.frequency || '').toLowerCase();
+        
+        if (frequency === 'diario' || frequency === 'diaria') {
+          return true;
+        } else if (frequency === 'semanal') {
+          return habit.days && habit.days.includes(currentDay);
+        } else if (frequency === 'mensual') {
+          return new Date().getDate() === 1;
+        }
+        return false;
+      });
+      
+      console.log(`📅 Inicializando registros para ${today}...`);
+      console.log(`📋 Hábitos del día: ${todayHabitsToInit.length}`);
+      
+      // Para cada hábito del día, verificar si ya tiene registro
+      for (const habit of todayHabitsToInit) {
+        const alreadyCompleted = completedHabits[today]?.includes(habit.id) || false;
+        
+        // Verificar si el hábito ya tiene registro en el backend
+        try {
+          const registros = await api.getRegistros(habit.id);
+          const registroHoy = registros.find(r => r.fecha === today);
+          
+          if (!registroHoy) {
+            // No existe registro, crear uno en false
+            console.log(`➕ Creando registro en false para: ${habit.name}`);
+            await api.toggleHabitoCompletado(habit.id, today, false);
+          } else {
+            console.log(`✓ Registro ya existe para: ${habit.name} (estado: ${registroHoy.estado})`);
+            
+            // Sincronizar con localStorage si el backend tiene el registro en true
+            if (registroHoy.estado && !alreadyCompleted) {
+              const newCompletedHabits = localStorageService.toggleHabitCompletion(habit.id, today, true);
+              setCompletedHabits(newCompletedHabits);
+            }
+          }
+        } catch (error) {
+          console.error(`Error al verificar registro de ${habit.name}:`, error);
+        }
+      }
+    };
+    
+    // Ejecutar solo cuando cambien los hábitos
+    initializeDailyRecords();
+  }, [habitsData]); // Solo cuando cambian los hábitos
+
   // Toggle dark mode
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
@@ -352,8 +409,9 @@ function App() {
                         key={habit.id}
                         habit={habit}
                         isCompleted={isHabitCompletedToday(habit.id)}
-                        onToggleComplete={toggleHabitCompletion}
+                        onComplete={toggleHabitCompletion}
                         onEdit={openEditModal}
+                        showCompleteButton={true}
                       />
                     ))
                   )}
@@ -365,7 +423,6 @@ function App() {
               <Calendar 
                 habitsData={habitsData}
                 completedHabits={completedHabits}
-                onToggleHabit={toggleHabitCompletion}
               />
             )}
 

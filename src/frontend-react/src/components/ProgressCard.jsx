@@ -21,6 +21,15 @@ const ProgressCard = ({ habito }) => {
           getProgresoMensual(habito.id)
         ]);
         
+        // Log para debugging
+        console.log('Progreso semanal para', habito.name, ':', {
+          inicio: semanal.inicio_semana,
+          fin: semanal.fin_semana,
+          completados: semanal.completados,
+          total: semanal.total,
+          progreso: semanal.progreso_semanal
+        });
+        
         setProgresoSemanal(semanal);
         setProgresoMensual(mensual);
       } catch (err) {
@@ -68,14 +77,26 @@ const ProgressCard = ({ habito }) => {
   
   if (!progresoActual) return null;
 
-  const progresoPorcentaje = vistaActual === 'semanal' 
+  // Calcular el porcentaje de progreso
+  const completados = progresoActual.completados;
+  const total = vistaActual === 'semanal' 
+    ? progresoActual.total || 7 
+    : progresoActual.registros_totales;
+
+  // Usar el porcentaje del backend, pero recalcular si es necesario
+  let progresoPorcentaje = vistaActual === 'semanal' 
     ? progresoActual.progreso_semanal 
     : progresoActual.progreso_mensual;
 
-  const completados = progresoActual.completados;
-  const total = vistaActual === 'semanal' 
-    ? progresoActual.total || 7 // Usar el total del backend, fallback a 7
-    : progresoActual.registros_totales;
+  // Si el porcentaje es 0 pero hay completados, recalcular
+  if (progresoPorcentaje === 0 && completados > 0 && total > 0) {
+    progresoPorcentaje = (completados / total) * 100;
+  }
+
+  // Asegurarse de que no sea NaN
+  if (isNaN(progresoPorcentaje)) {
+    progresoPorcentaje = 0;
+  }
 
   return (
     <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
@@ -147,9 +168,26 @@ const ProgressCard = ({ habito }) => {
               <span className="material-icons text-indigo-600 text-lg">calendar_today</span>
               <span className="text-xs text-gray-500 uppercase font-semibold">Período</span>
             </div>
-            <p className="text-xs sm:text-sm font-medium text-gray-800 truncate">
+            <p className="text-xs sm:text-sm font-medium text-gray-800">
               {vistaActual === 'semanal' 
-                ? `${new Date(progresoSemanal.inicio_semana).toLocaleDateString('es-ES', { month: 'short', day: 'numeric' })} - ${new Date(progresoSemanal.fin_semana).toLocaleDateString('es-ES', { month: 'short', day: 'numeric' })}`
+                ? (() => {
+                    // Parsear fechas correctamente (YYYY-MM-DD)
+                    const [yearInicio, mesInicio, diaInicio] = progresoSemanal.inicio_semana.split('-').map(Number);
+                    const [yearFin, mesFin, diaFin] = progresoSemanal.fin_semana.split('-').map(Number);
+                    
+                    const inicio = new Date(yearInicio, mesInicio - 1, diaInicio);
+                    const fin = new Date(yearFin, mesFin - 1, diaFin);
+                    
+                    // Formatear como "6 - 12 de octubre"
+                    const nombreMesInicio = inicio.toLocaleDateString('es-ES', { month: 'long' });
+                    const nombreMesFin = fin.toLocaleDateString('es-ES', { month: 'long' });
+                    
+                    if (nombreMesInicio === nombreMesFin) {
+                      return `${diaInicio} - ${diaFin} de ${nombreMesInicio}`;
+                    } else {
+                      return `${diaInicio} ${inicio.toLocaleDateString('es-ES', { month: 'short' })} - ${diaFin} ${fin.toLocaleDateString('es-ES', { month: 'short' })}`;
+                    }
+                  })()
                 : `${new Date(progresoMensual.inicio_mes).toLocaleDateString('es-ES', { month: 'long' })}`
               }
             </p>

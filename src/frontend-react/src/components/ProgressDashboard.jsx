@@ -7,28 +7,38 @@ const ProgressDashboard = ({ habitos }) => {
   const [loading, setLoading] = useState(true);
   const [vista, setVista] = useState('grid'); // 'grid' o 'list'
   const [filtro, setFiltro] = useState('todos'); // 'todos', 'alto', 'medio', 'bajo'
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const fetchProgresos = async () => {
+    if (!habitos || habitos.length === 0) {
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const habitoIds = habitos.map(h => h.id);
+      const progresosData = await getProgresosMultiples(habitoIds);
+      setProgresos(progresosData);
+    } catch (error) {
+      console.error('Error al cargar progresos:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRefresh = () => {
+    setRefreshKey(prev => prev + 1);
+  };
 
   useEffect(() => {
-    const fetchProgresos = async () => {
-      if (!habitos || habitos.length === 0) {
-        setLoading(false);
-        return;
-      }
-
-      setLoading(true);
-      try {
-        const habitoIds = habitos.map(h => h.id);
-        const progresosData = await getProgresosMultiples(habitoIds);
-        setProgresos(progresosData);
-      } catch (error) {
-        console.error('Error al cargar progresos:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchProgresos();
-  }, [habitos]);
+  }, [habitos, refreshKey]);
+
+  // Recargar datos cuando el componente se monta (útil al cambiar de vista)
+  useEffect(() => {
+    setRefreshKey(prev => prev + 1);
+  }, []);
 
   const getProgresoPromedio = () => {
     if (progresos.length === 0) return 0;
@@ -115,6 +125,16 @@ const ProgressDashboard = ({ habitos }) => {
             
             {/* Controles de vista */}
             <div className="flex items-center gap-2">
+              <button
+                onClick={handleRefresh}
+                className="p-2 rounded-lg bg-white text-gray-600 hover:bg-gray-100 transition-colors"
+                title="Actualizar datos"
+                disabled={loading}
+              >
+                <span className={`material-icons ${loading ? 'animate-spin' : ''}`}>
+                  refresh
+                </span>
+              </button>
               <button
                 onClick={() => setVista('grid')}
                 className={`p-2 rounded-lg transition-colors ${

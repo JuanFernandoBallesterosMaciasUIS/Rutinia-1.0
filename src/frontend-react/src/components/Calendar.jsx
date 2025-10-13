@@ -7,7 +7,7 @@ const monthNames = [
 
 const dayNamesShort = ['dom', 'lun', 'mar', 'mie', 'jue', 'vie', 'sab'];
 
-function Calendar({ habitsData, completedHabits, onToggleHabit }) {
+function Calendar({ habitsData, completedHabits }) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [currentView, setCurrentView] = useState('month'); // 'month' o 'week'
@@ -288,18 +288,16 @@ function Calendar({ habitsData, completedHabits, onToggleHabit }) {
               {habit.name}
             </span>
           </div>
-          <button
-            onClick={() => onToggleHabit(habit.id, dateStr)}
-            className={`p-2 rounded-lg ${
+          {/* Icono de estado (solo visualización, no se puede hacer clic) */}
+          <div className="p-2">
+            <span className={`material-icons text-2xl ${
               isCompleted 
                 ? 'text-green-500' 
-                : 'text-gray-400 dark:text-gray-600 hover:text-primary'
-            } transition-colors`}
-          >
-            <span className="material-icons">
+                : 'text-gray-400 dark:text-gray-500'
+            }`}>
               {isCompleted ? 'check_circle' : 'radio_button_unchecked'}
             </span>
-          </button>
+          </div>
         </div>
       );
     });
@@ -377,9 +375,18 @@ function Calendar({ habitsData, completedHabits, onToggleHabit }) {
 
       {/* Resumen de hábitos del día seleccionado */}
       <div className="bg-card-light dark:bg-card-dark rounded-large p-4 sm:p-6 shadow-sm">
-        <h2 className="text-xl font-bold text-text-light dark:text-text-dark mb-4">
-          Hábitos del {dayOfMonth} de {month} de {year}
-        </h2>
+        <div className="flex items-start justify-between mb-4">
+          <h2 className="text-xl font-bold text-text-light dark:text-text-dark">
+            Hábitos del {dayOfMonth} de {month} de {year}
+          </h2>
+          <div className="flex items-center gap-2 text-xs text-subtext-light dark:text-subtext-dark bg-blue-50 dark:bg-blue-900/20 px-3 py-1.5 rounded-full">
+            <span className="material-icons text-sm">info</span>
+            <span>Solo visualización</span>
+          </div>
+        </div>
+        <p className="text-sm text-subtext-light dark:text-subtext-dark mb-4">
+          Para marcar hábitos como completados, ve a la sección "Hábitos del día"
+        </p>
         <div className="space-y-3">
           {renderHabitsForDay()}
         </div>

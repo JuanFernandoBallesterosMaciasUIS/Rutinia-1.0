@@ -56,8 +56,8 @@ const HabitCard = ({
 
   return (
     <div
-      className={`bg-card-light dark:bg-card-dark rounded-large p-4 sm:p-6 shadow-sm hover:shadow-md transition-all ${
-        isCompleted ? 'opacity-60' : ''
+      className={`bg-card-light dark:bg-card-dark rounded-large p-4 sm:p-6 shadow-sm hover:shadow-md transition-all relative ${
+        isCompleted ? 'opacity-80' : ''
       }`}
     >
       {/* Header: Icono, Título y Botón de Editar */}
@@ -98,37 +98,39 @@ const HabitCard = ({
         </button>
       </div>
 
-      {/* Información del hábito */}
-      <div className="space-y-2 flex-1">
-        {/* Frecuencia */}
-        <div className="flex items-center gap-2 text-xs sm:text-sm text-subtext-light dark:text-subtext-dark">
-          <span className="material-icons text-sm sm:text-base">schedule</span>
-          <span>{formatFrequency()}</span>
+      {/* Información del hábito y botón de completar */}
+      <div className="flex items-end justify-between">
+        <div className="space-y-2 flex-1">
+          {/* Frecuencia */}
+          <div className="flex items-center gap-2 text-xs sm:text-sm text-subtext-light dark:text-subtext-dark">
+            <span className="material-icons text-sm sm:text-base">schedule</span>
+            <span>{formatFrequency()}</span>
+          </div>
+          
+          {/* Racha */}
+          <div className="flex items-center gap-2 text-xs sm:text-sm text-subtext-light dark:text-subtext-dark">
+            <span className="material-icons text-sm sm:text-base">local_fire_department</span>
+            <span>{habit.streak || 0} días</span>
+          </div>
         </div>
-        
-        {/* Racha */}
-        <div className="flex items-center gap-2 text-xs sm:text-sm text-subtext-light dark:text-subtext-dark">
-          <span className="material-icons text-sm sm:text-base">local_fire_department</span>
-          <span>Racha: {habit.streak || 0} {habit.streak === 1 ? 'día' : 'días'}</span>
-        </div>
-      </div>
 
-      {/* Botón de completar (condicional) */}
-      {showCompleteButton && (
-        <button
-          onClick={handleComplete}
-          className={`w-full py-2.5 rounded-lg font-medium transition-all mt-4 ${
-            isCompleted 
-              ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300' 
-              : 'bg-primary text-white hover:shadow-lg'
-          }`}
-        >
-          <span className="material-icons text-sm align-middle mr-1">
-            {isCompleted ? 'check_circle' : 'radio_button_unchecked'}
-          </span>
-          {isCompleted ? 'Completado' : 'Marcar como hecho'}
-        </button>
-      )}
+        {/* Botón de completar circular en la esquina inferior derecha */}
+        {showCompleteButton && (
+          <button
+            onClick={handleComplete}
+            className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-all hover:bg-gray-100 dark:hover:bg-gray-700"
+            aria-label={isCompleted ? 'Hábito completado' : 'Marcar como completado'}
+          >
+            <span className={`material-icons text-3xl transition-colors ${
+              isCompleted 
+                ? 'text-green-500' 
+                : 'text-gray-400 dark:text-gray-500'
+            }`}>
+              {isCompleted ? 'check_circle' : 'radio_button_unchecked'}
+            </span>
+          </button>
+        )}
+      </div>
     </div>
   );
 };
