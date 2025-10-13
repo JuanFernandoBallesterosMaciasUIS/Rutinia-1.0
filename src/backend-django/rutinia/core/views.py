@@ -276,8 +276,8 @@ class HabitoViewSet(viewsets.ModelViewSet):
         elif(str.capitalize(habito.tipo_frecuencia) == "Semanal"):
             total = len(habito.dias) * len(semanas_mes)
         
-        else:
-            total = 0
+        elif(str.capitalize(habito.tipo_frecuencia) == "Mensual"):
+            total = 1
 
         completados = registros.filter(estado=True).count()
         progreso = (completados / total * 100) if total > 0 else 0
@@ -288,7 +288,8 @@ class HabitoViewSet(viewsets.ModelViewSet):
             "fin_mes": fin_mes,
             "progreso_mensual": round(progreso, 2),
             "registros_totales": total,
-            "completados": completados
+            "completados": completados,
+            "total": total
         })
 
 """
