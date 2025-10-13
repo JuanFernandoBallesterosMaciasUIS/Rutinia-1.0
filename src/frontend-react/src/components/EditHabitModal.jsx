@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { availableIcons, availableColors, categories, frequencies, daysOfWeek } from '../data/habitsData';
 
-function EditHabitModal({ isOpen, onClose, onSubmit, onDelete, habitData }) {
+const EditHabitModal = ({ isOpen, onClose, onSubmit, onDelete, habitData }) => {
   const [formData, setFormData] = useState({
     id: '',
     name: '',
@@ -19,18 +19,20 @@ function EditHabitModal({ isOpen, onClose, onSubmit, onDelete, habitData }) {
 
   useEffect(() => {
     if (isOpen && habitData) {
+      // Los datos ya vienen normalizados desde api.js (mapHabitoToFrontend)
       setFormData({
-        id: habitData.id,
-        name: habitData.name,
-        category: habitData.category,
-        icon: habitData.icon,
-        color: habitData.color,
+        id: habitData.id || '',
+        name: habitData.name || '',
+        category: habitData.category || '',
+        icon: habitData.icon || '',
+        color: habitData.color || '',
         description: habitData.description || '',
-        frequency: habitData.frequency,
+        frequency: habitData.frequency || '',
         days: habitData.days || []
       });
-      setSelectedIcon(habitData.icon);
-      setSelectedColor(habitData.color);
+      
+      setSelectedIcon(habitData.icon || null);
+      setSelectedColor(habitData.color || null);
       setSelectedDays(habitData.days || []);
     }
   }, [isOpen, habitData]);
@@ -72,6 +74,12 @@ function EditHabitModal({ isOpen, onClose, onSubmit, onDelete, habitData }) {
     }
     
     onSubmit(formData);
+  };
+
+  const handleDelete = () => {
+    if (window.confirm('¿Estás seguro de que quieres eliminar este hábito?')) {
+      onDelete(formData.id);
+    }
   };
 
   const getIconColorClass = (iconName) => {
@@ -127,9 +135,7 @@ function EditHabitModal({ isOpen, onClose, onSubmit, onDelete, habitData }) {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
-          {/* Nombre y Categoría en dos columnas en pantallas grandes */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {/* Nombre del hábito */}
             <div>
               <label className="block text-xs sm:text-sm font-semibold text-text-light dark:text-text-dark mb-1">
                 Nombre del hábito *
@@ -144,7 +150,6 @@ function EditHabitModal({ isOpen, onClose, onSubmit, onDelete, habitData }) {
               />
             </div>
 
-            {/* Categoría */}
             <div>
               <label className="block text-xs sm:text-sm font-semibold text-text-light dark:text-text-dark mb-1">
                 Categoría *
@@ -163,9 +168,7 @@ function EditHabitModal({ isOpen, onClose, onSubmit, onDelete, habitData }) {
             </div>
           </div>
 
-          {/* Icono y Color en dos columnas */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {/* Icono */}
             <div>
               <label className="block text-xs sm:text-sm font-semibold text-text-light dark:text-text-dark mb-1">
                 Icono *
@@ -190,7 +193,6 @@ function EditHabitModal({ isOpen, onClose, onSubmit, onDelete, habitData }) {
               </div>
             </div>
 
-            {/* Color */}
             <div>
               <label className="block text-xs sm:text-sm font-semibold text-text-light dark:text-text-dark mb-1">
                 Color *
@@ -212,25 +214,38 @@ function EditHabitModal({ isOpen, onClose, onSubmit, onDelete, habitData }) {
             </div>
           </div>
 
-          {/* Frecuencia */}
-          <div>
-            <label className="block text-xs sm:text-sm font-semibold text-text-light dark:text-text-dark mb-1">
-              Frecuencia *
-            </label>
-            <select 
-              required
-              value={formData.frequency}
-              onChange={(e) => setFormData({ ...formData, frequency: e.target.value })}
-              className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-primary transition-all"
-            >
-              <option value="">Selecciona la frecuencia</option>
-              {frequencies.map(freq => (
-                <option key={freq.value} value={freq.value}>{freq.label}</option>
-              ))}
-            </select>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs sm:text-sm font-semibold text-text-light dark:text-text-dark mb-1">
+                Frecuencia *
+              </label>
+              <select 
+                required
+                value={formData.frequency}
+                onChange={(e) => setFormData({ ...formData, frequency: e.target.value })}
+                className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+              >
+                <option value="">Selecciona la frecuencia</option>
+                {frequencies.map(freq => (
+                  <option key={freq.value} value={freq.value}>{freq.label}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs sm:text-sm font-semibold text-text-light dark:text-text-dark mb-1">
+                Descripción (opcional)
+              </label>
+              <textarea 
+                rows="2"
+                placeholder="Describe tu hábito..."
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-primary transition-all resize-none"
+              />
+            </div>
           </div>
 
-          {/* Selector de días (solo visible cuando es semanal) */}
           {formData.frequency === 'semanal' && (
             <div>
               <label className="block text-xs sm:text-sm font-semibold text-text-light dark:text-text-dark mb-1">
@@ -255,33 +270,34 @@ function EditHabitModal({ isOpen, onClose, onSubmit, onDelete, habitData }) {
             </div>
           )}
 
-          {/* Botones */}
           <div className="flex gap-2 sm:gap-3 pt-2">
             <button 
               type="button" 
-              onClick={() => onDelete(formData.id)}
-              className="px-3 sm:px-4 py-2 text-sm rounded-lg border-2 border-red-500 text-red-500 font-semibold hover:bg-red-50 dark:hover:bg-red-900 dark:hover:bg-opacity-20 transition-all"
+              onClick={handleDelete}
+              className="px-4 py-2 text-sm sm:text-base rounded-lg border-2 border-red-500 text-red-500 font-semibold hover:bg-red-50 dark:hover:bg-red-900 transition-all"
             >
               Eliminar
             </button>
+            
             <button 
               type="button" 
               onClick={onClose}
-              className="flex-1 px-3 sm:px-4 py-2 text-sm rounded-lg border-2 border-gray-300 dark:border-gray-600 text-text-light dark:text-text-dark font-semibold hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
+              className="flex-1 px-4 py-2 text-sm sm:text-base rounded-lg border-2 border-gray-300 dark:border-gray-600 text-text-light dark:text-text-dark font-semibold hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
             >
               Cancelar
             </button>
+            
             <button 
               type="submit" 
-              className="flex-1 px-3 sm:px-4 py-2 text-sm rounded-lg bg-primary text-white font-semibold hover:bg-blue-600 transition-all shadow-lg hover:shadow-xl"
+              className="flex-1 px-4 py-2 text-sm sm:text-base rounded-lg bg-primary text-white font-semibold hover:bg-blue-600 transition-all shadow-lg hover:shadow-xl"
             >
-              Guardar
+              Guardar Cambios
             </button>
           </div>
         </form>
       </div>
     </div>
   );
-}
+};
 
 export default EditHabitModal;
