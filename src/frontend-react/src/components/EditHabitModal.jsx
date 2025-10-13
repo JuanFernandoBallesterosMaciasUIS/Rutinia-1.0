@@ -101,14 +101,14 @@ const EditHabitModal = ({ isOpen, onClose, onSubmit, onDelete, habitData }) => {
 
   const getColorBgClass = (color) => {
     const colorMap = {
-      indigo: 'bg-indigo-100 dark:bg-indigo-900',
-      green: 'bg-green-100 dark:bg-green-900',
-      blue: 'bg-blue-100 dark:bg-blue-900',
-      purple: 'bg-purple-100 dark:bg-purple-900',
-      red: 'bg-red-100 dark:bg-red-900',
-      yellow: 'bg-yellow-100 dark:bg-yellow-900',
-      pink: 'bg-pink-100 dark:bg-pink-900',
-      orange: 'bg-orange-100 dark:bg-orange-900'
+      indigo: 'bg-indigo-500',
+      green: 'bg-green-500',
+      blue: 'bg-blue-500',
+      purple: 'bg-purple-500',
+      red: 'bg-red-500',
+      yellow: 'bg-yellow-500',
+      pink: 'bg-pink-500',
+      orange: 'bg-orange-500'
     };
     return colorMap[color] || colorMap.blue;
   };
