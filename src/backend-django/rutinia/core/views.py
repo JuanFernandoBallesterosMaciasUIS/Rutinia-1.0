@@ -278,6 +278,9 @@ class HabitoViewSet(viewsets.ModelViewSet):
         
         elif(str.capitalize(habito.tipo_frecuencia) == "Mensual"):
             total = 1
+        
+        else: 
+            total = 0
 
         completados = registros.filter(estado=True).count()
         progreso = (completados / total * 100) if total > 0 else 0
