@@ -2,7 +2,7 @@ from django.db import models
 
 # Create your models here.
 from mongoengine import (
-    Document, EmbeddedDocument, fields
+    Document, EmbeddedDocument, fields, CASCADE
 )
 
 
@@ -54,7 +54,7 @@ class Habito(Document):
 
 # --- Registro de Hábito ---
 class RegistroHabito(Document):
-    habito = fields.ReferenceField(Habito)
+    habito = fields.ReferenceField(Habito, reverse_delete_rule=CASCADE)
     fecha = fields.DateField()
     estado = fields.BooleanField()
 
