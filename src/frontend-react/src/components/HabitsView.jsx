@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import HabitCard from './HabitCard';
 
-const HabitsView = ({ habits, onEditHabit, onDeleteHabit }) => {
+const HabitsView = ({ habits, completedHabits, calculateStreak, onEditHabit, onDeleteHabit }) => {
   const [currentFilter, setCurrentFilter] = useState('todos');
 
   // Filtrar hábitos según el filtro seleccionado
@@ -89,7 +89,10 @@ const HabitsView = ({ habits, onEditHabit, onDeleteHabit }) => {
           {filteredHabits.map(habit => (
             <HabitCard
               key={habit.id}
-              habit={habit}
+              habit={{
+                ...habit,
+                streak: calculateStreak ? calculateStreak(habit, completedHabits) : 0
+              }}
               onEdit={onEditHabit}
               onDelete={onDeleteHabit}
               showCompleteButton={false}

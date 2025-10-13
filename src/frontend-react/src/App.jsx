@@ -36,6 +36,77 @@ const normalizeDayName = (day) => {
   return dayMap[day] || day;
 };
 
+// 🔥 Función para calcular la racha actual de un hábito
+// Cuenta cuántos días consecutivos (según la frecuencia del hábito) se ha completado
+const calculateStreak = (habit, completedHabits) => {
+  if (!habit || !completedHabits) return 0;
+
+  const frequency = (habit.frequency || '').toLowerCase();
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // Normalizar a medianoche
+  
+  // Función helper para verificar si un hábito aplica en una fecha específica
+  const habitAppliesOnDate = (date) => {
+    if (frequency === 'diario') return true;
+    
+    if (frequency === 'semanal' && habit.days && habit.days.length > 0) {
+      const dayNames = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'];
+      const dayName = dayNames[date.getDay()];
+      const normalizedHabitDays = habit.days.map(day => normalizeDayName(day));
+      return normalizedHabitDays.includes(dayName);
+    }
+    
+    if (frequency === 'mensual') return true;
+    
+    return false;
+  };
+
+  // Función helper para formatear fecha como "YYYY-MM-DD"
+  const formatDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  let streak = 0;
+  let checkDate = new Date(today);
+  let foundFirstCompletion = false;
+  
+  // Retroceder día por día contando días consecutivos
+  for (let i = 0; i < 365; i++) { // Límite de 365 días
+    const dateStr = formatDate(checkDate);
+    
+    // Si este día aplica para el hábito
+    if (habitAppliesOnDate(checkDate)) {
+      const isCompleted = completedHabits[dateStr] && completedHabits[dateStr].includes(habit.id);
+      
+      if (isCompleted) {
+        streak++;
+        foundFirstCompletion = true;
+      } else {
+        // Si no está completado, verificar si es hoy
+        const isToday = checkDate.getTime() === today.getTime();
+        
+        if (isToday) {
+          // Es hoy y no está completado, continuar contando (permitir que hoy no esté hecho)
+          // No incrementar streak, pero no romperlo todavía
+        } else if (foundFirstCompletion) {
+          // Ya encontramos al menos un día completado y este día anterior no está completado
+          // La racha se rompió
+          break;
+        }
+        // Si nunca hemos encontrado un día completado, seguir buscando hacia atrás
+      }
+    }
+    
+    // Retroceder un día
+    checkDate.setDate(checkDate.getDate() - 1);
+  }
+
+  return streak;
+};
+
 // Componente simple de Toast
 function ToastContainer() {
   const [toasts, setToasts] = useState([]);
@@ -588,7 +659,10 @@ function App() {
                     todayHabits.map(habit => (
                       <HabitCard
                         key={habit.id}
-                        habit={habit}
+                        habit={{
+                          ...habit,
+                          streak: calculateStreak(habit, completedHabits)
+                        }}
                         isCompleted={isHabitCompletedToday(habit.id)}
                         onComplete={toggleHabitCompletion}
                         onEdit={openEditModal}
@@ -610,6 +684,8 @@ function App() {
             {currentView === 'habits' && (
               <HabitsView 
                 habits={habitsData}
+                completedHabits={completedHabits}
+                calculateStreak={calculateStreak}
                 onEditHabit={openEditModal}
                 onDeleteHabit={handleDeleteHabit}
               />
