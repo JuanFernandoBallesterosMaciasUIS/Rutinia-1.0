@@ -71,18 +71,18 @@ const ProgressCard = ({ habito }) => {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 animate-pulse">
-        <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
-        <div className="h-2 bg-gray-200 rounded w-full mb-2"></div>
-        <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 sm:p-6 animate-pulse">
+        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-4"></div>
+        <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded w-full mb-2"></div>
+        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-red-50 rounded-xl shadow-md p-4 sm:p-6 border border-red-200">
-        <p className="text-red-600 text-sm">Error: {error}</p>
+      <div className="bg-red-50 dark:bg-red-900/20 rounded-xl shadow-md p-4 sm:p-6 border border-red-200 dark:border-red-800">
+        <p className="text-red-600 dark:text-red-400 text-sm">Error: {error}</p>
       </div>
     );
   }
@@ -147,7 +147,7 @@ const ProgressCard = ({ habito }) => {
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
       {/* Header con nombre del hábito */}
       <div className="bg-gradient-to-r from-purple-500 to-indigo-600 p-4 sm:p-6">
         <div className="flex items-center space-x-3">
@@ -161,13 +161,13 @@ const ProgressCard = ({ habito }) => {
       </div>
 
       {/* Tabs para cambiar vista */}
-      <div className="flex border-b border-gray-200">
+      <div className="flex border-b border-gray-200 dark:border-gray-700">
         <button
           onClick={() => setVistaActual('semanal')}
           className={`flex-1 py-3 text-sm font-medium transition-colors ${
             vistaActual === 'semanal'
-              ? 'text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50'
-              : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+              ? 'text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400 bg-indigo-50 dark:bg-indigo-900/20'
+              : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
           }`}
         >
           📅 Semanal
@@ -176,8 +176,8 @@ const ProgressCard = ({ habito }) => {
           onClick={() => setVistaActual('mensual')}
           className={`flex-1 py-3 text-sm font-medium transition-colors ${
             vistaActual === 'mensual'
-              ? 'text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50'
-              : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+              ? 'text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400 bg-indigo-50 dark:bg-indigo-900/20'
+              : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
           }`}
         >
           📆 Mensual
@@ -189,14 +189,14 @@ const ProgressCard = ({ habito }) => {
         {/* Barra de progreso */}
         <div className="mb-4">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-xs sm:text-sm text-gray-600 font-medium">
+            <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-medium">
               {completados} de {total} completados
             </span>
             <span className={`text-sm sm:text-base font-bold ${getProgressTextColor(progresoPorcentaje)}`}>
               {Math.round(progresoPorcentaje)}%
             </span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-3 sm:h-4 overflow-hidden">
+          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 sm:h-4 overflow-hidden">
             <div
               className={`h-full rounded-full transition-all duration-500 ${getProgressColor(progresoPorcentaje)}`}
               style={{ width: `${Math.min(progresoPorcentaje, 100)}%` }}
@@ -206,12 +206,12 @@ const ProgressCard = ({ habito }) => {
 
         {/* Información adicional */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mt-4">
-          <div className="bg-gray-50 rounded-lg p-3">
+          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
             <div className="flex items-center space-x-2 mb-1">
-              <span className="material-icons text-indigo-600 text-lg">calendar_today</span>
-              <span className="text-xs text-gray-500 uppercase font-semibold">Período</span>
+              <span className="material-icons text-indigo-600 dark:text-indigo-400 text-lg">calendar_today</span>
+              <span className="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold">Período</span>
             </div>
-            <p className="text-xs sm:text-sm font-medium text-gray-800">
+            <p className="text-xs sm:text-sm font-medium text-gray-800 dark:text-gray-200">
               {vistaActual === 'semanal' 
                 ? (() => {
                     // Parsear fechas correctamente (YYYY-MM-DD)
@@ -236,14 +236,14 @@ const ProgressCard = ({ habito }) => {
             </p>
           </div>
 
-          <div className="bg-gray-50 rounded-lg p-3">
+          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
             <div className="flex items-center space-x-2 mb-1">
-              <span className="material-icons text-green-600 text-lg">check_circle</span>
-              <span className="text-xs text-gray-500 uppercase font-semibold">Completados</span>
+              <span className="material-icons text-green-600 dark:text-green-400 text-lg">check_circle</span>
+              <span className="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold">Completados</span>
             </div>
-            <p className="text-xl sm:text-2xl font-bold text-gray-800">
+            <p className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-200">
               {completados}
-              <span className="text-sm sm:text-base text-gray-500 ml-1">/ {total}</span>
+              <span className="text-sm sm:text-base text-gray-500 dark:text-gray-400 ml-1">/ {total}</span>
             </p>
           </div>
         </div>

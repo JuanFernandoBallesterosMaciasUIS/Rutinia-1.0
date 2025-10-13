@@ -74,13 +74,13 @@ const ProgressDashboard = ({ habitos }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50 p-4 sm:p-6 lg:p-8">
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-4 sm:p-6 lg:p-8">
         <div className="max-w-7xl mx-auto">
           <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/3 mb-6"></div>
+            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-6"></div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[1, 2, 3].map(i => (
-                <div key={i} className="bg-white rounded-xl h-64"></div>
+                <div key={i} className="bg-white dark:bg-gray-800 rounded-xl h-64"></div>
               ))}
             </div>
           </div>
@@ -91,15 +91,15 @@ const ProgressDashboard = ({ habitos }) => {
 
   if (!habitos || habitos.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4">
         <div className="text-center">
-          <span className="material-icons text-gray-300 text-6xl sm:text-8xl mb-4">
+          <span className="material-icons text-gray-300 dark:text-gray-600 text-6xl sm:text-8xl mb-4">
             insights
           </span>
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-700 mb-2">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-700 dark:text-gray-300 mb-2">
             No hay hábitos para mostrar
           </h2>
-          <p className="text-sm sm:text-base text-gray-500">
+          <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400">
             Crea tu primer hábito para ver tu progreso aquí
           </p>
         </div>
@@ -108,7 +108,7 @@ const ProgressDashboard = ({ habitos }) => {
   }
 
   return (
-    <div className="bg-gradient-to-br from-purple-50 via-white to-indigo-50 pb-8">
+    <div className="bg-gradient-to-br from-purple-50 via-white to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 pb-8">
       <div className="max-w-7xl mx-auto">
         {/* Stats Card */}
         <div className="mb-6">
@@ -162,7 +162,7 @@ const ProgressDashboard = ({ habitos }) => {
               className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-all text-xs sm:text-sm flex items-center gap-1.5 ${
                 filtro === 'todos'
                   ? 'bg-indigo-600 text-white shadow-md'
-                  : 'bg-white text-gray-600 hover:bg-gray-100 shadow-sm'
+                  : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 shadow-sm'
               }`}
             >
               <span className="material-icons text-base sm:text-lg">apps</span>
@@ -173,7 +173,7 @@ const ProgressDashboard = ({ habitos }) => {
               className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-all text-xs sm:text-sm flex items-center gap-1.5 ${
                 filtro === 'alto'
                   ? 'bg-green-600 text-white shadow-md'
-                  : 'bg-white text-gray-600 hover:bg-gray-100 shadow-sm'
+                  : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 shadow-sm'
               }`}
             >
               <span className="material-icons text-base sm:text-lg">trending_up</span>
@@ -185,7 +185,7 @@ const ProgressDashboard = ({ habitos }) => {
               className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-all text-xs sm:text-sm flex items-center gap-1.5 ${
                 filtro === 'medio'
                   ? 'bg-yellow-600 text-white shadow-md'
-                  : 'bg-white text-gray-600 hover:bg-gray-100 shadow-sm'
+                  : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 shadow-sm'
               }`}
             >
               <span className="material-icons text-base sm:text-lg">show_chart</span>
@@ -197,7 +197,7 @@ const ProgressDashboard = ({ habitos }) => {
               className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-all text-xs sm:text-sm flex items-center gap-1.5 ${
                 filtro === 'bajo'
                   ? 'bg-red-600 text-white shadow-md'
-                  : 'bg-white text-gray-600 hover:bg-gray-100 shadow-sm'
+                  : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 shadow-sm'
               }`}
             >
               <span className="material-icons text-base sm:text-lg">warning</span>
@@ -215,14 +215,14 @@ const ProgressDashboard = ({ habitos }) => {
             ))}
           </div>
         ) : (
-          <div className="bg-white rounded-xl shadow-md p-8 sm:p-12 text-center">
-            <span className="material-icons text-gray-300 text-5xl sm:text-6xl mb-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-8 sm:p-12 text-center">
+            <span className="material-icons text-gray-300 dark:text-gray-600 text-5xl sm:text-6xl mb-4">
               filter_alt_off
             </span>
-            <h3 className="text-lg sm:text-xl font-semibold text-gray-700 mb-2">
+            <h3 className="text-lg sm:text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
               No hay hábitos en esta categoría
             </h3>
-            <p className="text-sm sm:text-base text-gray-500">
+            <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400">
               Intenta con otro filtro para ver tus hábitos
             </p>
           </div>
