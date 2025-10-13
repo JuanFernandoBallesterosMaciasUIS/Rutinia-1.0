@@ -116,9 +116,10 @@ const ProgressDashboard = ({ habitos }) => {
             {/* Botón de actualizar en la esquina superior derecha */}
             <button
               onClick={handleRefresh}
-              className="absolute top-4 right-4 p-2 rounded-lg bg-white/20 hover:bg-white/30 text-white transition-colors"
+              className="absolute top-2 right-2 sm:top-4 sm:right-4 p-3 rounded-lg bg-white/20 hover:bg-white/40 active:bg-white/50 text-white transition-colors z-10 cursor-pointer"
               title="Actualizar datos"
               disabled={loading}
+              style={{ minWidth: '44px', minHeight: '44px' }}
             >
               <span className={`material-icons ${loading ? 'animate-spin' : ''}`}>
                 refresh
@@ -154,47 +155,54 @@ const ProgressDashboard = ({ habitos }) => {
         </div>
 
         {/* Filtros */}
-        <div className="mb-6 overflow-x-auto">
-          <div className="flex gap-2 min-w-max sm:min-w-0">
+        <div className="mb-6">
+          <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setFiltro('todos')}
-              className={`px-4 py-2 rounded-lg font-medium transition-all whitespace-nowrap ${
+              className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-all text-xs sm:text-sm flex items-center gap-1.5 ${
                 filtro === 'todos'
                   ? 'bg-indigo-600 text-white shadow-md'
-                  : 'bg-white text-gray-600 hover:bg-gray-100'
+                  : 'bg-white text-gray-600 hover:bg-gray-100 shadow-sm'
               }`}
             >
-              Todos ({habitos.length})
+              <span className="material-icons text-base sm:text-lg">apps</span>
+              <span>Todos ({habitos.length})</span>
             </button>
             <button
               onClick={() => setFiltro('alto')}
-              className={`px-4 py-2 rounded-lg font-medium transition-all whitespace-nowrap ${
+              className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-all text-xs sm:text-sm flex items-center gap-1.5 ${
                 filtro === 'alto'
                   ? 'bg-green-600 text-white shadow-md'
-                  : 'bg-white text-gray-600 hover:bg-gray-100'
+                  : 'bg-white text-gray-600 hover:bg-gray-100 shadow-sm'
               }`}
             >
-              Alto Rendimiento (≥70%)
+              <span className="material-icons text-base sm:text-lg">trending_up</span>
+              <span className="hidden sm:inline">Alto Rendimiento (≥70%)</span>
+              <span className="sm:hidden">Alto (≥70%)</span>
             </button>
             <button
               onClick={() => setFiltro('medio')}
-              className={`px-4 py-2 rounded-lg font-medium transition-all whitespace-nowrap ${
+              className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-all text-xs sm:text-sm flex items-center gap-1.5 ${
                 filtro === 'medio'
                   ? 'bg-yellow-600 text-white shadow-md'
-                  : 'bg-white text-gray-600 hover:bg-gray-100'
+                  : 'bg-white text-gray-600 hover:bg-gray-100 shadow-sm'
               }`}
             >
-              Rendimiento Medio (40-69%)
+              <span className="material-icons text-base sm:text-lg">show_chart</span>
+              <span className="hidden sm:inline">Rendimiento Medio (40-69%)</span>
+              <span className="sm:hidden">Medio (40-69%)</span>
             </button>
             <button
               onClick={() => setFiltro('bajo')}
-              className={`px-4 py-2 rounded-lg font-medium transition-all whitespace-nowrap ${
+              className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-all text-xs sm:text-sm flex items-center gap-1.5 ${
                 filtro === 'bajo'
                   ? 'bg-red-600 text-white shadow-md'
-                  : 'bg-white text-gray-600 hover:bg-gray-100'
+                  : 'bg-white text-gray-600 hover:bg-gray-100 shadow-sm'
               }`}
             >
-              Necesita Atención (&lt;40%)
+              <span className="material-icons text-base sm:text-lg">warning</span>
+              <span className="hidden sm:inline">Necesita Atención (&lt;40%)</span>
+              <span className="sm:hidden">Bajo (&lt;40%)</span>
             </button>
           </div>
         </div>

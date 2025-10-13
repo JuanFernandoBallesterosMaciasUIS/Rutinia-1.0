@@ -150,18 +150,13 @@ const ProgressCard = ({ habito }) => {
     <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
       {/* Header con nombre del hábito */}
       <div className="bg-gradient-to-r from-purple-500 to-indigo-600 p-4 sm:p-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <span className="material-icons text-white text-2xl sm:text-3xl">
-              {habito.icon || 'fitness_center'}
-            </span>
-            <h3 className="text-white font-bold text-base sm:text-lg truncate max-w-[150px] sm:max-w-none">
-              {habito.name}
-            </h3>
-          </div>
-          <div className={`px-3 py-1 rounded-full text-xs font-semibold ${getProgressTextColor(progresoPorcentaje)} bg-white`}>
-            {Math.round(progresoPorcentaje)}%
-          </div>
+        <div className="flex items-center space-x-3">
+          <span className="material-icons text-white text-2xl sm:text-3xl">
+            {habito.icon || 'fitness_center'}
+          </span>
+          <h3 className="text-white font-bold text-base sm:text-lg truncate max-w-[150px] sm:max-w-none">
+            {habito.name}
+          </h3>
         </div>
       </div>
 
@@ -251,28 +246,6 @@ const ProgressCard = ({ habito }) => {
               <span className="text-sm sm:text-base text-gray-500 ml-1">/ {total}</span>
             </p>
           </div>
-        </div>
-
-        {/* Mensaje motivacional */}
-        <div className="mt-4 pt-4 border-t border-gray-100">
-          {progresoPorcentaje >= 80 && (
-            <div className="flex items-center space-x-2 text-green-600">
-              <span className="material-icons text-lg">emoji_events</span>
-              <p className="text-xs sm:text-sm font-medium">¡Excelente progreso! Sigue así 🎉</p>
-            </div>
-          )}
-          {progresoPorcentaje >= 50 && progresoPorcentaje < 80 && (
-            <div className="flex items-center space-x-2 text-yellow-600">
-              <span className="material-icons text-lg">trending_up</span>
-              <p className="text-xs sm:text-sm font-medium">¡Buen trabajo! Puedes lograrlo 💪</p>
-            </div>
-          )}
-          {progresoPorcentaje < 50 && (
-            <div className="flex items-center space-x-2 text-orange-600">
-              <span className="material-icons text-lg">flag</span>
-              <p className="text-xs sm:text-sm font-medium">¡Vamos! Tú puedes mejorar 🚀</p>
-            </div>
-          )}
         </div>
       </div>
     </div>
