@@ -7,6 +7,7 @@ import EditHabitModal from './components/EditHabitModal';
 import Calendar from './components/Calendar';
 import HabitsView from './components/HabitsView';
 import ProgressDashboard from './components/ProgressDashboard';
+import Login from './components/Login';
 import { habitsData as initialHabitsData } from './data/habitsData';
 import * as api from './services/api';
 import * as localStorageService from './services/localStorage';
@@ -46,6 +47,10 @@ function ToastContainer() {
 }
 
 function App() {
+  // Estado de autenticación
+  const [usuario, setUsuario] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [currentView, setCurrentView] = useState('today'); // 'today', 'calendar', 'habits', 'analytics'
@@ -61,10 +66,27 @@ function App() {
   // Usuario temporal (hasta implementar autenticación)
   const TEMP_USER_ID = '68ea57f5fc52f3058c8233ab';
 
-  // Cargar hábitos del backend al iniciar
+  // Verificar si hay usuario guardado en localStorage al cargar
   useEffect(() => {
-    loadHabitsFromBackend();
+    const savedUser = localStorage.getItem('usuario');
+    if (savedUser) {
+      try {
+        const parsedUser = JSON.parse(savedUser);
+        setUsuario(parsedUser);
+        setIsAuthenticated(true);
+      } catch (error) {
+        console.error('Error al parsear usuario:', error);
+        localStorage.removeItem('usuario');
+      }
+    }
   }, []);
+
+  // Cargar hábitos del backend al iniciar (solo si está autenticado)
+  useEffect(() => {
+    if (isAuthenticated && usuario) {
+      loadHabitsFromBackend();
+    }
+  }, [isAuthenticated, usuario]);
 
   // Función para cargar hábitos del backend
   const loadHabitsFromBackend = async () => {
@@ -165,6 +187,24 @@ function App() {
       document.documentElement.classList.remove('dark');
       localStorage.setItem('theme', 'light');
     }
+  };
+
+  // Manejar login exitoso
+  const handleLoginSuccess = (userData) => {
+    setUsuario(userData);
+    setIsAuthenticated(true);
+    console.log('✅ Usuario autenticado:', userData);
+  };
+
+  // Manejar logout
+  const handleLogout = () => {
+    setUsuario(null);
+    setIsAuthenticated(false);
+    localStorage.removeItem('usuario');
+    setHabitsData([]);
+    setCompletedHabits({});
+    setCurrentView('today');
+    console.log('👋 Sesión cerrada');
   };
 
   // Funciones para obtener día y fecha
@@ -317,31 +357,38 @@ function App() {
 
   return (
     <div className="relative w-full min-h-screen bg-background-light dark:bg-background-dark font-display">
-      {/* Indicador de carga */}
-      {loading && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-          <div className="bg-card-light dark:bg-card-dark rounded-lg p-8 flex flex-col items-center gap-4">
-            <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
-            <p className="text-text-light dark:text-text-dark font-semibold">Cargando hábitos...</p>
-          </div>
-        </div>
-      )}
-      
-      {/* Sidebar */}
-      <Sidebar 
-        isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
-        darkMode={darkMode}
-        onToggleDarkMode={toggleDarkMode}
-      />
+      {/* Mostrar Login si no está autenticado */}
+      {!isAuthenticated ? (
+        <Login onLoginSuccess={handleLoginSuccess} />
+      ) : (
+        <>
+          {/* Indicador de carga */}
+          {loading && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+              <div className="bg-card-light dark:bg-card-dark rounded-lg p-8 flex flex-col items-center gap-4">
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
+                <p className="text-text-light dark:text-text-dark font-semibold">Cargando hábitos...</p>
+              </div>
+            </div>
+          )}
+          
+          {/* Sidebar */}
+          <Sidebar 
+            isOpen={sidebarOpen}
+            onClose={() => setSidebarOpen(false)}
+            darkMode={darkMode}
+            onToggleDarkMode={toggleDarkMode}
+            onLogout={handleLogout}
+            usuario={usuario}
+          />
 
-      {/* Overlay para móvil */}
-      {sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
+          {/* Overlay para móvil */}
+          {sidebarOpen && (
+            <div 
+              className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
+              onClick={() => setSidebarOpen(false)}
+            />
+          )}
 
       {/* Modal para crear nuevo hábito */}
       <NewHabitModal
@@ -393,8 +440,7 @@ function App() {
         <main className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 pb-40 sm:pb-36 lg:pb-16">
           <div>
             {currentView === 'today' && (
-              <>
-                
+              <div>
                 {/* Grid de hábitos */}
                 <div className="habits-grid mb-8">
                   {todayHabits.length === 0 ? (
@@ -416,7 +462,7 @@ function App() {
                     ))
                   )}
                 </div>
-              </>
+              </div>
             )}
 
             {currentView === 'calendar' && (
@@ -450,6 +496,8 @@ function App() {
 
       {/* Toast Container */}
       <ToastContainer />
+      </>
+      )}
     </div>
   );
 }
