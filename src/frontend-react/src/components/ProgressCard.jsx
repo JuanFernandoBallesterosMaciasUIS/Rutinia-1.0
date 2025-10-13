@@ -94,36 +94,83 @@ const ProgressCard = ({ habito }) => {
   // Calcular el porcentaje de progreso
   const completados = progresoActual.completados;
   
-  // Calcular el total correcto en el frontend si el backend envía 0
-  let total = vistaActual === 'semanal' 
-    ? progresoActual.total 
-    : (progresoActual.total || progresoActual.registros_totales || 0);
-
-  // Si el total es 0, calcularlo basándose en la frecuencia del hábito
-  if (total === 0 && habito.frequency) {
-    if (vistaActual === 'semanal') {
-      // Calcular total semanal
+  // 🔧 FORZAR RECÁLCULO CORRECTO PARA VISTA MENSUAL
+  let total = 0;
+  
+  if (vistaActual === 'semanal') {
+    // Vista semanal: usar el total del backend
+    total = progresoActual.total || 0;
+    
+    // Si es 0, calcular según frecuencia
+    if (total === 0 && habito.frequency) {
       if (habito.frequency === 'diario' || habito.frequency === 'Diario') {
-        total = 7; // Todos los días de la semana
+        total = 7;
       } else if (habito.frequency === 'semanal' || habito.frequency === 'Semanal') {
         total = habito.days && habito.days.length > 0 ? habito.days.length : 1;
       } else if (habito.frequency === 'mensual' || habito.frequency === 'Mensual') {
-        total = 1; // Una vez por semana para hábitos mensuales
+        total = 1;
       }
-    } else {
-      // Calcular total mensual
-      const hoy = new Date();
-      const diasEnMes = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0).getDate();
+    }
+  } else {
+    // 🔧 VISTA MENSUAL: SIEMPRE RECALCULAR EN EL FRONTEND (no confiar en el backend)
+    if (progresoMensual && progresoMensual.inicio_mes && progresoMensual.fin_mes && habito.frequency) {
+      // Parsear fechas del backend (YYYY-MM-DD)
+      const [yearInicio, mesInicio, diaInicio] = progresoMensual.inicio_mes.split('-').map(Number);
+      const [yearFin, mesFin, diaFin] = progresoMensual.fin_mes.split('-').map(Number);
+      
+      const fechaInicio = new Date(yearInicio, mesInicio - 1, diaInicio);
+      const fechaFin = new Date(yearFin, mesFin - 1, diaFin);
       
       if (habito.frequency === 'diario' || habito.frequency === 'Diario') {
-        total = diasEnMes; // Todos los días del mes
+        // Para hábitos diarios: contar todos los días del mes
+        const diffTime = Math.abs(fechaFin - fechaInicio);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 para incluir el último día
+        total = diffDays;
       } else if (habito.frequency === 'semanal' || habito.frequency === 'Semanal') {
-        // Aproximadamente 4 semanas por mes
-        const diasPorSemana = habito.days && habito.days.length > 0 ? habito.days.length : 1;
-        total = Math.ceil(diasEnMes / 7) * diasPorSemana;
+        // 🔧 Para hábitos semanales: contar cuántos días específicos hay en el mes
+        const diasSemanaHabito = habito.days || [];
+        
+        // Mapeo de abreviaturas a números de día (0=Domingo, 1=Lunes, ..., 6=Sábado)
+        const diaMap = {
+          'dom': 0, 'Domingo': 0,
+          'lun': 1, 'Lunes': 1,
+          'mar': 2, 'Martes': 2,
+          'mie': 3, 'Miercoles': 3,
+          'jue': 4, 'Jueves': 4,
+          'vie': 5, 'Viernes': 5,
+          'sab': 6, 'Sabado': 6
+        };
+        
+        // Convertir los días del hábito a números
+        const diasNumeros = diasSemanaHabito
+          .map(dia => diaMap[dia])
+          .filter(num => num !== undefined);
+        
+        if (diasNumeros.length > 0) {
+          // Contar cuántas veces aparece cada día en el rango de fechas
+          let contadorDias = 0;
+          const fechaActual = new Date(fechaInicio);
+          
+          while (fechaActual <= fechaFin) {
+            const diaSemana = fechaActual.getDay(); // 0-6
+            if (diasNumeros.includes(diaSemana)) {
+              contadorDias++;
+            }
+            // Avanzar un día
+            fechaActual.setDate(fechaActual.getDate() + 1);
+          }
+          
+          total = contadorDias;
+        } else {
+          // Fallback si no hay días configurados
+          total = progresoActual.total || progresoActual.registros_totales || 0;
+        }
       } else if (habito.frequency === 'mensual' || habito.frequency === 'Mensual') {
         total = 1; // Una vez al mes
       }
+    } else {
+      // Fallback: usar el valor del backend si no se puede calcular
+      total = progresoActual.total || progresoActual.registros_totales || 0;
     }
   }
 
@@ -231,7 +278,12 @@ const ProgressCard = ({ habito }) => {
                       return `${diaInicio} ${inicio.toLocaleDateString('es-ES', { month: 'short' })} - ${diaFin} ${fin.toLocaleDateString('es-ES', { month: 'short' })}`;
                     }
                   })()
-                : `${new Date(progresoMensual.inicio_mes).toLocaleDateString('es-ES', { month: 'long' })}`
+                : (() => {
+                    // 🔧 FIX: Parsear correctamente la fecha mensual (YYYY-MM-DD)
+                    const [year, mes, dia] = progresoMensual.inicio_mes.split('-').map(Number);
+                    const fecha = new Date(year, mes - 1, dia);
+                    return fecha.toLocaleDateString('es-ES', { month: 'long' });
+                  })()
               }
             </p>
           </div>
