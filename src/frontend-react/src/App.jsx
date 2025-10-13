@@ -8,6 +8,7 @@ import Calendar from './components/Calendar';
 import HabitsView from './components/HabitsView';
 import ProgressDashboard from './components/ProgressDashboard';
 import Login from './components/Login';
+import EditProfile from './components/EditProfile';
 import { habitsData as initialHabitsData } from './data/habitsData';
 import * as api from './services/api';
 import * as localStorageService from './services/localStorage';
@@ -56,6 +57,7 @@ function App() {
   const [currentView, setCurrentView] = useState('today'); // 'today', 'calendar', 'habits', 'analytics'
   const [showNewHabitModal, setShowNewHabitModal] = useState(false);
   const [showEditHabitModal, setShowEditHabitModal] = useState(false);
+  const [showEditProfileModal, setShowEditProfileModal] = useState(false);
   const [currentEditHabit, setCurrentEditHabit] = useState(null);
   const [habitsData, setHabitsData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -205,6 +207,14 @@ function App() {
     setCompletedHabits({});
     setCurrentView('today');
     console.log('👋 Sesión cerrada');
+  };
+
+  // Manejar actualización de perfil
+  const handleUpdateProfile = (updatedUser) => {
+    setUsuario(updatedUser);
+    console.log('✅ Perfil actualizado:', updatedUser);
+    // Mostrar mensaje de éxito
+    showSuccessMessage('Perfil actualizado correctamente');
   };
 
   // Funciones para obtener día y fecha
@@ -380,6 +390,7 @@ function App() {
             onToggleDarkMode={toggleDarkMode}
             onLogout={handleLogout}
             usuario={usuario}
+            onEditProfile={() => setShowEditProfileModal(true)}
           />
 
           {/* Overlay para móvil */}
@@ -410,6 +421,14 @@ function App() {
           habitData={currentEditHabit}
         />
       )}
+
+      {/* Modal para editar perfil */}
+      <EditProfile
+        isOpen={showEditProfileModal}
+        onClose={() => setShowEditProfileModal(false)}
+        usuario={usuario}
+        onUpdateSuccess={handleUpdateProfile}
+      />
 
       {/* Main Content */}
       <div className="lg:ml-64 transition-all duration-300 ease-in-out min-h-screen">

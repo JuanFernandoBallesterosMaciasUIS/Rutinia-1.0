@@ -1,4 +1,4 @@
-function Sidebar({ isOpen, onClose, darkMode, onToggleDarkMode, onLogout, usuario }) {
+function Sidebar({ isOpen, onClose, darkMode, onToggleDarkMode, onLogout, usuario, onEditProfile }) {
   return (
     <div 
       className={`fixed top-0 left-0 h-full w-64 bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark transform ${
@@ -27,6 +27,7 @@ function Sidebar({ isOpen, onClose, darkMode, onToggleDarkMode, onLogout, usuari
         </button>
         <button 
           className="flex items-center p-3 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-left" 
+          onClick={onEditProfile}
         >
           <span className="material-icons mr-4">edit</span>
           <span>Editar perfil</span>
