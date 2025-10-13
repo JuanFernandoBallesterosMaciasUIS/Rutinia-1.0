@@ -6,6 +6,7 @@ import NewHabitModal from './components/NewHabitModal';
 import EditHabitModal from './components/EditHabitModal';
 import Calendar from './components/Calendar';
 import HabitsView from './components/HabitsView';
+import ProgressDashboard from './components/ProgressDashboard';
 import { habitsData as initialHabitsData } from './data/habitsData';
 import * as api from './services/api';
 import * as localStorageService from './services/localStorage';
@@ -72,9 +73,9 @@ function App() {
       const backendHabits = await api.getHabitos();
       
       // Mapear hábitos del backend al formato frontend
-      const visualData = localStorageService.getVisualData();
+      // ✨ YA NO necesitamos visualData de localStorage
       const mappedHabits = backendHabits.map(habit => 
-        api.mapHabitoToFrontend(habit, visualData[habit.id])
+        api.mapHabitoToFrontend(habit)
       );
       
       setHabitsData(mappedHabits);
@@ -96,6 +97,63 @@ function App() {
       document.documentElement.classList.add('dark');
     }
   }, []);
+
+  // 🆕 Efecto para inicializar registros del día automáticamente
+  useEffect(() => {
+    const initializeDailyRecords = async () => {
+      if (habitsData.length === 0) return; // Esperar a que carguen los hábitos
+      
+      const today = getCurrentDateString();
+      
+      // Obtener hábitos que aplican para hoy
+      const todayHabitsToInit = habitsData.filter(habit => {
+        const currentDay = getDayOfWeek(new Date());
+        const frequency = (habit.frequency || '').toLowerCase();
+        
+        if (frequency === 'diario' || frequency === 'diaria') {
+          return true;
+        } else if (frequency === 'semanal') {
+          return habit.days && habit.days.includes(currentDay);
+        } else if (frequency === 'mensual') {
+          return new Date().getDate() === 1;
+        }
+        return false;
+      });
+      
+      console.log(`📅 Inicializando registros para ${today}...`);
+      console.log(`📋 Hábitos del día: ${todayHabitsToInit.length}`);
+      
+      // Para cada hábito del día, verificar si ya tiene registro
+      for (const habit of todayHabitsToInit) {
+        const alreadyCompleted = completedHabits[today]?.includes(habit.id) || false;
+        
+        // Verificar si el hábito ya tiene registro en el backend
+        try {
+          const registros = await api.getRegistros(habit.id);
+          const registroHoy = registros.find(r => r.fecha === today);
+          
+          if (!registroHoy) {
+            // No existe registro, crear uno en false
+            console.log(`➕ Creando registro en false para: ${habit.name}`);
+            await api.toggleHabitoCompletado(habit.id, today, false);
+          } else {
+            console.log(`✓ Registro ya existe para: ${habit.name} (estado: ${registroHoy.estado})`);
+            
+            // Sincronizar con localStorage si el backend tiene el registro en true
+            if (registroHoy.estado && !alreadyCompleted) {
+              const newCompletedHabits = localStorageService.toggleHabitCompletion(habit.id, today, true);
+              setCompletedHabits(newCompletedHabits);
+            }
+          }
+        } catch (error) {
+          console.error(`Error al verificar registro de ${habit.name}:`, error);
+        }
+      }
+    };
+    
+    // Ejecutar solo cuando cambien los hábitos
+    initializeDailyRecords();
+  }, [habitsData]); // Solo cuando cambian los hábitos
 
   // Toggle dark mode
   const toggleDarkMode = () => {
@@ -150,26 +208,20 @@ function App() {
     const wasCompleted = completedHabits[date]?.includes(habitId) || false;
     const newStatus = !wasCompleted;
     
-    // Actualizar localStorage
+    // Actualizar localStorage inmediatamente (optimistic update)
     const newCompletedHabits = localStorageService.toggleHabitCompletion(habitId, date, newStatus);
     setCompletedHabits(newCompletedHabits);
     
-    // Intentar sincronizar con backend
+    // Sincronizar con backend usando el nuevo endpoint que previene duplicados
     try {
-      if (newStatus) {
-        // Crear registro en backend
-        await api.createRegistro({
-          habito: habitId,
-          fecha: date,
-          estado: true
-        });
-      } else {
-        // TODO: Buscar y eliminar registro en backend
-        // Por ahora solo actualizamos localStorage
-      }
+      await api.toggleHabitoCompletado(habitId, date, newStatus);
+      showSuccessMessage(newStatus ? '¡Hábito completado! 🎉' : 'Hábito desmarcado');
     } catch (error) {
       console.error('Error al sincronizar con backend:', error);
-      // El cambio ya se guardó en localStorage, continuar
+      // Revertir el cambio en localStorage si falla
+      const revertedHabits = localStorageService.toggleHabitCompletion(habitId, date, wasCompleted);
+      setCompletedHabits(revertedHabits);
+      showErrorMessage('Error al guardar. Intenta de nuevo.');
     }
   };
 
@@ -179,23 +231,14 @@ function App() {
   // Manejar creación de nuevo hábito
   const handleCreateHabit = async (newHabitData) => {
     try {
-      // Guardar datos visuales en localStorage
-      const visualData = {
-        icon: newHabitData.icon,
-        color: newHabitData.color
-      };
-      
-      // Mapear al formato del backend
+      // ✨ Mapear al formato del backend (INCLUYE icon y color)
       const backendData = api.mapHabitoToBackend(newHabitData, TEMP_USER_ID);
       
       // Crear en el backend
       const createdHabit = await api.createHabito(backendData);
       
-      // Guardar datos visuales con el ID del backend
-      localStorageService.saveVisualData(createdHabit.id, visualData);
-      
-      // Mapear de vuelta al frontend y agregar a la lista
-      const frontendHabit = api.mapHabitoToFrontend(createdHabit, visualData);
+      // ✨ Mapear de vuelta al frontend (icon y color ya vienen del backend)
+      const frontendHabit = api.mapHabitoToFrontend(createdHabit);
       setHabitsData([...habitsData, frontendHabit]);
       
       setShowNewHabitModal(false);
@@ -209,21 +252,14 @@ function App() {
   // Manejar edición de hábito
   const handleEditHabit = async (editedHabitData) => {
     try {
-      // Actualizar datos visuales en localStorage
-      const visualData = {
-        icon: editedHabitData.icon,
-        color: editedHabitData.color
-      };
-      localStorageService.saveVisualData(editedHabitData.id, visualData);
-      
-      // Mapear al formato del backend (solo campos que acepta)
+      // ✨ Mapear al formato del backend (INCLUYE icon y color)
       const backendData = api.mapHabitoToBackend(editedHabitData, TEMP_USER_ID);
       
       // Actualizar en el backend
       const updatedHabit = await api.updateHabito(editedHabitData.id, backendData);
       
-      // Actualizar en el estado local
-      const frontendHabit = api.mapHabitoToFrontend(updatedHabit, visualData);
+      // ✨ Actualizar en el estado local (icon y color vienen del backend)
+      const frontendHabit = api.mapHabitoToFrontend(updatedHabit);
       const updatedHabits = habitsData.map(habit =>
         habit.id === editedHabitData.id ? frontendHabit : habit
       );
@@ -245,8 +281,7 @@ function App() {
         // Eliminar del backend
         await api.deleteHabito(habitId);
         
-        // Eliminar datos visuales
-        localStorageService.deleteVisualData(habitId);
+        // ✨ YA NO necesitamos eliminar de localStorage (icon y color están en backend)
         
         // Actualizar estado local
         const updatedHabits = habitsData.filter(habit => habit.id !== habitId);
@@ -346,8 +381,8 @@ function App() {
                 <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-text-light dark:text-text-dark">
                   {currentView === 'today' && 'Hábitos del día'}
                   {currentView === 'calendar' && 'Calendario'}
-                  {currentView === 'habits' && 'Mis Hábitos'}
-                  {currentView === 'analytics' && 'Análisis'}
+                  {currentView === 'habits' && 'Todos mis hábitos'}
+                  {currentView === 'analytics' && 'Dashboard de Progreso'}
                 </h1>
               </div>
             </div>
@@ -355,13 +390,13 @@ function App() {
         </header>
 
         {/* Contenido principal con padding para header y footer */}
-        <main className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8">
+        <main className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 pb-40 sm:pb-36 lg:pb-16">
           <div>
             {currentView === 'today' && (
               <>
                 
                 {/* Grid de hábitos */}
-                <div className="habits-grid">
+                <div className="habits-grid mb-8">
                   {todayHabits.length === 0 ? (
                     <div className="col-span-full text-center py-12">
                       <span className="material-icons text-6xl text-subtext-light dark:text-subtext-dark mb-4">event_available</span>
@@ -374,8 +409,9 @@ function App() {
                         key={habit.id}
                         habit={habit}
                         isCompleted={isHabitCompletedToday(habit.id)}
-                        onToggleComplete={toggleHabitCompletion}
+                        onComplete={toggleHabitCompletion}
                         onEdit={openEditModal}
+                        showCompleteButton={true}
                       />
                     ))
                   )}
@@ -387,26 +423,19 @@ function App() {
               <Calendar 
                 habitsData={habitsData}
                 completedHabits={completedHabits}
-                onToggleHabit={toggleHabitCompletion}
               />
             )}
 
             {currentView === 'habits' && (
               <HabitsView 
                 habits={habitsData}
-                onEditHabit={handleEditHabit}
+                onEditHabit={openEditModal}
                 onDeleteHabit={handleDeleteHabit}
               />
             )}
 
             {currentView === 'analytics' && (
-              <>
-                <div className="text-center py-12 text-subtext-light dark:text-subtext-dark">
-                  <span className="material-icons text-6xl mb-4">analytics</span>
-                  <p className="text-xl">Estadísticas y análisis</p>
-                  <p className="text-sm mt-2">Próximamente...</p>
-                </div>
-              </>
+              <ProgressDashboard habitos={habitsData} />
             )}
           </div>
         </main>

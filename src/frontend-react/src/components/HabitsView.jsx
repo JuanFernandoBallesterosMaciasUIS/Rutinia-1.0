@@ -16,7 +16,7 @@ const HabitsView = ({ habits, onEditHabit, onDeleteHabit }) => {
 
   // Función para obtener el estilo del botón de filtro
   const getFilterButtonClass = (filter) => {
-    const baseClass = 'px-4 py-2 rounded-lg font-semibold whitespace-nowrap transition-colors';
+    const baseClass = 'px-3 sm:px-4 py-2 rounded-lg font-semibold text-sm transition-colors';
     if (currentFilter === filter) {
       return `${baseClass} bg-primary text-white`;
     }
@@ -26,30 +26,42 @@ const HabitsView = ({ habits, onEditHabit, onDeleteHabit }) => {
   return (
     <div className="max-w-7xl mx-auto">
       {/* Filtros */}
-      <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+      <div className="flex flex-wrap gap-2 mb-6">
         <button
           className={getFilterButtonClass('todos')}
           onClick={() => setCurrentFilter('todos')}
         >
-          Todos
+          <span className="flex items-center gap-1.5">
+            <span className="material-icons text-base sm:text-lg">apps</span>
+            <span>Todos</span>
+          </span>
         </button>
         <button
           className={getFilterButtonClass('diario')}
           onClick={() => setCurrentFilter('diario')}
         >
-          Diarios
+          <span className="flex items-center gap-1.5">
+            <span className="material-icons text-base sm:text-lg">today</span>
+            <span>Diarios</span>
+          </span>
         </button>
         <button
           className={getFilterButtonClass('semanal')}
           onClick={() => setCurrentFilter('semanal')}
         >
-          Semanales
+          <span className="flex items-center gap-1.5">
+            <span className="material-icons text-base sm:text-lg">date_range</span>
+            <span>Semanales</span>
+          </span>
         </button>
         <button
           className={getFilterButtonClass('mensual')}
           onClick={() => setCurrentFilter('mensual')}
         >
-          Mensuales
+          <span className="flex items-center gap-1.5">
+            <span className="material-icons text-base sm:text-lg">calendar_month</span>
+            <span>Mensuales</span>
+          </span>
         </button>
       </div>
 
@@ -88,11 +100,11 @@ const HabitsView = ({ habits, onEditHabit, onDeleteHabit }) => {
 
       {/* Información adicional */}
       {filteredHabits.length > 0 && (
-        <div className="mt-6 p-4 bg-card-light dark:bg-card-dark rounded-lg">
-          <div className="flex flex-wrap gap-4 text-sm text-subtext-light dark:text-subtext-dark">
-            <div className="flex items-center gap-2">
-              <span className="material-icons text-lg">checklist</span>
-              <span>
+        <div className="mt-6 p-4 sm:p-5 bg-card-light dark:bg-card-dark rounded-lg shadow-sm">
+          <div className="flex flex-wrap gap-3 sm:gap-4 md:gap-6 text-sm text-subtext-light dark:text-subtext-dark">
+            <div className="flex items-center gap-2 min-w-fit">
+              <span className="material-icons text-lg text-primary">checklist</span>
+              <span className="font-medium">
                 {currentFilter === 'todos' 
                   ? `Total: ${filteredHabits.length} hábito${filteredHabits.length !== 1 ? 's' : ''}`
                   : `${filteredHabits.length} hábito${filteredHabits.length !== 1 ? 's' : ''} ${
@@ -105,17 +117,18 @@ const HabitsView = ({ habits, onEditHabit, onDeleteHabit }) => {
             </div>
             {currentFilter === 'todos' && (
               <>
-                <div className="flex items-center gap-2">
-                  <span className="w-3 h-3 rounded-full bg-blue-500"></span>
-                  <span>{habits.filter(h => h.frequency === 'diario').length} diarios</span>
+                <div className="hidden sm:block w-px h-6 bg-gray-300 dark:bg-gray-600"></div>
+                <div className="flex items-center gap-2 min-w-fit">
+                  <span className="w-3 h-3 rounded-full bg-blue-500 flex-shrink-0"></span>
+                  <span className="whitespace-nowrap">{habits.filter(h => h.frequency === 'diario').length} diarios</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="w-3 h-3 rounded-full bg-green-500"></span>
-                  <span>{habits.filter(h => h.frequency === 'semanal').length} semanales</span>
+                <div className="flex items-center gap-2 min-w-fit">
+                  <span className="w-3 h-3 rounded-full bg-green-500 flex-shrink-0"></span>
+                  <span className="whitespace-nowrap">{habits.filter(h => h.frequency === 'semanal').length} semanales</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="w-3 h-3 rounded-full bg-purple-500"></span>
-                  <span>{habits.filter(h => h.frequency === 'mensual').length} mensuales</span>
+                <div className="flex items-center gap-2 min-w-fit">
+                  <span className="w-3 h-3 rounded-full bg-purple-500 flex-shrink-0"></span>
+                  <span className="whitespace-nowrap">{habits.filter(h => h.frequency === 'mensual').length} mensuales</span>
                 </div>
               </>
             )}
