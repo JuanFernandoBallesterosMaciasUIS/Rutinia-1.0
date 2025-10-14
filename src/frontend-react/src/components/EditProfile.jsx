@@ -12,6 +12,7 @@ const EditProfile = ({ isOpen, onClose, usuario, onUpdateSuccess }) => {
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -33,6 +34,7 @@ const EditProfile = ({ isOpen, onClose, usuario, onUpdateSuccess }) => {
       });
       setChangePassword(false);
       setErrors({});
+      setIsClosing(false); // Reset closing state
     }
   }, [isOpen, usuario]);
 
@@ -156,8 +158,12 @@ const EditProfile = ({ isOpen, onClose, usuario, onUpdateSuccess }) => {
         onUpdateSuccess(usuarioActualizado);
       }
       
-      // Cerrar modal
-      onClose();
+      // Cerrar modal con animación
+      setIsClosing(true);
+      setTimeout(() => {
+        onClose();
+        setIsClosing(false);
+      }, 250);
       
     } catch (error) {
       console.error('Error al actualizar perfil:', error);
@@ -167,20 +173,34 @@ const EditProfile = ({ isOpen, onClose, usuario, onUpdateSuccess }) => {
     }
   };
 
-  // Cerrar modal
+  // Cerrar modal con animación
   const handleClose = () => {
     if (!loading) {
-      onClose();
+      setIsClosing(true);
+      setTimeout(() => {
+        onClose();
+        setIsClosing(false);
+      }, 250); // Duración de la animación de salida
     }
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+    <div 
+      className={`fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 modal-backdrop ${
+        isClosing ? 'modal-overlay-exit' : 'modal-overlay-enter'
+      }`}
+      onClick={handleClose}
+    >
+      <div 
+        className={`bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto ${
+          isClosing ? 'modal-content-exit' : 'modal-content-enter'
+        }`}
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
-        <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 flex items-center justify-between">
+        <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 flex items-center justify-between modal-header-enter">
           <h2 className="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
             <span className="material-icons text-purple-600 dark:text-purple-400">edit</span>
             Editar Perfil
@@ -195,7 +215,7 @@ const EditProfile = ({ isOpen, onClose, usuario, onUpdateSuccess }) => {
         </div>
 
         {/* Contenido */}
-        <div className="p-6">
+        <div className="p-6 modal-body-enter">
           {/* Error general */}
           {errors.general && (
             <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-center gap-2">
@@ -409,7 +429,7 @@ const EditProfile = ({ isOpen, onClose, usuario, onUpdateSuccess }) => {
             )}
 
             {/* Botones */}
-            <div className="flex gap-2 pt-4">
+            <div className="flex gap-2 pt-4 modal-footer-enter">
               <button
                 type="button"
                 onClick={handleClose}

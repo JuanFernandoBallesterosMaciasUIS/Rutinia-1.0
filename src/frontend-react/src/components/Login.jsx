@@ -1,8 +1,11 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { loginUsuario, registrarUsuario } from '../services/api';
 
 const Login = ({ onLoginSuccess }) => {
+  const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true); // true = login, false = registro
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [formData, setFormData] = useState({
     correo: '',
     clave: '',
@@ -12,6 +15,7 @@ const Login = ({ onLoginSuccess }) => {
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [loginSuccess, setLoginSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -86,10 +90,15 @@ const Login = ({ onLoginSuccess }) => {
       // Guardar en localStorage
       localStorage.setItem('usuario', JSON.stringify(usuario));
       
-      // Notificar al componente padre
-      if (onLoginSuccess) {
-        onLoginSuccess(usuario);
-      }
+      // Mostrar animación de éxito
+      setLoginSuccess(true);
+      
+      // Esperar un momento antes de notificar al padre
+      setTimeout(() => {
+        if (onLoginSuccess) {
+          onLoginSuccess(usuario);
+        }
+      }, 800);
 
     } catch (error) {
       console.error('Error en login:', error);
@@ -118,10 +127,15 @@ const Login = ({ onLoginSuccess }) => {
       // Guardar en localStorage
       localStorage.setItem('usuario', JSON.stringify(usuario));
       
-      // Notificar al componente padre
-      if (onLoginSuccess) {
-        onLoginSuccess(usuario);
-      }
+      // Mostrar animación de éxito
+      setLoginSuccess(true);
+      
+      // Esperar un momento antes de notificar al padre
+      setTimeout(() => {
+        if (onLoginSuccess) {
+          onLoginSuccess(usuario);
+        }
+      }, 800);
 
     } catch (error) {
       console.error('Error en registro:', error);
@@ -131,50 +145,81 @@ const Login = ({ onLoginSuccess }) => {
     }
   };
 
-  // Cambiar entre login y registro
+  // Cambiar entre login y registro con animación
   const toggleMode = () => {
-    setIsLogin(!isLogin);
-    setFormData({
-      correo: '',
-      clave: '',
-      nombre: '',
-      apellido: '',
-      confirmarClave: ''
-    });
-    setErrors({});
+    // Iniciar animación de salida
+    setIsTransitioning(true);
+    
+    // Esperar a que termine la animación de salida
+    setTimeout(() => {
+      setIsLogin(!isLogin);
+      setFormData({
+        correo: '',
+        clave: '',
+        nombre: '',
+        apellido: '',
+        confirmarClave: ''
+      });
+      setErrors({});
+      setLoginSuccess(false);
+      
+      // Terminar transición para activar animación de entrada
+      setIsTransitioning(false);
+    }, 300);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4 animate-fade-in">
+      <div className="w-full max-w-md animate-scale-in">
+        {/* Botón de volver */}
+        <button
+          onClick={() => navigate('/bienvenida')}
+          className="mb-4 flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors group"
+        >
+          <span className="material-icons group-hover:-translate-x-1 transition-transform">arrow_back</span>
+          <span className="font-medium">Volver al inicio</span>
+        </button>
+
         {/* Título */}
-        <div className="text-center mb-6">
+        <div className="text-center mb-6 animate-slide-down">
           <h1 className="text-5xl sm:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600 dark:from-purple-400 dark:to-indigo-400">
             Rutinia
           </h1>
         </div>
 
         {/* Formulario */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 sm:p-8">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 sm:p-8 animate-slide-up">
           {/* Tabs */}
-          <div className="flex mb-4 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+          <div className="flex mb-4 bg-gray-100 dark:bg-gray-700 rounded-lg p-1 relative">
+            {/* Indicador deslizante */}
+            <div 
+              className={`absolute top-1 bottom-1 w-[calc(50%-0.25rem)] bg-white dark:bg-gray-600 rounded-md shadow-sm transition-transform duration-300 ease-out ${
+                isLogin ? 'translate-x-1' : 'translate-x-[calc(100%+0.25rem)]'
+              }`}
+              style={{ zIndex: 0 }}
+            />
+            
             <button
-              onClick={() => setIsLogin(true)}
-              className={`flex-1 py-2 px-4 rounded-md font-medium transition-all ${
+              onClick={() => !isTransitioning && isLogin === false && toggleMode()}
+              disabled={isTransitioning}
+              className={`flex-1 py-2 px-4 rounded-md font-medium transition-all duration-300 relative ${
                 isLogin
-                  ? 'bg-white dark:bg-gray-600 text-purple-600 dark:text-purple-400 shadow-sm'
+                  ? 'text-purple-600 dark:text-purple-400'
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
               }`}
+              style={{ zIndex: 1 }}
             >
               Iniciar Sesión
             </button>
             <button
-              onClick={() => setIsLogin(false)}
-              className={`flex-1 py-2 px-4 rounded-md font-medium transition-all ${
+              onClick={() => !isTransitioning && isLogin === true && toggleMode()}
+              disabled={isTransitioning}
+              className={`flex-1 py-2 px-4 rounded-md font-medium transition-all duration-300 relative ${
                 !isLogin
-                  ? 'bg-white dark:bg-gray-600 text-purple-600 dark:text-purple-400 shadow-sm'
+                  ? 'text-purple-600 dark:text-purple-400'
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
               }`}
+              style={{ zIndex: 1 }}
             >
               Registrarse
             </button>
@@ -182,18 +227,27 @@ const Login = ({ onLoginSuccess }) => {
 
           {/* Error general */}
           {errors.general && (
-            <div className="mb-3 p-2.5 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-center gap-2">
+            <div className="mb-3 p-2.5 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-center gap-2 animate-shake">
               <span className="material-icons text-red-600 dark:text-red-400 text-sm">error</span>
               <span className="text-red-600 dark:text-red-400 text-sm">{errors.general}</span>
             </div>
           )}
 
           <form onSubmit={isLogin ? handleLogin : handleRegister} className="space-y-3">
+            {/* Contenedor con animación para los campos */}
+            <div 
+              key={isLogin ? 'login' : 'register'}
+              className={`space-y-3 transition-all duration-300 ease-out ${
+                isTransitioning 
+                  ? 'opacity-0 translate-x-8 scale-95' 
+                  : 'opacity-100 translate-x-0 scale-100'
+              }`}
+            >
             {/* Campos de registro */}
             {!isLogin && (
               <>
                 {/* Nombre */}
-                <div>
+                <div className={!isTransitioning ? 'field-animate' : ''}>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                     Nombre
                   </label>
@@ -218,7 +272,7 @@ const Login = ({ onLoginSuccess }) => {
                 </div>
 
                 {/* Apellido */}
-                <div>
+                <div className={!isTransitioning ? 'field-animate' : ''}>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                     Apellido
                   </label>
@@ -245,7 +299,7 @@ const Login = ({ onLoginSuccess }) => {
             )}
 
             {/* Correo (común para ambos) */}
-            <div>
+            <div className={!isTransitioning ? 'field-animate' : ''}>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                 Correo Electrónico
               </label>
@@ -270,7 +324,7 @@ const Login = ({ onLoginSuccess }) => {
             </div>
 
             {/* Contraseña */}
-            <div>
+            <div className={!isTransitioning ? 'field-animate' : ''}>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                 Contraseña
               </label>
@@ -305,7 +359,7 @@ const Login = ({ onLoginSuccess }) => {
 
             {/* Confirmar contraseña (solo registro) */}
             {!isLogin && (
-              <div>
+              <div className={!isTransitioning ? 'field-animate' : ''}>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                   Confirmar Contraseña
                 </label>
@@ -342,10 +396,19 @@ const Login = ({ onLoginSuccess }) => {
             {/* Botón submit */}
             <button
               type="submit"
-              disabled={loading}
-              className="w-full bg-gradient-to-r from-purple-500 to-indigo-600 text-white py-2.5 rounded-lg font-semibold hover:from-purple-600 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4"
+              disabled={loading || loginSuccess}
+              className={`w-full py-2.5 rounded-lg font-semibold transition-all shadow-lg hover:shadow-xl disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4 ${
+                loginSuccess 
+                  ? 'bg-green-500 text-white' 
+                  : 'bg-gradient-to-r from-purple-500 to-indigo-600 text-white hover:from-purple-600 hover:to-indigo-700 disabled:opacity-50'
+              }`}
             >
-              {loading ? (
+              {loginSuccess ? (
+                <>
+                  <span className="material-icons animate-scale-in">check_circle</span>
+                  <span>¡Bienvenido!</span>
+                </>
+              ) : loading ? (
                 <>
                   <span className="material-icons animate-spin">refresh</span>
                   <span>Cargando...</span>
@@ -357,6 +420,7 @@ const Login = ({ onLoginSuccess }) => {
                 </>
               )}
             </button>
+            </div>
           </form>
         </div>
 

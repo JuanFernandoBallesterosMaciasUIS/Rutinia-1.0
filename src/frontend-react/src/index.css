@@ -112,3 +112,455 @@ input:-webkit-autofill:active {
 .dark select {
   color-scheme: dark;
 }
+
+/* ============================================
+   ANIMACIONES DE AUTENTICACIÓN
+   ============================================ */
+
+/* Fade-in suave para el login */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out;
+}
+
+/* Fade-out para el logout */
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+.animate-fade-out {
+  animation: fadeOut 0.5s ease-in forwards;
+}
+
+/* Escala suave desde el centro */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Deslizamiento desde arriba (para el título) */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-down {
+  animation: slideDown 0.6s ease-out;
+}
+
+/* Deslizamiento desde abajo (para el formulario) */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.7s ease-out 0.1s backwards;
+}
+
+/* Transición del contenido principal después del login */
+@keyframes contentFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-content-in {
+  animation: contentFadeIn 0.8s ease-out;
+}
+
+/* Pulse suave para elementos interactivos */
+@keyframes gentlePulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.animate-gentle-pulse {
+  animation: gentlePulse 2s ease-in-out infinite;
+}
+
+/* Animación de shake sutil para errores */
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-4px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(4px);
+  }
+}
+
+.animate-shake {
+  animation: shake 0.5s;
+}
+
+/* Glow suave para inputs en focus */
+@keyframes inputGlow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 0 4px rgba(168, 85, 247, 0);
+  }
+}
+
+.input-glow:focus {
+  animation: inputGlow 0.6s;
+}
+
+/* ============================================
+   ANIMACIONES DE TRANSICIÓN DE TABS
+   ============================================ */
+
+/* Deslizamiento suave del contenido del formulario */
+@keyframes formSlideOut {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+}
+
+@keyframes formSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.form-slide-out {
+  animation: formSlideOut 0.3s ease-out forwards;
+}
+
+.form-slide-in {
+  animation: formSlideIn 0.3s ease-out forwards;
+}
+
+/* Transición del indicador de tabs */
+.tab-indicator {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Efecto hover en tabs */
+.tab-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.tab-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: rgba(168, 85, 247, 0.1);
+  transition: left 0.3s ease;
+}
+
+.tab-button:hover::before {
+  left: 0;
+}
+
+/* Animación de resplandor para el indicador de tabs */
+@keyframes tabGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 rgba(168, 85, 247, 0);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(168, 85, 247, 0.3);
+  }
+}
+
+.tab-active {
+  animation: tabGlow 2s ease-in-out infinite;
+}
+
+/* Animación escalonada para campos de formulario */
+@keyframes fieldFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.field-animate {
+  animation: fieldFadeIn 0.4s ease-out backwards;
+}
+
+.field-animate:nth-child(1) {
+  animation-delay: 0.05s;
+}
+
+.field-animate:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.field-animate:nth-child(3) {
+  animation-delay: 0.15s;
+}
+
+.field-animate:nth-child(4) {
+  animation-delay: 0.2s;
+}
+
+.field-animate:nth-child(5) {
+  animation-delay: 0.25s;
+}
+
+/* ============================================
+   ANIMACIONES DE MODALES
+   ============================================ */
+
+/* Fade-in del overlay del modal */
+@keyframes modalOverlayFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-overlay-enter {
+  animation: modalOverlayFadeIn 0.3s ease-out;
+}
+
+/* Fade-out del overlay del modal */
+@keyframes modalOverlayFadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.modal-overlay-exit {
+  animation: modalOverlayFadeOut 0.25s ease-in forwards;
+}
+
+/* Animación de entrada del modal - Escala y fade */
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-content-enter {
+  animation: modalSlideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Animación de salida del modal */
+@keyframes modalSlideDown {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+}
+
+.modal-content-exit {
+  animation: modalSlideDown 0.25s ease-in forwards;
+}
+
+/* Animación suave para el backdrop blur */
+@keyframes backdropBlur {
+  from {
+    backdrop-filter: blur(0px);
+  }
+  to {
+    backdrop-filter: blur(4px);
+  }
+}
+
+.modal-backdrop {
+  animation: backdropBlur 0.3s ease-out forwards;
+}
+
+/* Animación de shake para validaciones */
+@keyframes modalShake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-5px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(5px);
+  }
+}
+
+.modal-shake {
+  animation: modalShake 0.4s;
+}
+
+/* Animación del header del modal */
+@keyframes modalHeaderSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-header-enter {
+  animation: modalHeaderSlide 0.4s ease-out 0.1s backwards;
+}
+
+/* Animación del contenido del modal (formulario) */
+@keyframes modalBodyFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-body-enter {
+  animation: modalBodyFadeIn 0.5s ease-out 0.2s backwards;
+}
+
+/* Animación de los botones del modal */
+@keyframes modalFooterSlide {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-footer-enter {
+  animation: modalFooterSlide 0.4s ease-out 0.25s backwards;
+}
+
+/* ======================================
+   ANIMACIONES DE TRANSICIÓN ENTRE VISTAS
+   ====================================== */
+
+/* Animación de entrada de vista */
+@keyframes viewFadeInSlide {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Animación de salida de vista */
+@keyframes viewFadeOutSlide {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Clases para las transiciones */
+.view-container {
+  animation-duration: 0.3s;
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+}
+
+.view-transition-enter {
+  animation-name: viewFadeInSlide;
+}
+
+.view-transition-exit {
+  animation-name: viewFadeOutSlide;
+}
+
+/* ======================================
+   ANIMACIONES PÁGINA DE BIENVENIDA
+   ====================================== */
+
+/* Animación de flotación suave para tarjetas */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
