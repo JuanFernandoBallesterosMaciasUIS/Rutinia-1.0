@@ -1,4 +1,16 @@
+import { useState } from 'react';
+
 function Sidebar({ isOpen, onClose, darkMode, onToggleDarkMode, onLogout, usuario, onEditProfile }) {
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  // Función para manejar logout con animación
+  const handleLogout = () => {
+    setIsLoggingOut(true);
+    setTimeout(() => {
+      onLogout();
+    }, 300);
+  };
+
   // Función para obtener las iniciales del usuario
   const getInitials = () => {
     if (!usuario) return 'U';
@@ -73,11 +85,18 @@ function Sidebar({ isOpen, onClose, darkMode, onToggleDarkMode, onLogout, usuari
           
           {/* Botón de cerrar sesión */}
           <button 
-            className="flex items-center p-3 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-colors" 
-            onClick={onLogout}
+            className={`flex items-center p-3 rounded-lg transition-all duration-300 ${
+              isLoggingOut 
+                ? 'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 scale-95' 
+                : 'hover:bg-red-100 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400'
+            }`}
+            onClick={handleLogout}
+            disabled={isLoggingOut}
           >
-            <span className="material-icons mr-4">logout</span>
-            <span>Cerrar sesión</span>
+            <span className={`material-icons mr-4 ${isLoggingOut ? 'animate-spin' : ''}`}>
+              {isLoggingOut ? 'sync' : 'logout'}
+            </span>
+            <span>{isLoggingOut ? 'Cerrando sesión...' : 'Cerrar sesión'}</span>
           </button>
         </nav>
       </div>

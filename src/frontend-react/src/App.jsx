@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Footer from './components/Footer';
 import HabitCard from './components/HabitCard';
@@ -8,6 +9,7 @@ import Calendar from './components/Calendar';
 import HabitsView from './components/HabitsView';
 import ProgressDashboard from './components/ProgressDashboard';
 import Login from './components/Login';
+import Welcome from './components/Welcome';
 import EditProfile from './components/EditProfile';
 import { habitsData as initialHabitsData } from './data/habitsData';
 import * as api from './services/api';
@@ -142,6 +144,9 @@ function ToastContainer() {
 }
 
 function App() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  
   // Estado de autenticación
   const [usuario, setUsuario] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -149,6 +154,7 @@ function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [currentView, setCurrentView] = useState('today'); // 'today', 'calendar', 'habits', 'analytics'
+  const [isViewTransitioning, setIsViewTransitioning] = useState(false);
   const [showNewHabitModal, setShowNewHabitModal] = useState(false);
   const [showEditHabitModal, setShowEditHabitModal] = useState(false);
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
@@ -309,22 +315,36 @@ function App() {
     }
   };
 
-  // Manejar login exitoso
+  // Manejar login exitoso con animación
   const handleLoginSuccess = (userData) => {
-    setUsuario(userData);
-    setIsAuthenticated(true);
-    console.log('✅ Usuario autenticado:', userData);
+    // Pequeño delay para animación suave
+    setTimeout(() => {
+      setUsuario(userData);
+      setIsAuthenticated(true);
+      navigate('/app'); // Redirigir a /app después del login
+      console.log('✅ Usuario autenticado:', userData);
+    }, 300);
   };
 
-  // Manejar logout
+  // Manejar logout con animación
   const handleLogout = () => {
-    setUsuario(null);
-    setIsAuthenticated(false);
-    localStorage.removeItem('usuario');
-    setHabitsData([]);
-    setCompletedHabits({});
-    setCurrentView('today');
-    console.log('👋 Sesión cerrada');
+    // Agregar clase de animación de salida
+    const appElement = document.getElementById('app-content');
+    if (appElement) {
+      appElement.classList.add('animate-fade-out');
+    }
+    
+    // Esperar a que termine la animación antes de limpiar el estado
+    setTimeout(() => {
+      setUsuario(null);
+      setIsAuthenticated(false);
+      localStorage.removeItem('usuario');
+      setHabitsData([]);
+      setCompletedHabits({});
+      setCurrentView('today');
+      navigate('/login'); // Redirigir a /login después del logout
+      console.log('👋 Sesión cerrada');
+    }, 500);
   };
 
   // Manejar actualización de perfil
@@ -344,6 +364,19 @@ function App() {
   const getCurrentDateString = () => {
     const today = new Date();
     return today.toISOString().split('T')[0];
+  };
+
+  // Función para cambiar de vista con animación
+  const handleViewChange = (newView) => {
+    if (newView === currentView || isViewTransitioning) return;
+    
+    setIsViewTransitioning(true);
+    
+    // Esperar a que termine la animación de salida antes de cambiar la vista
+    setTimeout(() => {
+      setCurrentView(newView);
+      setIsViewTransitioning(false);
+    }, 300);
   };
 
   // Verificar si un hábito aplica al día actual
@@ -438,7 +471,6 @@ function App() {
     // Sincronizar con backend usando el nuevo endpoint que previene duplicados
     try {
       await api.toggleHabitoCompletado(habitId, date, newStatus);
-      showSuccessMessage(newStatus ? '¡Hábito completado! 🎉' : 'Hábito desmarcado');
     } catch (error) {
       console.error('Error al sincronizar con backend:', error);
       // Revertir el cambio en localStorage si falla
@@ -554,13 +586,23 @@ function App() {
 
   return (
     <div className="relative w-full min-h-screen bg-background-light dark:bg-background-dark font-display">
-      {/* Mostrar Login si no está autenticado */}
-      {!isAuthenticated ? (
-        <Login onLoginSuccess={handleLoginSuccess} />
-      ) : (
-        <>
-          {/* Indicador de carga */}
-          {loading && (
+      <Routes>
+        {/* Redirección de raíz a bienvenida */}
+        <Route path="/" element={<Navigate to="/bienvenida" replace />} />
+        
+        {/* Ruta de bienvenida */}
+        <Route path="/bienvenida" element={<Welcome />} />
+        
+        {/* Ruta de login */}
+        <Route path="/login" element={<Login onLoginSuccess={handleLoginSuccess} />} />
+        
+        {/* Rutas de la aplicación principal (requiere autenticación) */}
+        <Route path="/app" element={
+          !isAuthenticated ? (
+            <Login onLoginSuccess={handleLoginSuccess} />
+          ) : (
+            <div id="app-content" className="animate-content-in">{/* Indicador de carga */}
+              {loading && (
             <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
               <div className="bg-card-light dark:bg-card-dark rounded-lg p-8 flex flex-col items-center gap-4">
                 <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
@@ -644,7 +686,7 @@ function App() {
 
         {/* Contenido principal con padding para header y footer */}
         <main className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 pb-40 sm:pb-36 lg:pb-16">
-          <div>
+          <div className={`view-container ${isViewTransitioning ? 'view-transition-exit' : 'view-transition-enter'}`}>
             {currentView === 'today' && (
               <div>
                 {/* Grid de hábitos */}
@@ -701,14 +743,16 @@ function App() {
         <Footer 
           onAddHabit={() => setShowNewHabitModal(true)}
           currentView={currentView}
-          onChangeView={setCurrentView}
+          onChangeView={handleViewChange}
         />
-      </div>
+              </div>
 
-      {/* Toast Container */}
-      <ToastContainer />
-      </>
-      )}
+              {/* Toast Container */}
+              <ToastContainer />
+            </div>
+          )
+        } />
+      </Routes>
     </div>
   );
 }

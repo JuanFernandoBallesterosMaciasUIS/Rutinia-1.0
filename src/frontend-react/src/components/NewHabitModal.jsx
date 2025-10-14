@@ -15,6 +15,16 @@ function NewHabitModal({ isOpen, onClose, onSubmit }) {
   const [selectedIcon, setSelectedIcon] = useState(null);
   const [selectedColor, setSelectedColor] = useState(null);
   const [selectedDays, setSelectedDays] = useState([]);
+  const [isClosing, setIsClosing] = useState(false);
+
+  // Manejar cierre con animación
+  const handleClose = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      setIsClosing(false);
+      onClose();
+    }, 250);
+  };
 
   useEffect(() => {
     if (!isOpen) {
@@ -108,24 +118,28 @@ function NewHabitModal({ isOpen, onClose, onSubmit }) {
 
   return (
     <div 
-      className="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center p-2 sm:p-4"
-      onClick={onClose}
+      className={`fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center p-2 sm:p-4 modal-backdrop ${
+        isClosing ? 'modal-overlay-exit' : 'modal-overlay-enter'
+      }`}
+      onClick={handleClose}
     >
       <div 
-        className="bg-card-light dark:bg-card-dark rounded-lg sm:rounded-large p-4 sm:p-6 w-full max-w-2xl max-h-[95vh] overflow-y-auto shadow-2xl transform transition-all"
+        className={`bg-card-light dark:bg-card-dark rounded-lg sm:rounded-large p-4 sm:p-6 w-full max-w-2xl max-h-[95vh] overflow-y-auto shadow-2xl ${
+          isClosing ? 'modal-content-exit' : 'modal-content-enter'
+        }`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex justify-between items-center mb-3 sm:mb-4">
+        <div className="flex justify-between items-center mb-3 sm:mb-4 modal-header-enter">
           <h2 className="text-lg sm:text-xl font-bold text-text-light dark:text-text-dark">Nuevo Hábito</h2>
           <button 
-            className="text-subtext-light dark:text-subtext-dark hover:text-text-light dark:hover:text-text-dark"
-            onClick={onClose}
+            className="text-subtext-light dark:text-subtext-dark hover:text-text-light dark:hover:text-text-dark transition-colors"
+            onClick={handleClose}
           >
             <span className="material-icons text-xl">close</span>
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4 modal-body-enter">
           {/* Nombre y Categoría en dos columnas en pantallas grandes */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {/* Nombre del hábito */}
@@ -272,10 +286,10 @@ function NewHabitModal({ isOpen, onClose, onSubmit }) {
           )}
 
           {/* Botones */}
-          <div className="flex gap-2 sm:gap-3 pt-2">
+          <div className="flex gap-2 sm:gap-3 pt-2 modal-footer-enter">
             <button 
               type="button" 
-              onClick={onClose}
+              onClick={handleClose}
               className="flex-1 px-4 py-2 text-sm sm:text-base rounded-lg border-2 border-gray-300 dark:border-gray-600 text-text-light dark:text-text-dark font-semibold hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
             >
               Cancelar
