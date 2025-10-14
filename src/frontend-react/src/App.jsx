@@ -761,7 +761,7 @@ function App() {
             )}
 
             {currentView === 'analytics' && (
-              <ProgressDashboard habitos={habitsData} />
+              <ProgressDashboard habitos={habitsData} completedHabits={completedHabits} />
             )}
           </div>
         </main>

@@ -58,7 +58,7 @@ function Footer({ onAddHabit, currentView, onChangeView }) {
           >
             <span className="material-icons text-xl sm:text-2xl">insights</span>
             <span className={`text-xs sm:text-sm ${currentView === 'analytics' ? 'font-medium' : ''}`}>
-              progreso
+              dashboard
             </span>
           </button>
         </div>
