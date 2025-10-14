@@ -601,13 +601,11 @@ function App() {
           !isAuthenticated ? (
             <Login onLoginSuccess={handleLoginSuccess} />
           ) : (
-            <div id="app-content" className="animate-content-in">{/* Indicador de carga */}
-              {loading && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-              <div className="bg-card-light dark:bg-card-dark rounded-lg p-8 flex flex-col items-center gap-4">
-                <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
-                <p className="text-text-light dark:text-text-dark font-semibold">Cargando hábitos...</p>
-              </div>
+            <div id="app-content" className="animate-content-in">
+          {/* Indicador de carga minimalista */}
+          {loading && (
+            <div className="fixed top-0 left-0 right-0 z-50 h-1 bg-gray-200 dark:bg-gray-700 overflow-hidden">
+              <div className="h-full w-1/4 bg-gradient-to-r from-primary via-purple-500 to-primary loading-bar"></div>
             </div>
           )}
           

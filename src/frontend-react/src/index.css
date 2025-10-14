@@ -264,22 +264,18 @@ input:-webkit-autofill:active {
 @keyframes formSlideOut {
   from {
     opacity: 1;
-    transform: translateX(0);
   }
   to {
     opacity: 0;
-    transform: translateX(-20px);
   }
 }
 
 @keyframes formSlideIn {
   from {
     opacity: 0;
-    transform: translateX(20px);
   }
   to {
     opacity: 1;
-    transform: translateX(0);
   }
 }
 
@@ -563,4 +559,22 @@ input:-webkit-autofill:active {
 
 .animate-float {
   animation: float 6s ease-in-out infinite;
+}
+
+/* ======================================
+   INDICADOR DE CARGA MINIMALISTA
+   ====================================== */
+
+/* Animación de barra de progreso con efecto shimmer */
+@keyframes progressShimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(400%);
+  }
+}
+
+.loading-bar {
+  animation: progressShimmer 1.5s ease-in-out infinite;
 }
