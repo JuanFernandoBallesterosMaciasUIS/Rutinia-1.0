@@ -1,4 +1,4 @@
-# 🗓️ Rutinia - Gestor de Hábitos
+# Rutinia - Gestor de Hábitos
 
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/)
 [![Django](https://img.shields.io/badge/Django-5.2.7-green.svg)](https://www.djangoproject.com/)
@@ -9,41 +9,41 @@
 
 Aplicación web moderna para la gestión de hábitos, diseñada para ayudar a los usuarios a crear, organizar y seguir sus rutinas de forma intuitiva mediante calendarios interactivos, seguimiento diario y sincronización en la nube.
 
-### 🎯 Características Principales
+### Características Principales
 
-✨ **Gestión Completa de Hábitos** - Crea, edita y elimina hábitos personalizados  
-📅 **Frecuencias Flexibles** - Diaria, semanal o mensual  
-📆 **Calendario Interactivo** - Visualiza tu progreso mes a mes  
-✅ **Seguimiento Diario** - Marca hábitos completados cada día  
-🎨 **Personalización** - Elige iconos y colores para cada hábito  
-🌙 **Modo Oscuro** - Tema claro y oscuro  
-📱 **Responsive** - Funciona en móvil, tablet y desktop  
-☁️ **Nube** - Sincronización automática con MongoDB Atlas  
+- **Gestión Completa de Hábitos** - Crea, edita y elimina hábitos personalizados  
+- **Frecuencias Flexibles** - Diaria, semanal o mensual  
+- **Calendario Interactivo** - Visualiza tu progreso mes a mes  
+- **Seguimiento Diario** - Marca hábitos completados cada día  
+- **Personalización** - Elige iconos y colores para cada hábito  
+- **Modo Oscuro** - Tema claro y oscuro  
+- **Responsive** - Funciona en móvil, tablet y desktop  
+- **Nube** - Sincronización automática con MongoDB Atlas  
 
-👉 La documentación completa del proyecto está disponible en la [Wiki](https://github.com/JuanFernandoBallesterosMaciasUIS/Rutinia-1.0/wiki). 
-
----
-
-## 📑 Tabla de Contenidos
-
-- [⚙️ Instalación y Configuración](#️-instalación-y-configuración)
-  - [📦 Requisitos Previos](#-requisitos-previos)
-  - [🚀 Instalación Paso a Paso](#-instalación-paso-a-paso)
-  - [▶️ Ejecución del Proyecto](#️-ejecución-del-proyecto)
-  - [🔧 Solución de Problemas](#-solución-de-problemas)
-- [🛠️ Tecnologías Utilizadas](#️-tecnologías-utilizadas-versión-actual)
-- [📂 Estructura del Proyecto](#-estructura-del-proyecto-versión-actual)
-- [🗃️ Arquitectura de Datos](#️-arquitectura-de-datos)
-- [✨ Características](#-características-versión-actual)
-- [🤝 Contribución](#-contribución)
-- [👥 Equipo de Desarrollo](#-equipo-de-desarrollo)
-- [📧 Contacto y Soporte](#-contacto-y-soporte)
+La documentación completa del proyecto está disponible en la [Wiki](https://github.com/JuanFernandoBallesterosMaciasUIS/Rutinia-1.0/wiki). 
 
 ---
 
-## ⚙️ Instalación y configuración
+## Tabla de Contenidos
 
-### 📦 Requisitos Previos
+- [Instalación y Configuración](#instalación-y-configuración)
+  - [Requisitos Previos](#requisitos-previos)
+  - [Instalación Paso a Paso](#instalación-paso-a-paso)
+  - [Ejecución del Proyecto](#ejecución-del-proyecto)
+  - [Solución de Problemas](#solución-de-problemas)
+- [Tecnologías Utilizadas](#tecnologías-utilizadas-versión-actual)
+- [Estructura del Proyecto](#estructura-del-proyecto-versión-actual)
+- [Arquitectura de Datos](#arquitectura-de-datos)
+- [Características](#características-versión-actual)
+- [Contribución](#contribución)
+- [Equipo de Desarrollo](#equipo-de-desarrollo)
+- [Contacto y Soporte](#contacto-y-soporte)
+
+---
+
+## Instalación y configuración
+
+### Requisitos Previos
 
 Antes de comenzar, asegúrate de tener instalado:
 
@@ -52,16 +52,16 @@ Antes de comenzar, asegúrate de tener instalado:
 - **Git** - [Descargar](https://git-scm.com/downloads)
 - Conexión a Internet (para MongoDB Atlas)
 
-### 🚀 Instalación Paso a Paso
+### Instalación Paso a Paso
 
-#### 1️⃣ Clonar el repositorio
+#### 1. Clonar el repositorio
 
 ```bash
 git clone https://github.com/JuanFernandoBallesterosMaciasUIS/Rutinia-1.0.git
 cd Rutinia-1.0
 ```
 
-#### 2️⃣ Configurar Backend (Django + MongoDB)
+#### 2. Configurar Backend (Django + MongoDB)
 
 ```bash
 # Navegar a la carpeta del backend
@@ -82,7 +82,7 @@ source venv/bin/activate
 pip install -r requeriments.txt
 ```
 
-#### 3️⃣ Crear Datos de Prueba (Opcional)
+#### 3. Crear Datos de Prueba (Opcional)
 
 ```bash
 cd rutinia
@@ -94,7 +94,7 @@ Esto creará:
 - 1 categoría (Salud)
 - 3 hábitos de ejemplo
 
-#### 4️⃣ Configurar Frontend (React + Vite)
+#### 4. Configurar Frontend (React + Vite)
 
 ```bash
 # Desde la raíz del proyecto
@@ -104,7 +104,7 @@ cd src/frontend-react
 npm install
 ```
 
-### ▶️ Ejecución del Proyecto
+### Ejecución del Proyecto
 
 #### Opción 1: Script Automático (Windows - Recomendado)
 
@@ -114,8 +114,8 @@ cd src
 ```
 
 Este script abre automáticamente:
-- ✅ Django en `http://localhost:8000`
-- ✅ React en `http://localhost:5173`
+- Django en `http://localhost:8000`
+- React en `http://localhost:5173`
 
 #### Opción 2: Manual (Dos Terminales)
 
@@ -134,13 +134,13 @@ cd src/frontend-react
 npm run dev
 ```
 
-### 🌐 Acceder a la Aplicación
+###  Acceder a la Aplicación
 
 - **Aplicación Web:** `http://localhost:5173`
 - **API REST:** `http://localhost:8000/api/`
 - **Desde celular (misma WiFi):** Buscar URL "Network" en la terminal de React
 
-### 📡 API Endpoints Principales
+### API Endpoints Principales
 
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
@@ -150,7 +150,7 @@ npm run dev
 | `GET/POST` | `/api/categorias/` | Gestionar categorías |
 | `GET/POST` | `/api/registros/` | Registros de hábitos completados |
 
-### 🔧 Solución de Problemas
+### Solución de Problemas
 
 **Error: "ModuleNotFoundError: No module named 'django'"**
 ```bash
@@ -168,11 +168,11 @@ pip install -r requeriments.txt
 - Revisa la consola del navegador (F12)
 - Ejecuta el script de datos de prueba
 
-📖 **Documentación Completa:** Ver [`src/COMO_CORRER_PROYECTO.md`](src/COMO_CORRER_PROYECTO.md)
+**Documentación Completa:** Ver [`src/COMO_CORRER_PROYECTO.md`](src/COMO_CORRER_PROYECTO.md)
 
 ---
 
-## 🛠️ Tecnologías utilizadas (Versión Actual)
+## Tecnologías utilizadas (Versión Actual)
 
 ### Backend
 - **Django** 5.2.7
@@ -192,7 +192,7 @@ pip install -r requeriments.txt
 
 ---
 
-## 📂 Estructura del proyecto (Versión Actual)
+## Estructura del proyecto (Versión Actual)
 
 ```
 Rutinia-1.0/
@@ -227,7 +227,7 @@ Rutinia-1.0/
 
 ---
 
-## 🗃️ Arquitectura de Datos
+## Arquitectura de Datos
 
 ### Modelos Principales (MongoDB)
 
@@ -253,24 +253,24 @@ Rutinia-1.0/
 
 ---
 
-## ✨ Características (Versión Actual)
+##  Características (Versión Actual)
 
-- ✅ Crear y gestionar hábitos personalizados
-- 📅 Frecuencia: diaria, semanal, mensual
-- ✅ Marcar hábitos como completados
-- 📆 Vista de calendario interactivo
-- 📊 Vista de "Mis Hábitos" con filtros
-- 🎨 Modo oscuro/claro
-- � Responsive (móvil, tablet, desktop)
-- 🌐 Acceso desde dispositivos en red local
-- 💾 Sincronización automática con MongoDB
-- 🏷️ Categorización de hábitos
+-  Crear y gestionar hábitos personalizados
+-  Frecuencia: diaria, semanal, mensual
+- Marcar hábitos como completados
+- Vista de calendario interactivo
+- Vista de "Mis Hábitos" con filtros
+- Modo oscuro/claro
+- Responsive (móvil, tablet, desktop)
+- Acceso desde dispositivos en red local
+- Sincronización automática con MongoDB
+- Categorización de hábitos
 
 ---
 
-## 🎬 Demo y Capturas
+## Demo y Capturas
 
-> 📸 Agrega capturas de pantalla de la aplicación en `docs/screenshots/` para mostrar:
+> Agrega capturas de pantalla de la aplicación en `docs/screenshots/` para mostrar:
 > - Vista principal con calendario
 > - Sección "Mis Hábitos"
 > - Modal de creación de hábito
@@ -278,9 +278,9 @@ Rutinia-1.0/
 
 ---
 
-## 🗺️ Roadmap
+## Roadmap
 
-### ✅ Versión 1.0 (Actual)
+### Versión 1.0 (Actual)
 - [x] Migración de Django + MongoDB
 - [x] Frontend React con Vite
 - [x] CRUD completo de hábitos
@@ -288,14 +288,14 @@ Rutinia-1.0/
 - [x] Modo oscuro/claro
 - [x] Responsive design
 
-### 🚧 Versión 1.1 (Próximamente)
+### Versión 1.1 (Próximamente)
 - [ ] Autenticación de usuarios (login/registro)
 - [ ] Perfil de usuario
 - [ ] Edición de categorías desde UI
 - [ ] Estadísticas y gráficos de progreso
 - [ ] Sistema de recordatorios
 
-### 🔮 Versión 2.0 (Futuro)
+### Versión 2.0 (Futuro)
 - [ ] Modo offline con sincronización
 - [ ] Exportar datos a PDF/CSV
 - [ ] Compartir hábitos con otros usuarios
@@ -304,7 +304,7 @@ Rutinia-1.0/
 
 ---
 
-## 🤝 Contribución
+## Contribución
 
 ¡Las contribuciones son bienvenidas! Si deseas colaborar con el proyecto:
 
@@ -327,11 +327,11 @@ Rutinia-1.0/
 - `refactor:` Refactorización de código
 - `test:` Agregar o modificar tests
 
-> 📖 Para más detalles, consulta la sección [Cómo Colaborar](https://github.com/JuanFernandoBallesterosMaciasUIS/Rutinia-1.0/wiki) en la Wiki.
+> Para más detalles, consulta la sección [Cómo Colaborar](https://github.com/JuanFernandoBallesterosMaciasUIS/Rutinia-1.0/wiki) en la Wiki.
 
 ---
 
-## 👥 Equipo de Desarrollo
+## Equipo de Desarrollo
 
 - [Helbert Alexeiv Correa Uribe](https://github.com/Alvoid101) – Product Owner y Equipo de Desarrollo
 - [Juan Fernando Ballesteros Macias](https://github.com/JuanFernandoBallesterosMaciasUIS) – Scrum Master y Equipo de Desarrollo
@@ -340,18 +340,18 @@ Rutinia-1.0/
 - Carlos Eduardo Ayala Moreno – Product Owner y Equipo de Desarrollo
 - Harold Esteban Duran Osma – Equipo de Desarrollo
 
-## 📧 Contacto y Soporte
+## Contacto y Soporte
 
-- 📝 Abre un [Issue](https://github.com/JuanFernandoBallesterosMaciasUIS/Rutinia-1.0/issues) para reportar bugs o solicitar features
-- 📖 Consulta la [Wiki](https://github.com/JuanFernandoBallesterosMaciasUIS/Rutinia-1.0/wiki) para documentación detallada
-- 🤝 Lee la guía de [Contribución](https://github.com/JuanFernandoBallesterosMaciasUIS/Rutinia-1.0/wiki) antes de hacer Pull Requests
+- Abre un [Issue](https://github.com/JuanFernandoBallesterosMaciasUIS/Rutinia-1.0/issues) para reportar bugs o solicitar features
+- Consulta la [Wiki](https://github.com/JuanFernandoBallesterosMaciasUIS/Rutinia-1.0/wiki) para documentación detallada
+- Lee la guía de [Contribución](https://github.com/JuanFernandoBallesterosMaciasUIS/Rutinia-1.0/wiki) antes de hacer Pull Requests
 
-## 📊 Estado del Proyecto
+## Estado del Proyecto
 
-**🚀 Versión:** 1.0 (Django + React + MongoDB)  
-**📅 Última Actualización:** Enero 2025  
-**🔧 Estado:** En Desarrollo Activo  
-**🎓 Contexto:** Proyecto académico - UIS (Universidad Industrial de Santander)
+**Versión:** 1.0 (Django + React + MongoDB)  
+**Última Actualización:** Enero 2025  
+**Estado:** En Desarrollo Activo  
+**Contexto:** Proyecto académico - UIS (Universidad Industrial de Santander)
 
 ---
 
