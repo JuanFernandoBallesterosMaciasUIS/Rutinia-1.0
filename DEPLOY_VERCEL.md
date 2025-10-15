@@ -34,6 +34,7 @@ Esta guía te ayudará a desplegar tu aplicación Django + React en Vercel.
    - Click en "New Project"
    - Importa tu repositorio de GitHub
    - Selecciona la rama `despliegueVercel`
+   
 
 2. **Configura las variables de entorno:**
    
