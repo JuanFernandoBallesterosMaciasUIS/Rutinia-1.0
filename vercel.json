@@ -1,43 +1,11 @@
 {
-  "version": 2,
-  "builds": [
+  "buildCommand": "cd src/frontend-react && npm install && npm run build",
+  "outputDirectory": "src/frontend-react/dist",
+  "framework": "vite",
+  "rewrites": [
     {
-      "src": "src/backend-django/rutinia/vercel_app.py",
-      "use": "@vercel/python",
-      "config": {
-        "maxLambdaSize": "15mb",
-        "runtime": "python3.9"
-      }
-    },
-    {
-      "src": "src/frontend-react/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "src/backend-django/rutinia/vercel_app.py"
-    },
-    {
-      "src": "/admin/(.*)",
-      "dest": "src/backend-django/rutinia/vercel_app.py"
-    },
-    {
-      "src": "/static/(.*)",
-      "dest": "src/backend-django/rutinia/vercel_app.py"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "src/frontend-react/dist/index.html"
-    }
-  ],
-  "env": {
-    "DJANGO_SETTINGS_MODULE": "rutinia.settings",
-    "PYTHONUNBUFFERED": "1"
-  },
-  "outputDirectory": "src/frontend-react/dist"
+  ]
 }
