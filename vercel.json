@@ -1,0 +1,46 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "src/backend-django/rutinia/vercel_app.py",
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "15mb",
+        "runtime": "python3.9"
+      }
+    },
+    {
+      "src": "src/frontend-react/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "src/frontend-react/dist"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "src/backend-django/rutinia/vercel_app.py"
+    },
+    {
+      "src": "/admin/(.*)",
+      "dest": "src/backend-django/rutinia/vercel_app.py"
+    },
+    {
+      "src": "/static/(.*)",
+      "dest": "src/backend-django/rutinia/vercel_app.py"
+    },
+    {
+      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|json|woff|woff2|ttf|eot))",
+      "dest": "src/frontend-react/dist/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "src/frontend-react/dist/index.html"
+    }
+  ],
+  "env": {
+    "DJANGO_SETTINGS_MODULE": "rutinia.settings",
+    "PYTHONUNBUFFERED": "1"
+  }
+}
