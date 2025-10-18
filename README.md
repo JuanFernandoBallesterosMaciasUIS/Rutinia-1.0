@@ -79,7 +79,7 @@ python -m venv venv
 source venv/bin/activate
 
 # Instalar dependencias
-pip install -r requeriments.txt
+pip install -r requirements.txt
 ```
 
 #### 3. Crear Datos de Prueba (Opcional)
