@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 function Welcome() {
   const navigate = useNavigate();
   const [isTransitioning, setIsTransitioning] = useState(false);
+  // Sin lógica de imagen: volvemos al logo tipográfico (R + utinia)
 
   const handleGoToLogin = () => {
     setIsTransitioning(true);
@@ -16,17 +17,16 @@ function Welcome() {
     <div className={`min-h-screen bg-gradient-to-br from-purple-50 via-indigo-50 to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4 transition-all duration-300 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
       <div className="max-w-4xl w-full text-center space-y-8">
         
-        {/* Logo con letra R + Título Rutinia */}
+        {/* Logo con persona formando la R + Título utinia */}
         <div className="flex flex-col items-center justify-center space-y-6">
-          {/* Logo horizontal: Icono R + Texto utinia */}
-          <div className="flex items-center gap-4 transform hover:scale-105 transition-transform duration-300">
-            {/* Cuadrado morado con letra R con degradado */}
-            <div className="w-24 h-24 bg-gradient-to-br from-purple-600 via-purple-500 to-blue-500 rounded-3xl shadow-xl flex items-center justify-center">
-              <span className="text-white text-6xl font-black">R</span>
+          {/* Logo horizontal: Persona con lápiz formando R + Texto utinia */}
+          <div className="flex items-center transform hover:scale-105 transition-transform duration-300">
+            {/* Icono: cuadrado redondeado con degradado y 'R' blanca */}
+            <div className="relative flex items-center justify-center w-20 h-20 md:w-24 md:h-24 rounded-3xl bg-gradient-to-r from-purple-500 to-indigo-600 shadow-lg ring-1 ring-white/60 dark:ring-white/10 mr-1 md:mr-2 select-none opacity-95">
+              <span className="text-white font-black text-5xl md:text-6xl leading-none drop-shadow-md md:drop-shadow-lg">R</span>
             </div>
-            
-            {/* Texto utinia con degradado morado a azul */}
-            <h1 className="text-7xl font-black bg-gradient-to-r from-purple-600 via-purple-500 to-blue-500 bg-clip-text text-transparent">
+            {/* Texto utinia con el mismo estilo de degradado */}
+            <h1 className="text-[3.5rem] md:text-[4.5rem] leading-none font-black bg-gradient-to-r from-purple-500 to-indigo-600 bg-clip-text text-transparent tracking-tight select-none drop-shadow-sm -ml-1 md:-ml-2">
               utinia
             </h1>
           </div>
