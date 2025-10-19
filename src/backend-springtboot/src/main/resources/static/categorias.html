@@ -297,6 +297,7 @@
         <div class="user-info">
             <div class="nav-buttons">
                 <a href="habitos.html" class="btn btn-info">← Volver a Hábitos</a>
+                <a href="usuarios.html" class="btn btn-warning" id="btnAdminPanel" style="display: none;">👥 Usuarios (Admin)</a>
             </div>
             <span id="userName">Cargando...</span>
             <button class="btn btn-secondary" onclick="logout()">Cerrar Sesión</button>
@@ -379,6 +380,7 @@
         function verificarAutenticacion() {
             token = localStorage.getItem('token');
             const userName = localStorage.getItem('userName');
+            const userRole = localStorage.getItem('userRole');
 
             if (!token) {
                 alert('Por favor inicia sesión primero');
@@ -387,6 +389,12 @@
             }
 
             document.getElementById('userName').textContent = userName || 'Usuario';
+            
+            // Mostrar botón de admin panel solo si es administrador
+            if (userRole && userRole.toLowerCase() === 'administrador') {
+                document.getElementById('btnAdminPanel').style.display = 'inline-block';
+            }
+            
             cargarCategorias();
         }
 

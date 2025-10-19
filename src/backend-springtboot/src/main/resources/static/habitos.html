@@ -117,30 +117,102 @@
             font-size: 1rem;
         }
 
-        .table-container {
-            overflow-x: auto;
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 1.5rem;
+            padding: 1rem 0;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
+        .habit-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
         }
 
-        th {
-            background: #667eea;
+        .habit-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            border-color: #667eea;
+        }
+
+        .habit-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 1rem;
+        }
+
+        .habit-card-title {
+            flex: 1;
+        }
+
+        .habit-card-title h3 {
+            color: #667eea;
+            margin: 0 0 0.5rem 0;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .habit-card-id {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 1rem;
-            text-align: left;
-            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
         }
 
-        td {
-            padding: 1rem;
-            border-bottom: 1px solid #e1e5e9;
+        .habit-card-body {
+            margin-bottom: 1rem;
         }
 
-        tr:hover {
-            background-color: #f8f9fa;
+        .habit-info-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            color: #555;
+            font-size: 0.95rem;
+        }
+
+        .habit-info-row i {
+            margin-right: 0.75rem;
+            width: 24px;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+
+        .habit-info-row strong {
+            margin-right: 0.3rem;
+        }
+
+        .habit-description {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            color: #666;
+            font-style: italic;
+            line-height: 1.5;
+        }
+
+        .habit-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .habit-status {
+            display: flex;
+            gap: 0.5rem;
         }
 
         .badge {
@@ -308,6 +380,57 @@
             color: #667eea;
             display: none;
         }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .cards-container {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .user-info {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .nav-buttons {
+                width: 100%;
+                flex-direction: column;
+            }
+
+            .habit-card-header {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .habit-card-footer {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+
+            .actions {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 1rem;
+            }
+
+            .habit-card {
+                padding: 1rem;
+            }
+
+            .habit-card-title h3 {
+                font-size: 1.1rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -318,6 +441,7 @@
         <div class="user-info">
             <div class="nav-buttons">
                 <a href="categorias.html" class="btn btn-info">📁 Categorías</a>
+                <a href="usuarios.html" class="btn btn-warning" id="btnAdminPanel" style="display: none;">👥 Usuarios (Admin)</a>
             </div>
             <span id="userName">Cargando...</span>
             <button class="btn btn-secondary" onclick="logout()">Cerrar Sesión</button>
@@ -336,29 +460,14 @@
 
         <div id="loading" class="loading">Cargando hábitos...</div>
 
-        <div class="table-container">
-            <table id="habitosTable">
-                <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Categoría</th>
-                        <th>Dificultad</th>
-                        <th>Frecuencia</th>
-                        <th>Fecha Inicio</th>
-                        <th>Fecha Fin</th>
-                        <th>Visibilidad</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="habitosBody">
-                    <!-- Los hábitos se cargarán aquí -->
-                </tbody>
-            </table>
-            <div id="emptyState" class="empty-state" style="display: none;">
-                <div>📋</div>
-                <h3>No tienes hábitos aún</h3>
-                <p>Comienza creando tu primer hábito</p>
-            </div>
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <div>📋</div>
+            <h3>No tienes hábitos aún</h3>
+            <p>Comienza creando tu primer hábito</p>
+        </div>
+
+        <div id="habitosContainer" class="cards-container">
+            <!-- Las tarjetas de hábitos se cargarán aquí -->
         </div>
     </div>
 
@@ -457,10 +566,12 @@
             token = localStorage.getItem('token');
             usuarioId = localStorage.getItem('userId');
             const userName = localStorage.getItem('userName');
+            const userRole = localStorage.getItem('userRole');
 
             console.log('Token:', token);
             console.log('Usuario ID:', usuarioId);
             console.log('Usuario Name:', userName);
+            console.log('Usuario Role:', userRole);
 
             if (!token || !usuarioId) {
                 console.warn('No hay token o usuario ID, redirigiendo al login...');
@@ -470,6 +581,12 @@
             }
 
             document.getElementById('userName').textContent = userName || 'Usuario';
+            
+            // Mostrar botón de admin panel solo si es administrador
+            if (userRole && userRole.toLowerCase() === 'administrador') {
+                document.getElementById('btnAdminPanel').style.display = 'inline-block';
+            }
+            
             cargarDatosIniciales();
         }
 
@@ -541,11 +658,11 @@
 
         async function cargarHabitos() {
             const loading = document.getElementById('loading');
-            const tbody = document.getElementById('habitosBody');
+            const container = document.getElementById('habitosContainer');
             const emptyState = document.getElementById('emptyState');
 
             loading.style.display = 'block';
-            tbody.innerHTML = '';
+            container.innerHTML = '';
 
             try {
                 console.log('Cargando hábitos para usuario:', usuarioId);
@@ -564,10 +681,10 @@
                     
                     if (habitos.length === 0) {
                         emptyState.style.display = 'block';
-                        document.getElementById('habitosTable').style.display = 'none';
+                        container.style.display = 'none';
                     } else {
                         emptyState.style.display = 'none';
-                        document.getElementById('habitosTable').style.display = 'table';
+                        container.style.display = 'grid';
                         mostrarHabitos(habitos);
                     }
                 } else if (response.status === 401) {
@@ -579,7 +696,7 @@
                     mostrarAlerta('Error al cargar hábitos. Código: ' + response.status, 'error');
                     // Mostrar estado vacío en caso de error
                     emptyState.style.display = 'block';
-                    document.getElementById('habitosTable').style.display = 'none';
+                    container.style.display = 'none';
                 }
             } catch (error) {
                 loading.style.display = 'none';
@@ -587,38 +704,76 @@
                 mostrarAlerta('Error de conexión. ¿Está el servidor corriendo?', 'error');
                 // Mostrar estado vacío en caso de error
                 emptyState.style.display = 'block';
-                document.getElementById('habitosTable').style.display = 'none';
+                container.style.display = 'none';
             }
         }
 
         function mostrarHabitos(habitosArray) {
-            const tbody = document.getElementById('habitosBody');
-            tbody.innerHTML = '';
+            const container = document.getElementById('habitosContainer');
+            container.innerHTML = '';
 
             habitosArray.forEach(habito => {
                 const dificultadClass = habito.dificultad === 'Fácil' ? 'facil' : 
                                        habito.dificultad === 'Medio' ? 'medio' : 'dificil';
                 const visibilidadClass = habito.publico ? 'publico' : 'privado';
-                const visibilidadText = habito.publico ? 'Público' : 'Privado';
+                const visibilidadText = habito.publico ? '🌍 Público' : '🔒 Privado';
+                const dificultadIcon = habito.dificultad === 'Fácil' ? '😊' : 
+                                      habito.dificultad === 'Medio' ? '😐' : '😰';
 
-                const row = `
-                    <tr>
-                        <td><strong>${habito.nombre}</strong><br>
-                            <small style="color: #999;">${habito.descripcion || 'Sin descripción'}</small>
-                        </td>
-                        <td>${habito.categoria?.nombre || 'N/A'}</td>
-                        <td><span class="badge badge-${dificultadClass}">${habito.dificultad}</span></td>
-                        <td>${habito.frecuencia?.tipo || 'N/A'}</td>
-                        <td>${formatearFecha(habito.fechaInicio)}</td>
-                        <td>${habito.fechaFin ? formatearFecha(habito.fechaFin) : 'Sin límite'}</td>
-                        <td><span class="badge badge-${visibilidadClass}">${visibilidadText}</span></td>
-                        <td class="actions">
-                            <button class="btn btn-warning" onclick="editarHabito(${habito.habitoId})" title="Editar">✏️</button>
-                            <button class="btn btn-danger" onclick="confirmarEliminar(${habito.habitoId})" title="Eliminar">🗑️</button>
-                        </td>
-                    </tr>
+                const card = `
+                    <div class="habit-card">
+                        <div class="habit-card-header">
+                            <div class="habit-card-title">
+                                <h3>${habito.nombre}</h3>
+                                <span class="badge badge-${visibilidadClass}">${visibilidadText}</span>
+                            </div>
+                            <span class="habit-card-id">#${habito.habitoId}</span>
+                        </div>
+
+                        <div class="habit-card-body">
+                            ${habito.descripcion ? `<div class="habit-description">${habito.descripcion}</div>` : ''}
+                            
+                            <div class="habit-info-row">
+                                <i>📁</i>
+                                <strong>Categoría:</strong>&nbsp; ${habito.categoria?.nombre || 'Sin categoría'}
+                            </div>
+
+                            <div class="habit-info-row">
+                                <i>${dificultadIcon}</i>
+                                <strong>Dificultad:</strong>&nbsp;
+                                <span class="badge badge-${dificultadClass}">${habito.dificultad}</span>
+                            </div>
+
+                            <div class="habit-info-row">
+                                <i>🔄</i>
+                                <strong>Frecuencia:</strong>&nbsp; ${habito.frecuencia?.tipo || 'No definida'}
+                            </div>
+
+                            <div class="habit-info-row">
+                                <i>📅</i>
+                                <strong>Inicio:</strong>&nbsp; ${formatearFecha(habito.fechaInicio)}
+                            </div>
+
+                            ${habito.fechaFin ? `
+                            <div class="habit-info-row">
+                                <i>🏁</i>
+                                <strong>Fin:</strong>&nbsp; ${formatearFecha(habito.fechaFin)}
+                            </div>
+                            ` : ''}
+                        </div>
+
+                        <div class="habit-card-footer">
+                            <div class="habit-status">
+                                <span class="badge badge-${dificultadClass}">${habito.dificultad}</span>
+                            </div>
+                            <div class="actions">
+                                <button class="btn btn-warning" onclick="editarHabito(${habito.habitoId})" title="Editar">✏️</button>
+                                <button class="btn btn-danger" onclick="confirmarEliminar(${habito.habitoId})" title="Eliminar">🗑️</button>
+                            </div>
+                        </div>
+                    </div>
                 `;
-                tbody.innerHTML += row;
+                container.innerHTML += card;
             });
         }
 

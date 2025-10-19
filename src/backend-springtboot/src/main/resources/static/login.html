@@ -228,6 +228,9 @@
                     localStorage.setItem('userName', data.nombreUsuario || data.correo);
                     localStorage.setItem('userEmail', data.correo);
                     
+                    // Obtener el rol del usuario para mostrar opciones de admin
+                    obtenerRolUsuario(data.idUsuario, data.token);
+                    
                     // Redirigir a la página de hábitos después de 1 segundo
                     setTimeout(() => {
                         window.location.href = '/habitos.html';
@@ -245,6 +248,31 @@
                 alertDiv.style.display = 'block';
             }
         });
+        
+        async function obtenerRolUsuario(userId, token) {
+            try {
+                const response = await fetch(`/api/usuarios/list/${userId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const usuario = await response.json();
+                    if (usuario.rol) {
+                        localStorage.setItem('userRole', usuario.rol.nombre);
+                        localStorage.setItem('userRoleId', usuario.rol.idRol);
+                    }
+                }
+            } catch (error) {
+                console.error('Error al obtener rol del usuario:', error);
+            }
+            
+            // Redirigir a la página de hábitos después de obtener el rol
+            setTimeout(() => {
+                window.location.href = '/habitos.html';
+            }, 1000);
+        }
     </script>
 </body>
 </html>
