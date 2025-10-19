@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rutinia - Gestión de Hábitos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .header {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2rem;
+        }
+
+        .user-info {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .search-box {
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .badge-facil {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-medio {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-dificil {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge-publico {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .badge-privado {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
+        .actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h2 {
+            color: #667eea;
+        }
+
+        .close {
+            font-size: 2rem;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #667eea;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1>🏃‍♂️ Rutinia - Mis Hábitos</h1>
+        </div>
+        <div class="user-info">
+            <div class="nav-buttons">
+                <a href="categorias.html" class="btn btn-info">📁 Categorías</a>
+            </div>
+            <span id="userName">Cargando...</span>
+            <button class="btn btn-secondary" onclick="logout()">Cerrar Sesión</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="alert" class="alert"></div>
+
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Buscar hábitos..." onkeyup="filtrarHabitos()">
+            </div>
+            <button class="btn btn-primary" onclick="abrirModalNuevo()">+ Nuevo Hábito</button>
+        </div>
+
+        <div id="loading" class="loading">Cargando hábitos...</div>
+
+        <div class="table-container">
+            <table id="habitosTable">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Categoría</th>
+                        <th>Dificultad</th>
+                        <th>Frecuencia</th>
+                        <th>Fecha Inicio</th>
+                        <th>Fecha Fin</th>
+                        <th>Visibilidad</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="habitosBody">
+                    <!-- Los hábitos se cargarán aquí -->
+                </tbody>
+            </table>
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <div>📋</div>
+                <h3>No tienes hábitos aún</h3>
+                <p>Comienza creando tu primer hábito</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para crear/editar hábito -->
+    <div id="habitoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Nuevo Hábito</h2>
+                <span class="close" onclick="cerrarModal()">&times;</span>
+            </div>
+
+            <form id="habitoForm">
+                <input type="hidden" id="habitoId">
+
+                <div class="form-group">
+                    <label for="nombre">Nombre del Hábito *</label>
+                    <input type="text" id="nombre" required maxlength="50">
+                </div>
+
+                <div class="form-group">
+                    <label for="descripcion">Descripción</label>
+                    <textarea id="descripcion" maxlength="100"></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="categoria">Categoría *</label>
+                        <select id="categoria" required>
+                            <option value="">Selecciona una categoría</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="frecuencia">Frecuencia *</label>
+                        <select id="frecuencia" required>
+                            <option value="">Selecciona una frecuencia</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="dificultad">Dificultad *</label>
+                        <select id="dificultad" required>
+                            <option value="">Selecciona dificultad</option>
+                            <option value="Fácil">Fácil</option>
+                            <option value="Medio">Medio</option>
+                            <option value="Difícil">Difícil</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="recompensa">Recompensa</label>
+                        <input type="text" id="recompensa" maxlength="100">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fechaInicio">Fecha de Inicio *</label>
+                        <input type="date" id="fechaInicio" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fechaFin">Fecha de Fin</label>
+                        <input type="date" id="fechaFin">
+                    </div>
+                </div>
+
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="publico">
+                    <label for="publico">Hacer este hábito público (otros usuarios podrán verlo)</label>
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-success" style="flex: 1;">Guardar</button>
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let habitos = [];
+        let categorias = [];
+        let frecuencias = [];
+        let usuarioId = null;
+        let token = null;
+
+        // Verificar autenticación al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            verificarAutenticacion();
+        });
+
+        function verificarAutenticacion() {
+            token = localStorage.getItem('token');
+            usuarioId = localStorage.getItem('userId');
+            const userName = localStorage.getItem('userName');
+
+            console.log('Token:', token);
+            console.log('Usuario ID:', usuarioId);
+            console.log('Usuario Name:', userName);
+
+            if (!token || !usuarioId) {
+                console.warn('No hay token o usuario ID, redirigiendo al login...');
+                alert('Por favor inicia sesión primero');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            document.getElementById('userName').textContent = userName || 'Usuario';
+            cargarDatosIniciales();
+        }
+
+        async function cargarDatosIniciales() {
+            await Promise.all([
+                cargarCategorias(),
+                cargarFrecuencias(),
+                cargarHabitos()
+            ]);
+        }
+
+        async function cargarCategorias() {
+            try {
+                console.log('Cargando categorías...');
+                const response = await fetch('/api/categorias/list', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                console.log('Respuesta categorías:', response.status);
+
+                if (response.ok) {
+                    categorias = await response.json();
+                    console.log('Categorías cargadas:', categorias);
+                    const select = document.getElementById('categoria');
+                    select.innerHTML = '<option value="">Selecciona una categoría</option>';
+                    categorias.forEach(cat => {
+                        select.innerHTML += `<option value="${cat.idCategoria}">${cat.nombre}</option>`;
+                    });
+                } else {
+                    console.error('Error HTTP al cargar categorías:', response.status);
+                    mostrarAlerta('Error al cargar categorías. Código: ' + response.status, 'error');
+                }
+            } catch (error) {
+                console.error('Error al cargar categorías:', error);
+                mostrarAlerta('Error de conexión al cargar categorías', 'error');
+            }
+        }
+
+        async function cargarFrecuencias() {
+            try {
+                console.log('Cargando frecuencias...');
+                const response = await fetch('/api/frecuencias/list', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                console.log('Respuesta frecuencias:', response.status);
+
+                if (response.ok) {
+                    frecuencias = await response.json();
+                    console.log('Frecuencias cargadas:', frecuencias);
+                    const select = document.getElementById('frecuencia');
+                    select.innerHTML = '<option value="">Selecciona una frecuencia</option>';
+                    frecuencias.forEach(frec => {
+                        select.innerHTML += `<option value="${frec.idFrecuencia}">${frec.tipo}</option>`;
+                    });
+                } else {
+                    console.error('Error HTTP al cargar frecuencias:', response.status);
+                    mostrarAlerta('Error al cargar frecuencias. Código: ' + response.status, 'error');
+                }
+            } catch (error) {
+                console.error('Error al cargar frecuencias:', error);
+                mostrarAlerta('Error de conexión al cargar frecuencias', 'error');
+            }
+        }
+
+        async function cargarHabitos() {
+            const loading = document.getElementById('loading');
+            const tbody = document.getElementById('habitosBody');
+            const emptyState = document.getElementById('emptyState');
+
+            loading.style.display = 'block';
+            tbody.innerHTML = '';
+
+            try {
+                console.log('Cargando hábitos para usuario:', usuarioId);
+                const response = await fetch(`/api/habitos/usuarios/${usuarioId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                console.log('Respuesta hábitos:', response.status);
+                loading.style.display = 'none';
+
+                if (response.ok) {
+                    habitos = await response.json();
+                    console.log('Hábitos cargados:', habitos);
+                    
+                    if (habitos.length === 0) {
+                        emptyState.style.display = 'block';
+                        document.getElementById('habitosTable').style.display = 'none';
+                    } else {
+                        emptyState.style.display = 'none';
+                        document.getElementById('habitosTable').style.display = 'table';
+                        mostrarHabitos(habitos);
+                    }
+                } else if (response.status === 401) {
+                    console.error('Sesión expirada o token inválido');
+                    mostrarAlerta('Sesión expirada. Por favor inicia sesión nuevamente.', 'error');
+                    setTimeout(() => logout(), 2000);
+                } else {
+                    console.error('Error HTTP al cargar hábitos:', response.status);
+                    mostrarAlerta('Error al cargar hábitos. Código: ' + response.status, 'error');
+                    // Mostrar estado vacío en caso de error
+                    emptyState.style.display = 'block';
+                    document.getElementById('habitosTable').style.display = 'none';
+                }
+            } catch (error) {
+                loading.style.display = 'none';
+                console.error('Error de conexión al cargar hábitos:', error);
+                mostrarAlerta('Error de conexión. ¿Está el servidor corriendo?', 'error');
+                // Mostrar estado vacío en caso de error
+                emptyState.style.display = 'block';
+                document.getElementById('habitosTable').style.display = 'none';
+            }
+        }
+
+        function mostrarHabitos(habitosArray) {
+            const tbody = document.getElementById('habitosBody');
+            tbody.innerHTML = '';
+
+            habitosArray.forEach(habito => {
+                const dificultadClass = habito.dificultad === 'Fácil' ? 'facil' : 
+                                       habito.dificultad === 'Medio' ? 'medio' : 'dificil';
+                const visibilidadClass = habito.publico ? 'publico' : 'privado';
+                const visibilidadText = habito.publico ? 'Público' : 'Privado';
+
+                const row = `
+                    <tr>
+                        <td><strong>${habito.nombre}</strong><br>
+                            <small style="color: #999;">${habito.descripcion || 'Sin descripción'}</small>
+                        </td>
+                        <td>${habito.categoria?.nombre || 'N/A'}</td>
+                        <td><span class="badge badge-${dificultadClass}">${habito.dificultad}</span></td>
+                        <td>${habito.frecuencia?.tipo || 'N/A'}</td>
+                        <td>${formatearFecha(habito.fechaInicio)}</td>
+                        <td>${habito.fechaFin ? formatearFecha(habito.fechaFin) : 'Sin límite'}</td>
+                        <td><span class="badge badge-${visibilidadClass}">${visibilidadText}</span></td>
+                        <td class="actions">
+                            <button class="btn btn-warning" onclick="editarHabito(${habito.habitoId})" title="Editar">✏️</button>
+                            <button class="btn btn-danger" onclick="confirmarEliminar(${habito.habitoId})" title="Eliminar">🗑️</button>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        function formatearFecha(fecha) {
+            if (!fecha) return '';
+            const date = new Date(fecha);
+            return date.toLocaleDateString('es-ES');
+        }
+
+        function filtrarHabitos() {
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+            const habitosFiltrados = habitos.filter(h => 
+                h.nombre.toLowerCase().includes(searchText) ||
+                (h.descripcion && h.descripcion.toLowerCase().includes(searchText)) ||
+                (h.categoria?.nombre && h.categoria.nombre.toLowerCase().includes(searchText))
+            );
+            mostrarHabitos(habitosFiltrados);
+        }
+
+        function abrirModalNuevo() {
+            document.getElementById('modalTitle').textContent = 'Nuevo Hábito';
+            document.getElementById('habitoForm').reset();
+            document.getElementById('habitoId').value = '';
+            document.getElementById('fechaInicio').valueAsDate = new Date();
+            document.getElementById('habitoModal').classList.add('active');
+        }
+
+        function editarHabito(id) {
+            const habito = habitos.find(h => h.habitoId === id);
+            if (!habito) return;
+
+            document.getElementById('modalTitle').textContent = 'Editar Hábito';
+            document.getElementById('habitoId').value = habito.habitoId;
+            document.getElementById('nombre').value = habito.nombre;
+            document.getElementById('descripcion').value = habito.descripcion || '';
+            document.getElementById('categoria').value = habito.categoria?.idCategoria || '';
+            document.getElementById('frecuencia').value = habito.frecuencia?.idFrecuencia || '';
+            document.getElementById('dificultad').value = habito.dificultad;
+            document.getElementById('recompensa').value = habito.recompensa || '';
+            document.getElementById('fechaInicio').value = habito.fechaInicio;
+            document.getElementById('fechaFin').value = habito.fechaFin || '';
+            document.getElementById('publico').checked = habito.publico || false;
+
+            document.getElementById('habitoModal').classList.add('active');
+        }
+
+        function cerrarModal() {
+            document.getElementById('habitoModal').classList.remove('active');
+        }
+
+        document.getElementById('habitoForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const habitoId = document.getElementById('habitoId').value;
+            const categoriaId = document.getElementById('categoria').value;
+            const frecuenciaId = document.getElementById('frecuencia').value;
+
+            const habitoData = {
+                nombre: document.getElementById('nombre').value,
+                descripcion: document.getElementById('descripcion').value,
+                dificultad: document.getElementById('dificultad').value,
+                fechaInicio: document.getElementById('fechaInicio').value,
+                fechaFin: document.getElementById('fechaFin').value || null,
+                recompensa: document.getElementById('recompensa').value,
+                publico: document.getElementById('publico').checked,
+                usuario: { idUsuario: parseInt(usuarioId) },
+                categoria: { idCategoria: parseInt(categoriaId) },
+                frecuencia: { idFrecuencia: parseInt(frecuenciaId) }
+            };
+
+            try {
+                let response;
+                if (habitoId) {
+                    // Actualizar
+                    response = await fetch(`/api/habitos/${habitoId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(habitoData)
+                    });
+                } else {
+                    // Crear nuevo
+                    response = await fetch('/api/habitos/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(habitoData)
+                    });
+                }
+
+                if (response.ok) {
+                    mostrarAlerta(habitoId ? 'Hábito actualizado exitosamente' : 'Hábito creado exitosamente', 'success');
+                    cerrarModal();
+                    await cargarHabitos();
+                } else {
+                    const error = await response.json();
+                    mostrarAlerta(error.message || 'Error al guardar el hábito', 'error');
+                }
+            } catch (error) {
+                mostrarAlerta('Error de conexión', 'error');
+                console.error('Error:', error);
+            }
+        });
+
+        function confirmarEliminar(id) {
+            if (confirm('¿Estás seguro de que deseas eliminar este hábito?')) {
+                eliminarHabito(id);
+            }
+        }
+
+        async function eliminarHabito(id) {
+            try {
+                const response = await fetch(`/api/habitos/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    mostrarAlerta('Hábito eliminado exitosamente', 'success');
+                    await cargarHabitos();
+                } else {
+                    mostrarAlerta('Error al eliminar el hábito', 'error');
+                }
+            } catch (error) {
+                mostrarAlerta('Error de conexión', 'error');
+                console.error('Error:', error);
+            }
+        }
+
+        function mostrarAlerta(mensaje, tipo) {
+            const alert = document.getElementById('alert');
+            alert.className = `alert alert-${tipo}`;
+            alert.textContent = mensaje;
+            alert.style.display = 'block';
+
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 3000);
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('userId');
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userEmail');
+            window.location.href = 'login.html';
+        }
+
+        // Cerrar modal al hacer clic fuera
+        window.onclick = function(event) {
+            const modal = document.getElementById('habitoModal');
+            if (event.target === modal) {
+                cerrarModal();
+            }
+        }
+    </script>
+</body>
+</html>

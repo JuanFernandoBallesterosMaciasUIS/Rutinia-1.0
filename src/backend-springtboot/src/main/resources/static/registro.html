@@ -301,12 +301,13 @@
                     if (data.token) {
                         localStorage.setItem('token', data.token);
                         localStorage.setItem('userId', data.idUsuario);
-                        localStorage.setItem('userName', data.nombreUsuario);
+                        // nombreUsuario viene del backend con el nombre completo
+                        localStorage.setItem('userName', data.nombreUsuario || data.correo);
                         localStorage.setItem('userEmail', data.correo);
                         
-                        // Redirigir a Swagger UI (o a donde quieras) después de 2 segundos
+                        // Redirigir a la página de hábitos después de 2 segundos
                         setTimeout(() => {
-                            window.location.href = '/swagger-ui/index.html';
+                            window.location.href = '/habitos.html';
                         }, 2000);
                     } else {
                         // Si por alguna razón no hay token, redirigir al login

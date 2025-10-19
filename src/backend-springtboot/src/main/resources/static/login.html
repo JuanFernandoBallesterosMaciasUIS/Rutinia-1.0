@@ -224,12 +224,13 @@
                     // Guardar token JWT y datos del usuario en localStorage
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('userId', data.idUsuario);
-                    localStorage.setItem('userName', data.nombreUsuario);
+                    // nombreUsuario viene del backend con el nombre completo
+                    localStorage.setItem('userName', data.nombreUsuario || data.correo);
                     localStorage.setItem('userEmail', data.correo);
                     
-                    // Redirigir a Swagger UI después de 1 segundo
+                    // Redirigir a la página de hábitos después de 1 segundo
                     setTimeout(() => {
-                        window.location.href = '/swagger-ui/index.html';
+                        window.location.href = '/habitos.html';
                     }, 1000);
                 } else {
                     // Login fallido
