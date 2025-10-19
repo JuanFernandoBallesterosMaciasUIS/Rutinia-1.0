@@ -79,7 +79,7 @@ python -m venv venv
 source venv/bin/activate
 
 # Instalar dependencias
-pip install -r requeriments.txt
+pip install -r requirements.txt
 ```
 
 #### 3. Crear Datos de Prueba (Opcional)
@@ -337,7 +337,7 @@ Rutinia-1.0/
 - [Juan Fernando Ballesteros Macias](https://github.com/JuanFernandoBallesterosMaciasUIS) – Scrum Master y Equipo de Desarrollo
 - Camilo Ivan Palacio Perez – Equipo de Desarrollo
 - [Julian Javier Lizcano Villarreal](https://github.com/jjlizcano) – Scrum Master y Equipo de Desarrollo
-- Carlos Eduardo Ayala Moreno – Product Owner y Equipo de Desarrollo
+- [Carlos Eduardo Ayala Moreno](https://github.com/Cayalam) – Product Owner y Equipo de Desarrollo
 - Harold Esteban Duran Osma – Equipo de Desarrollo
 
 ## Contacto y Soporte
