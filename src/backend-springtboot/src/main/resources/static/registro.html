@@ -280,7 +280,7 @@
             };
             
             try {
-                const response = await fetch('/registro', {
+                const response = await fetch('/api/auth/registro', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -293,17 +293,31 @@
                 if (response.ok) {
                     const data = await response.json();
                     alertDiv.className = 'alert alert-success';
-                    alertDiv.textContent = 'Cuenta creada exitosamente! Redirigiendo al login...';
+                    alertDiv.textContent = 'Cuenta creada exitosamente! Iniciando sesión...';
                     alertDiv.style.display = 'block';
                     
-                    // Redirigir al login después de 2 segundos
-                    setTimeout(() => {
-                        window.location.href = 'login.html';
-                    }, 2000);
+                    // El endpoint /api/auth/registro ya devuelve un token JWT automáticamente
+                    // Guardar token y datos del usuario
+                    if (data.token) {
+                        localStorage.setItem('token', data.token);
+                        localStorage.setItem('userId', data.idUsuario);
+                        localStorage.setItem('userName', data.nombreUsuario);
+                        localStorage.setItem('userEmail', data.correo);
+                        
+                        // Redirigir a Swagger UI (o a donde quieras) después de 2 segundos
+                        setTimeout(() => {
+                            window.location.href = '/swagger-ui/index.html';
+                        }, 2000);
+                    } else {
+                        // Si por alguna razón no hay token, redirigir al login
+                        setTimeout(() => {
+                            window.location.href = 'login.html';
+                        }, 2000);
+                    }
                 } else {
                     const errorData = await response.json();
                     alertDiv.className = 'alert alert-error';
-                    alertDiv.textContent = errorData.message || 'Error al crear la cuenta';
+                    alertDiv.textContent = errorData.mensaje || 'Error al crear la cuenta';
                     alertDiv.style.display = 'block';
                 }
             } catch (error) {
