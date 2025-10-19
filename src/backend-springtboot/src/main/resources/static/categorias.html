@@ -445,6 +445,7 @@
                         <td><strong>${categoria.nombre}</strong></td>
                         <td class="actions">
                             <button class="btn btn-warning" onclick="editarCategoria(${categoria.idCategoria})" title="Editar">✏️ Editar</button>
+                            <button class="btn btn-danger" onclick="confirmarEliminar(${categoria.idCategoria}, '${categoria.nombre}')" title="Eliminar">🗑️ Eliminar</button>
                         </td>
                     </tr>
                 `;
@@ -543,6 +544,39 @@
             setTimeout(() => {
                 alert.style.display = 'none';
             }, 3000);
+        }
+
+        function confirmarEliminar(id, nombre) {
+            if (confirm(`¿Estás seguro de que deseas eliminar la categoría "${nombre}"?\n\nNOTA: No podrás eliminar categorías que estén asociadas a hábitos existentes.`)) {
+                eliminarCategoria(id);
+            }
+        }
+
+        async function eliminarCategoria(id) {
+            try {
+                const response = await fetch(`/api/categorias/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    mostrarAlerta('Categoría eliminada exitosamente', 'success');
+                    await cargarCategorias();
+                } else if (response.status === 409) {
+                    // Conflict - categoría en uso
+                    const mensaje = await response.text();
+                    mostrarAlerta(mensaje || 'No se puede eliminar. La categoría está en uso.', 'error');
+                } else if (response.status === 404) {
+                    mostrarAlerta('Categoría no encontrada', 'error');
+                } else {
+                    mostrarAlerta('Error al eliminar la categoría', 'error');
+                }
+            } catch (error) {
+                mostrarAlerta('Error de conexión', 'error');
+                console.error('Error:', error);
+            }
         }
 
         function logout() {
