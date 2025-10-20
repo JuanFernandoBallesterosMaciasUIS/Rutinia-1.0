@@ -322,6 +322,7 @@ Rutinia-1.0/
 ![pagina_Categorias](docs/screenshots/Springboot/Categorias.png)
 ![pagina_Habitos](docs/screenshots/Springboot/Habitos.png)
 ![pagina_Usuarios](docs/screenshots/Springboot/Usuarios.png)
+![Modelo entidad relación](docs/arquitectura/Modelo-Entidad-Relacion/MER_Extendido.jpg)
 
 ---
 
@@ -396,11 +397,8 @@ Rutinia-1.0/
 ## Estado del Proyecto
 
 **Versión:** 1.0 (Django + React + MongoDB)  
-**Última Actualización:** Enero 2025  
+**Última Actualización:** Octubre 2025  
 **Estado:** En Desarrollo Activo  
 **Contexto:** Proyecto académico - UIS (Universidad Industrial de Santander)
 
 ---
-
-## Diseño de base de datos relacional (Legacy)
-![Modelo entidad relación](docs/arquitectura/Modelo-Entidad-Relacion/MER_Extendido.jpg)
