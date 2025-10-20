@@ -32,12 +32,39 @@
         .logo {
             text-align: center;
             margin-bottom: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
         }
 
-        .logo h1 {
-            color: #667eea;
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo-icon {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .logo-text {
             font-size: 2.5rem;
-            margin-bottom: 0.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .logo p {
@@ -157,7 +184,10 @@
 <body>
     <div class="container">
         <div class="logo">
-            <h1>🏃‍♂️ Rutinia</h1>
+            <div class="logo-container">
+                <div class="logo-icon">R</div>
+                <span class="logo-text">utinia</span>
+            </div>
             <p>Tu compañero de hábitos diarios</p>
         </div>
 
