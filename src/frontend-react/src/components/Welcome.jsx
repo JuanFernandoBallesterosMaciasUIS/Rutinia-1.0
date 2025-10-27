@@ -131,44 +131,6 @@ function Welcome() {
           </div>
         </section>
 
-        {/* Sección de características */}
-        <section id="features" className="mt-12 md:mt-16">
-          <div className="grid gap-4 sm:gap-6 md:grid-cols-3">
-            {/* Feature 1 */}
-            <div className="group p-5 rounded-xl bg-white/70 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all">
-              <div className="w-11 h-11 rounded-lg bg-gradient-to-r from-green-400 to-emerald-500 text-white flex items-center justify-center shadow-md">
-                <span className="material-icons">calendar_today</span>
-              </div>
-              <h3 className="mt-4 text-lg font-semibold text-gray-900 dark:text-white">Seguimiento diario</h3>
-              <p className="mt-1.5 text-sm text-gray-600 dark:text-gray-300">
-                Registra tus hábitos día a día y mantén el foco con recordatorios y rachas.
-              </p>
-            </div>
-
-            {/* Feature 2 */}
-            <div className="group p-5 rounded-xl bg-white/70 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all">
-              <div className="w-11 h-11 rounded-lg bg-gradient-to-r from-indigo-400 to-cyan-500 text-white flex items-center justify-center shadow-md">
-                <span className="material-icons">insights</span>
-              </div>
-              <h3 className="mt-4 text-lg font-semibold text-gray-900 dark:text-white">Estadísticas claras</h3>
-              <p className="mt-1.5 text-sm text-gray-600 dark:text-gray-300">
-                Visualiza tu progreso con métricas y gráficos simples de entender.
-              </p>
-            </div>
-
-            {/* Feature 3 */}
-            <div className="group p-5 rounded-xl bg-white/70 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all">
-              <div className="w-11 h-11 rounded-lg bg-gradient-to-r from-purple-400 to-pink-500 text-white flex items-center justify-center shadow-md">
-                <span className="material-icons">star</span>
-              </div>
-              <h3 className="mt-4 text-lg font-semibold text-gray-900 dark:text-white">Rachas y logros</h3>
-              <p className="mt-1.5 text-sm text-gray-600 dark:text-gray-300">
-                Mantén tu motivación con rachas, objetivos y pequeños logros diarios.
-              </p>
-            </div>
-          </div>
-        </section>
-
         {/* Footer */}
         <footer className="mt-12 md:mt-16 text-center">
           <p className="text-sm text-gray-500 dark:text-gray-400">© 2024 Rutinia — Versión Beta</p>
